@@ -27,19 +27,37 @@ const DEFAULTS: Settings = {
 export default function Display() {
   const [url, setUrl] = useState<string>(localStorage.getItem('media_url') || '')
   const [settings, setSettings] = useState<Settings>(() => {
-    const saved = localStorage.getItem('nzxtMediaConfig')
-    if (saved) {
-      try { return { ...DEFAULTS, ...JSON.parse(saved) } } catch { return DEFAULTS }
-    }
+    try {
+      const saved = localStorage.getItem('nzxtMediaConfig')
+      if (saved) return { ...DEFAULTS, ...JSON.parse(saved) }
+    } catch {}
     return DEFAULTS
   })
 
-  // storage event’lerini dinle (URL veya ayarlar değişince)
+  // 🔹 NZXT CAM tarafından sağlanan gerçek cihaz çözünürlüğü
+  const [deviceSize, setDeviceSize] = useState<{ w: number; h: number }>({
+    w:
+      (window as any)?.nzxt?.v1?.width ||
+      (window as any)?.nzxt?.v1?.height ||
+      640,
+    h:
+      (window as any)?.nzxt?.v1?.height ||
+      (window as any)?.nzxt?.v1?.width ||
+      640,
+  })
+
+  // CAM device info değişirse güncelle (bazı sürümlerde dynamic oluyor)
+  useEffect(() => {
+    const api = (window as any)?.nzxt?.v1
+    if (api && (api.width || api.height)) {
+      setDeviceSize({ w: api.width ?? 640, h: api.height ?? 640 })
+    }
+  }, [])
+
+  // URL / ayar değişikliklerini dinle
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === 'media_url' && e.newValue !== null) {
-        setUrl(e.newValue)
-      }
+      if (e.key === 'media_url' && e.newValue) setUrl(e.newValue)
       if (e.key === 'nzxtMediaConfig' && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue)
@@ -49,25 +67,10 @@ export default function Display() {
       }
     }
     window.addEventListener('storage', onStorage)
-
-    // İlk yüklemede senkron:
-    const initCfg = localStorage.getItem('nzxtMediaConfig')
-    if (initCfg) {
-      try {
-        const parsed = JSON.parse(initCfg)
-        setSettings((prev) => ({ ...prev, ...parsed }))
-        if (parsed.url && parsed.url !== url) setUrl(parsed.url)
-      } catch {}
-    } else {
-      const legacy = localStorage.getItem('media_url')
-      if (legacy && legacy !== url) setUrl(legacy)
-    }
-
     return () => window.removeEventListener('storage', onStorage)
   }, [url])
 
-  const isVideo = /\.mp4($|\?)/i.test(url) || url.toLowerCase().includes('mp4')
-
+  const isVideo = /\.mp4($|\?)/i.test(url)
   const objectPosition =
     settings.align === 'center' ? '50% 50%' :
     settings.align === 'top'    ? '50% 0%'  :
@@ -75,8 +78,8 @@ export default function Display() {
     settings.align === 'left'   ? '0% 50%' :
                                   '100% 50%'
 
-  // Ekranı dairesel maske ile sun (Kraken LCD’ye benzer)
-  // Not: gerçek LCD boyutu CAM tarafından verilir; burada simülasyon yapıyoruz.
+  const diameter = Math.min(deviceSize.w, deviceSize.h)
+
   return (
     <div
       style={{
@@ -89,12 +92,12 @@ export default function Display() {
     >
       <div
         style={{
-          width: 320,           // simülasyon çapı (px) – CAM tarafında gerçek LCD çözünürlüğüne göre gelebilir
-          height: 320,
-          borderRadius: '50%',
+          width: diameter,
+          height: diameter,
+          borderRadius: (window as any)?.nzxt?.v1?.shape === 'circle' ? '50%' : '0%',
           overflow: 'hidden',
-          border: '2px solid #222',
-          backgroundColor: '#000',
+          border: '2px solid #111',
+          background: '#000',
           position: 'relative',
         }}
       >
