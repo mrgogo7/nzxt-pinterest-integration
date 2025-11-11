@@ -5,8 +5,10 @@ import { resolve } from 'node:path'
 const repoName = 'nzxt-pinterest-integration'
 
 export default defineConfig({
-  base: `/${repoName}/`, 
+  base: `/${repoName}/`,
+
   plugins: [react()],
+
   build: {
     rollupOptions: {
       input: {
