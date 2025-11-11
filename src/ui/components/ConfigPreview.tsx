@@ -3,8 +3,8 @@ import "../styles/ConfigPreview.css";
 
 type Settings = {
   scale: number;
-  x: number; // px
-  y: number; // px
+  x: number;
+  y: number;
   fit: "cover" | "contain" | "fill";
   align: "center" | "top" | "bottom" | "left" | "right";
   loop: boolean;
@@ -29,22 +29,23 @@ export default function ConfigPreview() {
   const [mediaUrl, setMediaUrl] = useState<string>("");
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
 
-  // Başlangıçta aktif URL ve ayarları yükle
+  // 🔹 LCD ile önizleme boyut farkını dengelemek için ölçek oranı
+  const lcdResolution = (window as any)?.nzxt?.v1?.width || 640;
+  const previewSize = 200;
+  const offsetScale = previewSize / lcdResolution; // ≈0.3125
+
   useEffect(() => {
-    // URL önceliği: media_url -> nzxtMediaConfig.url
     const cfgRaw = localStorage.getItem("nzxtMediaConfig");
     const cfg = cfgRaw ? safeParse(cfgRaw) : {};
-    const activeUrl = localStorage.getItem("media_url") || (cfg as any).url || "";
+    const activeUrl =
+      localStorage.getItem("media_url") || (cfg as any).url || "";
     setMediaUrl(activeUrl);
     setSettings({ ...DEFAULTS, ...(cfg || {}) });
   }, []);
 
-  // Config.tsx’te Kaydet’e basılınca storage event ile URL güncellenir
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === "media_url" && e.newValue !== null) {
-        setMediaUrl(e.newValue);
-      }
+      if (e.key === "media_url" && e.newValue !== null) setMediaUrl(e.newValue);
       if (e.key === "nzxtMediaConfig" && e.newValue) {
         const parsed = safeParse(e.newValue);
         if (parsed) setSettings((prev) => ({ ...prev, ...parsed }));
@@ -54,46 +55,61 @@ export default function ConfigPreview() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  // Ayar değişince sadece nzxtMediaConfig güncellenir (URL’e dokunma)
   useEffect(() => {
     const current = safeParse(localStorage.getItem("nzxtMediaConfig") || "{}") || {};
     const next = { ...current, ...settings, url: current.url ?? mediaUrl };
     localStorage.setItem("nzxtMediaConfig", JSON.stringify(next));
-    window.dispatchEvent(new StorageEvent("storage", { key: "nzxtMediaConfig", newValue: JSON.stringify(next) }));
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key: "nzxtMediaConfig",
+        newValue: JSON.stringify(next),
+      })
+    );
   }, [settings]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleChange = <K extends keyof Settings>(key: K, value: Settings[K]) => {
+  const handleChange = <K extends keyof Settings>(
+    key: K,
+    value: Settings[K]
+  ) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
-  const isVideo = /\.mp4($|\?)/i.test(mediaUrl) || mediaUrl.toLowerCase().includes("mp4");
+  const isVideo =
+    /\.mp4($|\?)/i.test(mediaUrl) || mediaUrl.toLowerCase().includes("mp4");
 
-  // align -> base yüzdeleri
+  // Align için baz koordinatlar (%)
   const base = (() => {
     switch (settings.align) {
-      case "top": return { x: 50, y: 0 };
-      case "bottom": return { x: 50, y: 100 };
-      case "left": return { x: 0, y: 50 };
-      case "right": return { x: 100, y: 50 };
-      default: return { x: 50, y: 50 }; // center
+      case "top":
+        return { x: 50, y: 0 };
+      case "bottom":
+        return { x: 50, y: 100 };
+      case "left":
+        return { x: 0, y: 50 };
+      case "right":
+        return { x: 100, y: 50 };
+      default:
+        return { x: 50, y: 50 };
     }
   })();
 
-  // px offset’leri object-position ile uygula (calc(% + px))
-  const objectPosition = `calc(${base.x}% + ${settings.x}px) calc(${base.y}% + ${settings.y}px)`;
+  // 🔹 LCD’deki etkiyi simüle etmek için offset’leri orantılı küçült
+  const adjX = settings.x * offsetScale;
+  const adjY = settings.y * offsetScale;
+
+  const objectPosition = `calc(${base.x}% + ${adjX}px) calc(${base.y}% + ${adjY}px)`;
 
   return (
     <div className="config-container">
       <h2>Media Configuration</h2>
       <p className="hint">
-        Aşağıdaki dairesel önizleme, kaydedilmiş URL ve bu ayarlarla LCD’deki görüntüyü birebir simüle eder.
+        Aşağıdaki dairesel önizleme, kaydedilmiş URL ve bu ayarlarla LCD’deki
+        görüntüyü birebir simüle eder.
       </p>
 
       <div className="preview-section">
         <h3>Thumbnail Preview (Kraken-style)</h3>
-
         <div className="preview-circle">
-          {/* İçte transform sadece scale; offset’ler object-position ile verildi */}
           {isVideo ? (
             <video
               src={mediaUrl}
@@ -141,27 +157,35 @@ export default function ConfigPreview() {
           min={0.1}
           step={0.1}
           value={settings.scale}
-          onChange={(e) => handleChange("scale", parseFloat(e.target.value || "1"))}
+          onChange={(e) =>
+            handleChange("scale", parseFloat(e.target.value || "1"))
+          }
         />
 
         <label>X Offset (px)</label>
         <input
           type="number"
           value={settings.x}
-          onChange={(e) => handleChange("x", parseInt(e.target.value || "0", 10))}
+          onChange={(e) =>
+            handleChange("x", parseInt(e.target.value || "0", 10))
+          }
         />
 
         <label>Y Offset (px)</label>
         <input
           type="number"
           value={settings.y}
-          onChange={(e) => handleChange("y", parseInt(e.target.value || "0", 10))}
+          onChange={(e) =>
+            handleChange("y", parseInt(e.target.value || "0", 10))
+          }
         />
 
         <label>Align</label>
         <select
           value={settings.align}
-          onChange={(e) => handleChange("align", e.target.value as Settings["align"])}
+          onChange={(e) =>
+            handleChange("align", e.target.value as Settings["align"])
+          }
         >
           <option>center</option>
           <option>top</option>
@@ -173,7 +197,9 @@ export default function ConfigPreview() {
         <label>Fit</label>
         <select
           value={settings.fit}
-          onChange={(e) => handleChange("fit", e.target.value as Settings["fit"])}
+          onChange={(e) =>
+            handleChange("fit", e.target.value as Settings["fit"])
+          }
         >
           <option>cover</option>
           <option>contain</option>
@@ -185,5 +211,9 @@ export default function ConfigPreview() {
 }
 
 function safeParse(s: string) {
-  try { return JSON.parse(s) } catch { return null }
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
 }
