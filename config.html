@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pinterest Config</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    input {
+      width: 80%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+    button {
+      background-color: #e6007a;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ff0080;
+    }
+    small {
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <h2>NZXT Pinterest Integration</h2>
+  <p>Görsel veya video URL'sini girin (örn. mp4 veya jpg):</p>
+  <input id="urlInput" type="text" placeholder="https://..." />
+  <button id="saveBtn">Kaydet</button>
+  <small>Bu link NZXT CAM ekranında gösterilecektir.</small>
+
+  <script>
+    const input = document.getElementById('urlInput');
+    const btn = document.getElementById('saveBtn');
+
+    // Önceden kaydedilmiş linki göster
+    input.value = localStorage.getItem('pinterest_url') || '';
+
+    btn.addEventListener('click', () => {
+      const url = input.value.trim();
+      if (url) {
+        localStorage.setItem('pinterest_url', url);
+        alert('URL kaydedildi!');
+      } else {
+        alert('Lütfen geçerli bir URL girin.');
+      }
+    });
+  </script>
+</body>
+</html>
