@@ -1,105 +1,39 @@
-import React, { useState, useEffect } from 'react'
-import { getMediaUrl, setMediaUrl } from '../storage'
+import { useState, useEffect } from 'react'
 
 export default function Config() {
-  const [url, setUrl] = useState('')
+  const [url, setUrl] = useState(localStorage.getItem('media_url') || '')
 
   useEffect(() => {
-    setUrl(getMediaUrl())
-  }, [])
-
-  function save() {
-    const u = url.trim()
-    if (!u) {
-      alert('Lütfen geçerli bir URL girin.')
-      return
-    }
-
-    // 1️⃣ Hem cookie/localStorage olarak kaydet
-    setMediaUrl(u)
-
-    // 2️⃣ CAM "onConfigurationUpdate" callback'ine config gönder
-    try {
-      const config = { mediaUrl: u }
-      if (typeof (window as any).onConfigurationUpdate === 'function') {
-        ;(window as any).onConfigurationUpdate(config)
-      }
-      console.log('[NZXT] Config saved:', config)
-    } catch (err) {
-      console.warn('[NZXT] CAM config broadcast failed:', err)
-    }
-
-    alert('URL kaydedildi! LCD ekran birkaç saniye içinde güncellenecek.')
-  }
+    // Giriş yapıldığında anında kaydet
+    localStorage.setItem('media_url', url)
+  }, [url])
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'grid',
-        placeItems: 'center',
-        background: '#121212',
-        color: '#fff',
-        fontFamily: 'system-ui, sans-serif',
-      }}
-    >
-      <div
+    <div style={{
+      padding: '1rem',
+      fontFamily: 'sans-serif',
+      color: 'white',
+      backgroundColor: '#111',
+      minHeight: '100vh'
+    }}>
+      <h2 style={{ textAlign: 'center' }}>Pinterest Media URL</h2>
+      <input
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        placeholder="https://...jpg veya .mp4"
         style={{
-          width: 680,
-          maxWidth: '90vw',
-          background: '#1e1e1e',
-          padding: 20,
-          borderRadius: 12,
-          boxShadow: '0 10px 30px rgba(0,0,0,.35)',
+          width: '100%',
+          padding: '0.5rem',
+          marginTop: '1rem',
+          borderRadius: '6px',
+          border: '1px solid #555',
+          backgroundColor: '#222',
+          color: 'white'
         }}
-      >
-        <h2>NZXT Pinterest Integration</h2>
-        <p>MP4 veya JPG/PNG/GIF URL’si girin:</p>
-        <input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://i.pinimg.com/...mp4 veya ...jpg"
-          style={{
-            width: '100%',
-            padding: '10px 12px',
-            borderRadius: 8,
-            border: '1px solid #333',
-            background: '#0f0f0f',
-            color: '#fff',
-          }}
-        />
-        <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-          <button
-            onClick={save}
-            style={{
-              background: '#e6007a',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 8,
-              padding: '10px 16px',
-              cursor: 'pointer',
-            }}
-          >
-            Kaydet
-          </button>
-          <a
-            href="./"
-            target="_blank"
-            style={{
-              background: '#2d2d2d',
-              color: '#fff',
-              borderRadius: 8,
-              padding: '10px 16px',
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            Display’i Aç
-          </a>
-        </div>
-      </div>
+      />
+      <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#aaa' }}>
+        LCD’de anında önizlenir. Girmek istediğin görselin doğrudan .jpg veya .mp4 bağlantısını kullan.
+      </p>
     </div>
   )
 }
