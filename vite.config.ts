@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { resolve } from 'node:path'
 
 export default defineConfig({
-  base: '/nzxt-pinterest-integration/', // 🔴 BU SATIR ŞART 🔴
+  base: '/nzxt-pinterest-integration/',
   plugins: [react()],
   build: {
     rollupOptions: {
@@ -13,4 +13,5 @@ export default defineConfig({
       },
     },
   },
+  publicDir: 'public'
 })
