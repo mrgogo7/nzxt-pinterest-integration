@@ -142,7 +142,15 @@ export default function ConfigPreview() {
 
           {/* 🔹 Overlay rehberi */}
           {showGuide && (
-            <div className="overlay-guide">
+            <div
+              className="overlay-guide"
+              style={{
+                transform: `translate(${settings.x * offsetScale}px, ${
+                  settings.y * offsetScale
+                }px) scale(${settings.scale})`,
+                transformOrigin: "center center",
+              }}
+            >
               <div className="crosshair horizontal" />
               <div className="crosshair vertical" />
             </div>
