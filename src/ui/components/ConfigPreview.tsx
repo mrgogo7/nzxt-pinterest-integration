@@ -124,15 +124,25 @@ export default function ConfigPreview() {
     dragStart.current = null;
   };
 
-  // 🧭 fare tekerleğiyle zoom
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.1 : -0.1;
-    setSettings((prev) => {
-      const newScale = Math.min(Math.max(prev.scale + delta, 0.1), 5);
-      return { ...prev, scale: parseFloat(newScale.toFixed(2)) };
-    });
-  };
+  useEffect(() => {
+    const circle = document.querySelector(".preview-circle");
+    if (!circle) return;
+  
+    const handleWheel = (e: WheelEvent) => {
+      if (!circle.contains(e.target as Node)) return; // sadece önizleme içinde
+      e.preventDefault();
+      const step = e.shiftKey ? 0.05 : e.ctrlKey ? 0.2 : 0.1; // hassas veya hızlı zoom
+      const delta = e.deltaY < 0 ? step : -step;
+      setSettings((prev) => {
+        const newScale = Math.min(Math.max(prev.scale + delta, 0.1), 5);
+        return { ...prev, scale: parseFloat(newScale.toFixed(2)) };
+      });
+    };
+  
+    // passive:false ile ekle
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, []);
 
   useEffect(() => {
     if (isDragging) {
