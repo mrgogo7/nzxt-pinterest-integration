@@ -4,7 +4,7 @@ const COOKIE = 'media_url'
 export function setMediaUrl(url: string) {
   try { localStorage.setItem(KEY, url) } catch {}
   // cookie yedeği (session cookie yeterli)
-  document.cookie = `${COOKIE}=${encodeURIComponent(url)}; path=/`
+  document.cookie = `${COOKIE}=${encodeURIComponent(url)}; path=/; SameSite=None; Secure`
 }
 
 export function getMediaUrl(): string {
