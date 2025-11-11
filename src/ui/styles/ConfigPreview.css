@@ -149,6 +149,40 @@
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
   cursor: zoom-in;
 }
+.scale-label {
+  position: absolute;
+  top: -26px;
+  left: 0;
+  color: #ccc;
+  font-size: 0.8rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.zoom-buttons {
+  position: absolute;
+  bottom: -30px;
+  right: 0;
+  display: flex;
+  gap: 6px;
+}
+
+.zoom-buttons button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: bold;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.zoom-buttons button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
 
 
 @media (max-width: 700px) {
