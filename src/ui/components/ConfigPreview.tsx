@@ -1,84 +1,116 @@
 import React, { useState, useEffect } from "react";
 import "../styles/ConfigPreview.css";
 
-export default function ConfigPreview() {
-  const [mediaUrl, setMediaUrl] = useState("");
-  const [settings, setSettings] = useState({
-    scale: 1.0,
-    x: 0,
-    y: 0,
-    fit: "cover",
-    align: "center",
-    loop: true,
-    autoplay: true,
-    mute: true,
-    resolution: `${window.innerWidth} x ${window.innerHeight}`,
-  });
+type Settings = {
+  scale: number;
+  x: number;
+  y: number;
+  fit: "cover" | "contain" | "fill";
+  align: "center" | "top" | "bottom" | "left" | "right";
+  // Aşağıdakiler kontrol olarak görünmeyecek ama davranış sabit:
+  loop: boolean;
+  autoplay: boolean;
+  mute: boolean;
+  resolution: string;
+};
 
-  // LocalStorage'dan verileri yükle
+const DEFAULTS: Settings = {
+  scale: 1.0,
+  x: 0,
+  y: 0,
+  fit: "cover",
+  align: "center",
+  loop: true,
+  autoplay: true,
+  mute: true,
+  resolution: `${window.innerWidth} x ${window.innerHeight}`,
+};
+
+export default function ConfigPreview() {
+  const [mediaUrl, setMediaUrl] = useState<string>("");
+  const [settings, setSettings] = useState<Settings>(DEFAULTS);
+
+  // Başlangıç: nzxtMediaConfig veya legacy media_url'den yükle
   useEffect(() => {
     const saved = localStorage.getItem("nzxtMediaConfig");
     if (saved) {
-      const parsed = JSON.parse(saved);
-      setMediaUrl(parsed.url || localStorage.getItem("media_url") || "");
-      setSettings((prev) => ({ ...prev, ...parsed }));
+      try {
+        const parsed = JSON.parse(saved);
+        setMediaUrl(parsed.url || localStorage.getItem("media_url") || "");
+        setSettings({ ...DEFAULTS, ...parsed });
+      } catch {
+        setMediaUrl(localStorage.getItem("media_url") || "");
+        setSettings(DEFAULTS);
+      }
     } else {
-      // Eğer yalnızca eski sistem varsa onu kullan
-      const legacyUrl = localStorage.getItem("media_url");
-      if (legacyUrl) setMediaUrl(legacyUrl);
+      setMediaUrl(localStorage.getItem("media_url") || "");
+      setSettings(DEFAULTS);
     }
   }, []);
 
-  // Dışarıdan URL değiştiğinde (Config.tsx’ten gelen) senkronize et
+  // Dışarıdan (Config.tsx) URL değişirse senkronize et
   useEffect(() => {
-    const checkExternal = setInterval(() => {
-      const external = localStorage.getItem("media_url");
-      if (external && external !== mediaUrl) {
-        setMediaUrl(external);
-      }
-    }, 500);
-    return () => clearInterval(checkExternal);
+    const sync = setInterval(() => {
+      const u = localStorage.getItem("media_url") || "";
+      if (u !== mediaUrl) setMediaUrl(u);
+    }, 400);
+    return () => clearInterval(sync);
   }, [mediaUrl]);
 
-  // Değişiklikleri localStorage'a yaz (her değişimde)
+  // Her değişiklikte kaydet (LCD ve diğer sayfalar da aynı veriyi okur)
   useEffect(() => {
     const cfg = { url: mediaUrl, ...settings };
     localStorage.setItem("nzxtMediaConfig", JSON.stringify(cfg));
-    localStorage.setItem("media_url", mediaUrl); // LCD tarafı için
+    // legacy uyumluluk (Display eski anahtarı da dinleyebilir)
+    localStorage.setItem("media_url", mediaUrl);
+    // storage event tetikleme için (bazı ortamlar gerektiğinde)
+    window.dispatchEvent(new StorageEvent("storage", { key: "nzxtMediaConfig", newValue: JSON.stringify(cfg) }));
+    window.dispatchEvent(new StorageEvent("storage", { key: "media_url", newValue: mediaUrl }));
   }, [mediaUrl, settings]);
 
-  const handleChange = (key: string, value: any) => {
+  const handleChange = <K extends keyof Settings,>(key: K, value: Settings[K]) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
-  const isVideo =
-    mediaUrl.toLowerCase().endsWith(".mp4") ||
-    mediaUrl.toLowerCase().includes("mp4");
+  const isVideo = /\.mp4($|\?)/i.test(mediaUrl) || mediaUrl.toLowerCase().includes("mp4");
+
+  // object-position eşlemesi
+  const objectPosition =
+    settings.align === "center" ? "50% 50%" :
+    settings.align === "top"    ? "50% 0%"  :
+    settings.align === "bottom" ? "50% 100%" :
+    settings.align === "left"   ? "0% 50%" :
+    /* right */                   "100% 50%";
 
   return (
     <div className="config-container">
       <h2>Media Configuration</h2>
 
+      {/* URL alanını burada göstermiyoruz; tek kaynak Config.tsx’teki giriş */}
+      <p className="hint">
+        Aşağıdaki dairesel önizleme, Config’te girdiğin URL ve bu ayarlarla birebir LCD’deki görüntüyü simüle eder.
+      </p>
+
       <div className="preview-section">
-        <h3>Thumbnail Preview</h3>
-        <div
-          className="preview-box"
-          style={{
-            transform: `scale(${settings.scale}) translate(${settings.x}px, ${settings.y}px)`,
-          }}
-        >
+        <h3>Thumbnail Preview (Kraken-style)</h3>
+
+        {/* Dairesel sabit maske */}
+        <div className="preview-circle">
+          {/* Medya elemanı dairenin içinde hareket edip ölçeklenecek */}
           {isVideo ? (
             <video
               src={mediaUrl}
-              autoPlay={settings.autoplay}
-              muted={settings.mute}
-              loop={settings.loop}
+              autoPlay
+              muted
+              loop
               playsInline
               style={{
-                objectFit: settings.fit as any,
-                objectPosition: settings.align,
                 width: "100%",
                 height: "100%",
+                objectFit: settings.fit,
+                objectPosition,
+                transform: `translate(${settings.x}px, ${settings.y}px) scale(${settings.scale})`,
+                transformOrigin: "center center",
               }}
             />
           ) : (
@@ -87,10 +119,12 @@ export default function ConfigPreview() {
                 src={mediaUrl}
                 alt="preview"
                 style={{
-                  objectFit: settings.fit as any,
-                  objectPosition: settings.align,
                   width: "100%",
                   height: "100%",
+                  objectFit: settings.fit,
+                  objectPosition,
+                  transform: `translate(${settings.x}px, ${settings.y}px) scale(${settings.scale})`,
+                  transformOrigin: "center center",
                 }}
               />
             )
@@ -105,29 +139,30 @@ export default function ConfigPreview() {
         <label>Scale</label>
         <input
           type="number"
-          step="0.1"
+          min={0.1}
+          step={0.1}
           value={settings.scale}
-          onChange={(e) => handleChange("scale", parseFloat(e.target.value))}
+          onChange={(e) => handleChange("scale", parseFloat(e.target.value || "1"))}
         />
 
-        <label>X Offset</label>
+        <label>X Offset (px)</label>
         <input
           type="number"
           value={settings.x}
-          onChange={(e) => handleChange("x", parseInt(e.target.value))}
+          onChange={(e) => handleChange("x", parseInt(e.target.value || "0", 10))}
         />
 
-        <label>Y Offset</label>
+        <label>Y Offset (px)</label>
         <input
           type="number"
           value={settings.y}
-          onChange={(e) => handleChange("y", parseInt(e.target.value))}
+          onChange={(e) => handleChange("y", parseInt(e.target.value || "0", 10))}
         />
 
         <label>Align</label>
         <select
           value={settings.align}
-          onChange={(e) => handleChange("align", e.target.value)}
+          onChange={(e) => handleChange("align", e.target.value as Settings["align"])}
         >
           <option>center</option>
           <option>top</option>
@@ -139,37 +174,15 @@ export default function ConfigPreview() {
         <label>Fit</label>
         <select
           value={settings.fit}
-          onChange={(e) => handleChange("fit", e.target.value)}
+          onChange={(e) => handleChange("fit", e.target.value as Settings["fit"])}
         >
           <option>cover</option>
           <option>contain</option>
           <option>fill</option>
         </select>
 
-        <label>
-          <input
-            type="checkbox"
-            checked={settings.loop}
-            onChange={(e) => handleChange("loop", e.target.checked)}
-          />
-          Loop
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={settings.autoplay}
-            onChange={(e) => handleChange("autoplay", e.target.checked)}
-          />
-          Autoplay
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={settings.mute}
-            onChange={(e) => handleChange("mute", e.target.checked)}
-          />
-          Mute
-        </label>
+        {/* Mute & Loop görünmez; varsayılan davranış zaten muted+loop */}
+        {/* <label>…</label> */}
       </div>
     </div>
   );
