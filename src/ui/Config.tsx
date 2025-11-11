@@ -2,20 +2,29 @@ import { useState, useEffect } from 'react'
 import ConfigPreview from './components/ConfigPreview'
 
 export default function Config() {
-  const [url, setUrl] = useState(localStorage.getItem('media_url') || '')
+  // Tek URL kaynağı
+  const [url, setUrl] = useState(
+    () => JSON.parse(localStorage.getItem('nzxtMediaConfig') || '{}').url || localStorage.getItem('media_url') || ''
+  )
 
+  // LocalStorage güncellemesi (her değişiklikte)
   useEffect(() => {
+    const currentConfig = JSON.parse(localStorage.getItem('nzxtMediaConfig') || '{}')
+    const newConfig = { ...currentConfig, url }
+    localStorage.setItem('nzxtMediaConfig', JSON.stringify(newConfig))
     localStorage.setItem('media_url', url)
   }, [url])
 
   return (
-    <div style={{
-      padding: '1rem',
-      fontFamily: 'sans-serif',
-      color: 'white',
-      backgroundColor: '#111',
-      minHeight: '100vh'
-    }}>
+    <div
+      style={{
+        padding: '1rem',
+        fontFamily: 'sans-serif',
+        color: 'white',
+        backgroundColor: '#111',
+        minHeight: '100vh',
+      }}
+    >
       <h2 style={{ textAlign: 'center' }}>Pinterest Media URL</h2>
       <input
         value={url}
@@ -28,17 +37,15 @@ export default function Config() {
           borderRadius: '6px',
           border: '1px solid #555',
           backgroundColor: '#222',
-          color: 'white'
+          color: 'white',
         }}
       />
       <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#aaa' }}>
-        LCD’de anında önizlenir. Girmek istediğin görselin doğrudan .jpg veya .mp4 bağlantısını kullan.
+        LCD’de ve aşağıdaki önizlemede anında görüntülenir. Görselin doğrudan .jpg veya .mp4 bağlantısını kullan.
       </p>
 
-      {/* Ayırıcı çizgi */}
-      <hr style={{ margin: '2rem 0', borderColor: '#333' }} />
-
       {/* Thumbnail ve medya ayarları */}
+      <hr style={{ margin: '2rem 0', borderColor: '#333' }} />
       <ConfigPreview />
     </div>
   )
