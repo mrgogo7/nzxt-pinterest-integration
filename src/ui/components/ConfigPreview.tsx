@@ -205,9 +205,9 @@ export default function ConfigPreview() {
           )}
 
           {/* ✅ Zoom butonları dairenin içinde */}
-          <div className="zoom-buttons-inside">
+          <div className="zoom-buttons-bottom">
+            <button onClick={() => adjustScale(-0.1)}>−</button>
             <button onClick={() => adjustScale(0.1)}>＋</button>
-            <button onClick={() => adjustScale(-0.1)}>－</button>
           </div>
         </div>
       </div>
