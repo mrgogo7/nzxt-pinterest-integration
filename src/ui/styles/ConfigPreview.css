@@ -139,6 +139,12 @@
   color: #fff;
   width: 100%;
 }
+.preview-circle.dragging {
+  cursor: grabbing;
+}
+.preview-circle {
+  cursor: grab;
+}
 
 @media (max-width: 700px) {
   .config-wrapper {
