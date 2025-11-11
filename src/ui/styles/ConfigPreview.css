@@ -49,21 +49,21 @@
   background-color: rgba(255, 255, 255, 0.3);
   transition: all 0.2s ease;
 }
-
 .crosshair.horizontal {
   top: 50%;
   left: 0;
-  width: 100%;
+  width: 120%;
   height: 1px;
+  transform: translateY(-50%) translateX(-10%);
 }
 
 .crosshair.vertical {
   left: 50%;
   top: 0;
+  height: 120%;
   width: 1px;
-  height: 100%;
+  transform: translateX(-50%) translateY(-10%);
 }
-
 /* 🔹 Align vurgusu */
 .overlay-guide.align-center .crosshair {
   background-color: rgba(255, 255, 255, 0.35);
