@@ -20,35 +20,44 @@ export default function ConfigPreview() {
     const saved = localStorage.getItem("nzxtMediaConfig");
     if (saved) {
       const parsed = JSON.parse(saved);
-      setMediaUrl(parsed.url || "");
-      setSettings(parsed);
+      setMediaUrl(parsed.url || localStorage.getItem("media_url") || "");
+      setSettings((prev) => ({ ...prev, ...parsed }));
+    } else {
+      // Eğer yalnızca eski sistem varsa onu kullan
+      const legacyUrl = localStorage.getItem("media_url");
+      if (legacyUrl) setMediaUrl(legacyUrl);
     }
   }, []);
 
-  // Değişiklikleri localStorage'a yaz
+  // Dışarıdan URL değiştiğinde (Config.tsx’ten gelen) senkronize et
+  useEffect(() => {
+    const checkExternal = setInterval(() => {
+      const external = localStorage.getItem("media_url");
+      if (external && external !== mediaUrl) {
+        setMediaUrl(external);
+      }
+    }, 500);
+    return () => clearInterval(checkExternal);
+  }, [mediaUrl]);
+
+  // Değişiklikleri localStorage'a yaz (her değişimde)
   useEffect(() => {
     const cfg = { url: mediaUrl, ...settings };
     localStorage.setItem("nzxtMediaConfig", JSON.stringify(cfg));
+    localStorage.setItem("media_url", mediaUrl); // LCD tarafı için
   }, [mediaUrl, settings]);
 
   const handleChange = (key: string, value: any) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
-  const isVideo = mediaUrl.endsWith(".mp4") || mediaUrl.includes("mp4");
+  const isVideo =
+    mediaUrl.toLowerCase().endsWith(".mp4") ||
+    mediaUrl.toLowerCase().includes("mp4");
 
   return (
     <div className="config-container">
       <h2>Media Configuration</h2>
-
-      <label htmlFor="mediaUrl">Media URL</label>
-      <input
-        id="mediaUrl"
-        type="text"
-        value={mediaUrl}
-        onChange={(e) => setMediaUrl(e.target.value)}
-        placeholder="https://...mp4 / ...jpg / ...gif"
-      />
 
       <div className="preview-section">
         <h3>Thumbnail Preview</h3>
@@ -73,16 +82,18 @@ export default function ConfigPreview() {
               }}
             />
           ) : (
-            <img
-              src={mediaUrl}
-              alt="preview"
-              style={{
-                objectFit: settings.fit as any,
-                objectPosition: settings.align,
-                width: "100%",
-                height: "100%",
-              }}
-            />
+            mediaUrl && (
+              <img
+                src={mediaUrl}
+                alt="preview"
+                style={{
+                  objectFit: settings.fit as any,
+                  objectPosition: settings.align,
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            )
           )}
         </div>
       </div>
