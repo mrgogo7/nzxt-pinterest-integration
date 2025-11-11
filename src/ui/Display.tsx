@@ -34,19 +34,11 @@ export default function Display() {
     return DEFAULTS
   })
 
-  // 🔹 NZXT CAM tarafından sağlanan gerçek cihaz çözünürlüğü
   const [deviceSize, setDeviceSize] = useState<{ w: number; h: number }>({
-    w:
-      (window as any)?.nzxt?.v1?.width ||
-      (window as any)?.nzxt?.v1?.height ||
-      640,
-    h:
-      (window as any)?.nzxt?.v1?.height ||
-      (window as any)?.nzxt?.v1?.width ||
-      640,
+    w: (window as any)?.nzxt?.v1?.width || 640,
+    h: (window as any)?.nzxt?.v1?.height || 640,
   })
 
-  // CAM device info değişirse güncelle (bazı sürümlerde dynamic oluyor)
   useEffect(() => {
     const api = (window as any)?.nzxt?.v1
     if (api && (api.width || api.height)) {
@@ -54,7 +46,6 @@ export default function Display() {
     }
   }, [])
 
-  // URL / ayar değişikliklerini dinle
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (e.key === 'media_url' && e.newValue) setUrl(e.newValue)
@@ -79,6 +70,7 @@ export default function Display() {
                                   '100% 50%'
 
   const diameter = Math.min(deviceSize.w, deviceSize.h)
+  const radius = (window as any)?.nzxt?.v1?.shape === 'circle' ? '50%' : '0%'
 
   return (
     <div
@@ -94,45 +86,53 @@ export default function Display() {
         style={{
           width: diameter,
           height: diameter,
-          borderRadius: (window as any)?.nzxt?.v1?.shape === 'circle' ? '50%' : '0%',
+          borderRadius: radius,
           overflow: 'hidden',
           border: '2px solid #111',
           background: '#000',
           position: 'relative',
         }}
       >
-        {isVideo ? (
-          <video
-            src={url}
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: settings.fit,
-              objectPosition,
-              transform: `translate(${settings.x}px, ${settings.y}px) scale(${settings.scale})`,
-              transformOrigin: 'center center',
-            }}
-          />
-        ) : (
-          url && (
-            <img
+        <div
+          className="media-layer"
+          style={{
+            width: '100%',
+            height: '100%',
+            transform: `translate(${settings.x}px, ${settings.y}px) scale(${settings.scale})`,
+            transformOrigin: 'center center',
+          }}
+        >
+          {isVideo ? (
+            <video
               src={url}
-              alt="Media"
+              autoPlay
+              loop
+              muted
+              playsInline
               style={{
                 width: '100%',
                 height: '100%',
                 objectFit: settings.fit,
                 objectPosition,
-                transform: `translate(${settings.x}px, ${settings.y}px) scale(${settings.scale})`,
-                transformOrigin: 'center center',
+                display: 'block',
               }}
             />
-          )
-        )}
+          ) : (
+            url && (
+              <img
+                src={url}
+                alt="Media"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: settings.fit,
+                  objectPosition,
+                  display: 'block',
+                }}
+              />
+            )
+          )}
+        </div>
       </div>
     </div>
   )
