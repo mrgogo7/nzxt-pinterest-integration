@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/ConfigPreview.css";
 
 type Settings = {
@@ -29,6 +29,8 @@ export default function ConfigPreview() {
   const [mediaUrl, setMediaUrl] = useState<string>("");
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [showGuide, setShowGuide] = useState<boolean>(true);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStart = useRef<{ x: number; y: number } | null>(null);
 
   const lcdResolution = (window as any)?.nzxt?.v1?.width || 640;
   const previewSize = 200;
@@ -97,12 +99,53 @@ export default function ConfigPreview() {
   const adjY = settings.y * offsetScale;
   const objectPosition = `calc(${base.x}% + ${adjX}px) calc(${base.y}% + ${adjY}px)`;
 
+  // 🧭 fareyle sürükleme
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    dragStart.current = { x: e.clientX, y: e.clientY };
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging || !dragStart.current) return;
+    const dx = e.clientX - dragStart.current.x;
+    const dy = e.clientY - dragStart.current.y;
+    dragStart.current = { x: e.clientX, y: e.clientY };
+
+    setSettings((prev) => ({
+      ...prev,
+      x: prev.x + Math.round(dx / offsetScale),
+      y: prev.y + Math.round(dy / offsetScale),
+    }));
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    dragStart.current = null;
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    } else {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging]);
+
   return (
     <div className="config-wrapper">
-      {/* Sol: LCD önizleme */}
       <div className="preview-column">
         <div className="preview-title">LCD Preview</div>
-        <div className="preview-circle">
+        <div
+          className={`preview-circle ${isDragging ? "dragging" : ""}`}
+          onMouseDown={handleMouseDown}
+        >
           {isVideo ? (
             <video
               src={mediaUrl}
@@ -138,7 +181,6 @@ export default function ConfigPreview() {
             )
           )}
 
-          {/* 🔹 Overlay rehberi */}
           {showGuide && (
             <div
               className={`overlay-guide align-${settings.align}`}
@@ -156,7 +198,6 @@ export default function ConfigPreview() {
         </div>
       </div>
 
-      {/* Sağ: ayarlar */}
       <div className="settings-column">
         <div className="overlay-toggle">
           <label>
