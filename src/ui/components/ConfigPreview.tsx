@@ -28,6 +28,7 @@ const DEFAULTS: Settings = {
 export default function ConfigPreview() {
   const [mediaUrl, setMediaUrl] = useState<string>("");
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
+  const [showGuide, setShowGuide] = useState<boolean>(true);
 
   // LCD ile önizleme boyut farkı (ölçek oranı)
   const lcdResolution = (window as any)?.nzxt?.v1?.width || 640;
@@ -138,14 +139,35 @@ export default function ConfigPreview() {
               />
             )
           )}
+
+          {/* 🔹 Overlay rehberi */}
+          {showGuide && (
+            <div className="overlay-guide">
+              <div className="crosshair horizontal" />
+              <div className="crosshair vertical" />
+            </div>
+          )}
         </div>
       </div>
 
       {/* Sağ: ayarlar */}
       <div className="settings-column">
+        {/* 🔹 Overlay toggle butonu */}
+        <div className="overlay-toggle">
+          <label>
+            <input
+              type="checkbox"
+              checked={showGuide}
+              onChange={(e) => setShowGuide(e.target.checked)}
+            />{" "}
+            Overlay Guide Göster
+          </label>
+        </div>
+
         <div className="settings-grid">
-          <label>Resolution</label>
-          <input value={settings.resolution} readOnly />
+          {/* Resolution gizli */}
+          {/* <label>Resolution</label>
+          <input value={settings.resolution} readOnly /> */}
 
           <label>Scale</label>
           <input
