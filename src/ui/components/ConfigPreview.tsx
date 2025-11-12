@@ -64,11 +64,15 @@ export default function ConfigPreview() {
     if (savedCfg) {
       try {
         const parsed = JSON.parse(savedCfg);
-        setSettings((prev) => ({
-          ...prev,
-          ...DEFAULTS,
-          ...parsed,
-        }));
+        setSettings({ ...DEFAULTS, ...parsed });
+        if (parsed && typeof parsed === "object") {
+          setSettings({
+            ...DEFAULTS,
+            ...Object.fromEntries(
+              Object.entries(parsed).filter(([k, v]) => v !== undefined && v !== null)
+            ),
+          });
+        }
         setMediaUrl(parsed.url || savedUrl || "");
       } catch {
         console.warn("⚠️ Failed to parse saved config, using defaults.");
