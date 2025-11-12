@@ -89,6 +89,29 @@ Once opened inside NZXT CAM:
 
 ---
 
+## 🧑‍💻 Developer Notes
+
+> 💡 **About the `?kraken=1` parameter**
+
+When a Web Integration runs inside **NZXT CAM**,  
+the application automatically appends the `?kraken=1` parameter to the URL.  
+This flag identifies that the integration is being rendered on an **NZXT Kraken LCD**.
+
+For development and testing purposes, you can manually access both environments:
+
+- 🖥️ **Control Panel (Configuration UI):**  
+  [https://mrgogo7.github.io/nzxt-web-integration-amc/](https://mrgogo7.github.io/nzxt-web-integration-amc/)
+
+- ⚙️ **LCD Simulation (what the Kraken actually displays):**  
+  [https://mrgogo7.github.io/nzxt-web-integration-amc/?kraken=1](https://mrgogo7.github.io/nzxt-web-integration-amc/?kraken=1)
+
+This allows developers **without a physical NZXT Kraken** to preview and contribute  
+to the project just like they would on an actual device.
+
+> 🧩 _In short: `/?kraken=1` simulates the LCD output, while the root URL opens the control panel._
+
+---
+
 ## 🧭 Keywords (for search engines)
 
 **NZXT Web Integration, NZXT LCD, Kraken Elite, CAM Overlay, Media Configurator, Live Preview, Drag & Scale, React Configurator**
@@ -98,7 +121,7 @@ Once opened inside NZXT CAM:
 ## 🧑‍💻 Author
 
 Developed by **Gökhan Akgül**  
-_“Because every pixel deserves precision.”_  
+_“What NZXT CAM missed — now open for contribution.”_  
 🔗 [GitHub Profile](https://github.com/mrgogo7)
 
 ---
