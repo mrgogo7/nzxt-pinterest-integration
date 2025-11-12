@@ -81,10 +81,11 @@ src/
 ├── ui/
 │ ├── components/
 │ │ └── ConfigPreview.tsx
-│ └── styles/
-│ └── ConfigPreview.css
-├── config.tsx
+│ ├── styles/
+│ │ └── ConfigPreview.css
+│ └── Config.tsx
 ├── i18n.ts
+├── config.tsx
 vite.config.ts
 
 ---
