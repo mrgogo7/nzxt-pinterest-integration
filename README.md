@@ -106,6 +106,16 @@ _“What NZXT CAM missed — now open for contribution.”_
 
 ---
 
+## ☕️ Buy Me a Coffee
+
+Hi there 👋  
+I build things — sometimes code, sometimes ideas, sometimes tools that make life easier (like my NZXT integrations).  
+If you enjoy what I create or just want to say thanks, maybe you’d like to buy me a coffee ☕️  
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/mrgogo)
+
+---
+
 ## 🧑‍💻 Developer Notes
 
 > 💡 **About the `?kraken=1` parameter**
