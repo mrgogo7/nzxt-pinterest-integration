@@ -3,11 +3,12 @@ import "../styles/ConfigPreview.css";
 import { LANG_KEY, Lang, t, getInitialLang } from "../../i18n";
 import {
   RefreshCw,
-  AlignCenter,
+  AlignCenterHorizontal,
+  AlignCenterVertical,
   AlignLeft,
   AlignRight,
-  AlignTop,
-  AlignBottom,
+  ArrowUp,
+  ArrowDown,
   Maximize2,
   Square,
   StretchHorizontal,
@@ -187,12 +188,13 @@ export default function ConfigPreview() {
   };
 
   const alignIcons = [
-    { key: "center", icon: <AlignCenter size={16} /> },
-    { key: "top", icon: <AlignTop size={16} /> },
-    { key: "bottom", icon: <AlignBottom size={16} /> },
+    { key: "center", icon: <AlignCenterHorizontal size={16} /> },
+    { key: "top", icon: <ArrowUp size={16} /> },
+    { key: "bottom", icon: <ArrowDown size={16} /> },
     { key: "left", icon: <AlignLeft size={16} /> },
     { key: "right", icon: <AlignRight size={16} /> },
   ];
+
   const fitIcons = [
     { key: "cover", icon: <Maximize2 size={16} /> },
     { key: "contain", icon: <Square size={16} /> },
