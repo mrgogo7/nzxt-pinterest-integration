@@ -98,24 +98,6 @@ Once opened inside NZXT CAM:
 
 ---
 
-## 🧑‍💻 Author
-
-Developed by **Gökhan Akgül**  
-_“What NZXT CAM missed — now open for contribution.”_  
-🔗 [GitHub Profile](https://github.com/mrgogo7)
-
----
-
-## ☕️ Buy Me a Coffee
-
-Hi there 👋  
-I build things — sometimes code, sometimes ideas, sometimes tools that make life easier (like my NZXT integrations).  
-If you enjoy what I create or just want to say thanks, maybe you’d like to buy me a coffee ☕️  
-
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/mrgogo)
-
----
-
 ## 🧑‍💻 Developer Notes
 
 > 💡 **About the `?kraken=1` parameter**
@@ -136,6 +118,24 @@ This allows developers **without a physical NZXT Kraken** to preview and contrib
 to the project just like they would on an actual device.
 
 > 🧩 _In short: `/?kraken=1` simulates the LCD output, while the root URL opens the control panel._
+
+---
+
+## 🧑‍💻 Author
+
+Developed by **Gökhan Akgül**  
+_“What NZXT CAM missed — now open for contribution.”_  
+🔗 [GitHub Profile](https://github.com/mrgogo7)
+
+---
+
+## ☕️ Buy Me a Coffee
+
+Hi there 👋  
+I build things — sometimes code, sometimes ideas, sometimes tools that make life easier (like my NZXT integrations).  
+If you enjoy what I create or just want to say thanks, maybe you’d like to buy me a coffee ☕️  
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/mrgogo)
 
 ---
 
