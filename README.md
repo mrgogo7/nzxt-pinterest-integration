@@ -77,16 +77,15 @@ Once opened inside NZXT CAM:
 ---
 
 ## 📦 Project Structure
-src/
-├── ui/
-│ ├── components/
-│ │ └── ConfigPreview.tsx
-│ ├── styles/
-│ │ └── ConfigPreview.css
-│ └── Config.tsx
-├── i18n.ts
-├── config.tsx
-vite.config.ts
+
+| Path | Description |
+|------|--------------|
+| `src/ui/components/ConfigPreview.tsx` | Main configuration and preview logic |
+| `src/ui/styles/ConfigPreview.css` | Styles for the circular preview UI |
+| `src/ui/Config.tsx` | Main configuration page entry |
+| `src/i18n.ts` | Multi-language handling |
+| `src/config.tsx` | Entry point for Config page |
+| `vite.config.ts` | Vite build and base path configuration |
 
 ---
 
