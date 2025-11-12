@@ -56,15 +56,22 @@ export default function ConfigPreview() {
 
   // === Load from storage on mount ===
   useEffect(() => {
-    const cfgRaw =
-      localStorage.getItem(CFG_KEY) || localStorage.getItem(CFG_COMPAT);
+    // Load last saved configuration (persistent)
     const savedUrl = localStorage.getItem(URL_KEY);
-    if (cfgRaw) {
+    const savedCfg =
+      localStorage.getItem(CFG_KEY) || localStorage.getItem(CFG_COMPAT);
+  
+    if (savedCfg) {
       try {
-        const parsed = JSON.parse(cfgRaw);
-        setSettings({ ...DEFAULTS, ...parsed });
+        const parsed = JSON.parse(savedCfg);
+        setSettings((prev) => ({
+          ...prev,
+          ...DEFAULTS,
+          ...parsed,
+        }));
         setMediaUrl(parsed.url || savedUrl || "");
       } catch {
+        console.warn("⚠️ Failed to parse saved config, using defaults.");
         setSettings(DEFAULTS);
         setMediaUrl(savedUrl || "");
       }
@@ -72,8 +79,11 @@ export default function ConfigPreview() {
       setSettings(DEFAULTS);
       setMediaUrl(savedUrl || "");
     }
+  
+    // apply saved language as well
     setLang(getInitialLang());
   }, []);
+
 
   // === Listen for external changes (multi-tab / NZXT overlay) ===
   useEffect(() => {
