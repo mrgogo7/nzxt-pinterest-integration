@@ -1,8 +1,0 @@
-{
-  "name": "NZXT Pinterest Integration",
-  "version": "1.0.0",
-  "author": "mrgogo7",
-  "description": "Displays a Pinterest JPG or MP4 on the Kraken LCD",
-  "config": "config.html", 
-  "monitoring": "index.html"
-}
