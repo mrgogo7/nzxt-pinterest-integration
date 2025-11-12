@@ -49,7 +49,8 @@ export default function ConfigPreview() {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef<{ x: number; y: number } | null>(null);
-  const hasLoadedRef = useRef(false); // 👈 ekledik
+  const hasLoadedRef = useRef(false);
+  const hasInteractedRef = useRef(false);
 
   const lcdResolution = (window as any)?.nzxt?.v1?.width || 640;
   const previewSize = 200;
@@ -79,11 +80,26 @@ export default function ConfigPreview() {
       setMediaUrl(savedUrl || "");
     }
 
-    // 👇 only set language if not set before
+    // apply language only if not previously set
     const langFromStorage = localStorage.getItem(LANG_KEY);
     if (!langFromStorage) setLang(getInitialLang());
 
-    hasLoadedRef.current = true; // ✅ mark as loaded
+    hasLoadedRef.current = true;
+  }, []);
+
+  // === Enable realtime sync only after first user interaction ===
+  useEffect(() => {
+    const enableRealtime = () => {
+      hasInteractedRef.current = true;
+    };
+    window.addEventListener("mousedown", enableRealtime, { once: true });
+    window.addEventListener("wheel", enableRealtime, { once: true });
+    window.addEventListener("keydown", enableRealtime, { once: true });
+    return () => {
+      window.removeEventListener("mousedown", enableRealtime);
+      window.removeEventListener("wheel", enableRealtime);
+      window.removeEventListener("keydown", enableRealtime);
+    };
   }, []);
 
   // === Listen for external changes (multi-tab / NZXT overlay) ===
@@ -102,10 +118,10 @@ export default function ConfigPreview() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  // === Throttled persist (every ~100ms), skip until first load done ===
+  // === Throttled persist (every ~100ms), only after load + user interaction ===
   const lastSyncRef = useRef(0);
   useEffect(() => {
-    if (!hasLoadedRef.current) return; // ⛔ skip until settings are loaded
+    if (!hasLoadedRef.current || !hasInteractedRef.current) return;
 
     const now = Date.now();
     if (now - lastSyncRef.current < 100) return;
@@ -122,10 +138,10 @@ export default function ConfigPreview() {
     );
   }, [mediaUrl, settings]);
 
+  // === Helpers ===
   const isVideo =
     /\.mp4($|\?)/i.test(mediaUrl) || mediaUrl.toLowerCase().includes("mp4");
 
-  // === Compute object position ===
   const base = (() => {
     switch (settings.align) {
       case "top":
@@ -221,7 +237,6 @@ export default function ConfigPreview() {
   // === Render ===
   return (
     <div className="config-wrapper">
-      {/* Left preview */}
       <div className="preview-column">
         <div className="preview-title">{t("previewTitle", lang)}</div>
 
@@ -286,7 +301,6 @@ export default function ConfigPreview() {
         </div>
       </div>
 
-      {/* Right settings */}
       <div className="settings-column">
         <div className="panel">
           <div className="panel-header">
