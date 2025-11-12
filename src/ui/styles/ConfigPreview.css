@@ -1,12 +1,15 @@
 /* ==== Page scaffold ==== */
 .config-page {
+  max-width: 710px;     /* <-- limit total width */
+  width: 100%;
+  margin: 0 auto;       /* <-- center the whole page */
   padding: 16px;
+  box-sizing: border-box;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   color: #fff;
   background: #0f0f10;
   min-height: 100vh;
 }
-
 .config-header {
   display: flex;
   align-items: center;
