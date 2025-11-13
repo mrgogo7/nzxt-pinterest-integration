@@ -424,16 +424,27 @@ function SingleOverlay({
             {valueNumber}
           </div>
 
-          <div
-            style={{
-              fontSize: `${unitSize}px`,
-              color: numberColor,
-			  fontWeight: 700,
-			  alignSelf: "flex-start",
-            }}
-          >
-            {valueUnit}
-          </div>
+			<div
+			  style={{
+				fontSize: `${unitSize}px`,
+				color: numberColor,
+				fontWeight: 700,
+				lineHeight: 1,
+
+				// ° için daha yukarı
+				transform:
+				  valueUnitType === "temp"
+					? "translateY(-35%)"                // derece yukarı hizalama
+					: valueUnitType === "percent"
+					? "translateY(25%)"                 // % aşağı hizalama
+					: "translateY(0)",
+
+				// LCD’de tam hizalama için
+				marginLeft: numberSize * 0.05,
+			  }}
+			>
+			  {valueUnit}
+			</div>
         </div>
       ) : (
         <>
