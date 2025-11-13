@@ -1,21 +1,17 @@
-import React, { useEffect, useMemo, useState, CSSProperties } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-/**
- * KrakenOverlay
- *
- * Shown only inside NZXT Kraken Browser (?kraken=1).
- * Renders the user's selected media PLUS the infographic overlay.
- * Uses settings saved by ConfigPreview.
- */
+/*
+  ================================================================
+   KrakenOverlay
+   This component renders the media + overlay onto the LCD panel.
+   Resolution is ALWAYS 640x640 for Kraken Elite LCD.
+   Matching the exact behavior of ConfigPreview is critical.
+  ================================================================
+*/
 
-const CFG_KEY = "nzxtPinterestConfig";
-const CFG_COMPAT = "nzxtMediaConfig";
-const URL_KEY = "media_url";
+type OverlayMode = "none" | "single" | "dual" | "triple";
 
-// Types must match ConfigPreview logic
-export type OverlayMode = "none" | "single" | "dual" | "triple";
-
-export type OverlayMetricKey =
+type OverlayMetricKey =
   | "cpuTemp"
   | "cpuLoad"
   | "cpuClock"
@@ -24,9 +20,16 @@ export type OverlayMetricKey =
   | "gpuLoad"
   | "gpuClock";
 
-type Settings = {
-  scale: number;
-  x: number; // LCD pixel offsets
+interface OverlaySettings {
+  mode: OverlayMode;
+  primaryMetric: OverlayMetricKey;
+  numberColor: string;
+  textColor: string;
+}
+
+interface Settings {
+  scale: number;      // same as preview
+  x: number;          // REAL LCD px offset (same as preview)
   y: number;
   fit: "cover" | "contain" | "fill";
   align: "center" | "top" | "bottom" | "left" | "right";
@@ -34,297 +37,215 @@ type Settings = {
   autoplay: boolean;
   mute: boolean;
   resolution: string;
+  showGuide?: boolean;
+  overlay: OverlaySettings;
+}
 
-  overlay?: {
-    mode: OverlayMode;
-    primaryMetric: OverlayMetricKey;
-    numberColor: string;
-    textColor: string;
-  };
-};
+interface Props {
+  mediaUrl: string;
+  settings: Settings;
+}
 
-const DEFAULTS: Settings = {
-  scale: 1,
-  x: 0,
-  y: 0,
-  fit: "cover",
-  align: "center",
-  loop: true,
-  autoplay: true,
-  mute: true,
-  resolution: `${window.innerWidth}x${window.innerHeight}`,
-  overlay: {
-    mode: "none",
-    primaryMetric: "cpuTemp",
-    numberColor: "#ffffff",
-    textColor: "#ffffff",
-  },
-};
+/* 
+   ================================================================
+   Mapping to NZXT alignment
+   ================================================================
+*/
+function getBaseAlign(align: Settings["align"]) {
+  switch (align) {
+    case "top": return { x: 50, y: 0 };
+    case "bottom": return { x: 50, y: 100 };
+    case "left": return { x: 0, y: 50 };
+    case "right": return { x: 100, y: 50 };
+    default: return { x: 50, y: 50 }; // center
+  }
+}
 
-type MonitoringData = any;
+/*
+   ================================================================
+   MOCK API: When web-based (not inside NZXT CAM),
+   return dummy metrics so the overlay works.
+   ================================================================
+*/
+function useMockOrRealMetrics() {
+  const [data, setData] = useState({
+    cpuTemp: 42,
+    cpuLoad: 17,
+    cpuClock: 4520,
+    liquidTemp: 38,
+    gpuTemp: 55,
+    gpuLoad: 34,
+    gpuClock: 1780,
+  });
 
-// Detect media type
-const isVideoUrl = (url: string): boolean =>
-  /\.mp4($|\?)/i.test(url) || url.toLowerCase().includes("mp4");
-
-// Human-readable labels
-const readingLabelMap: Record<OverlayMetricKey, string> = {
-  cpuTemp: "CPU Temperature",
-  cpuLoad: "CPU Load",
-  cpuClock: "CPU Clock Speed",
-  liquidTemp: "Liquid Temperature",
-  gpuTemp: "GPU Temperature",
-  gpuLoad: "GPU Load",
-  gpuClock: "GPU Clock Speed",
-};
-
-export default function KrakenOverlay() {
-  const [mediaUrl, setMediaUrl] = useState<string>("");
-  const [settings, setSettings] = useState<Settings>(DEFAULTS);
-  const [monitoring, setMonitoring] = useState<MonitoringData | null>(null);
-
-  // Load settings
   useEffect(() => {
-    try {
-      const savedUrl = localStorage.getItem(URL_KEY) || "";
-      const savedCfg =
-        localStorage.getItem(CFG_KEY) ||
-        localStorage.getItem(CFG_COMPAT);
+    let interval = setInterval(() => {
+      // If NZXT API is present → use it
+      if ((window as any)?.nzxt?.v1?.cpu?.temperature) {
+        const api = (window as any).nzxt.v1;
 
-      if (savedCfg) {
-        const parsed = JSON.parse(savedCfg);
-        const merged: Settings = {
-          ...DEFAULTS,
-          ...parsed,
-          overlay: {
-            ...DEFAULTS.overlay!,
-            ...(parsed.overlay || {}),
-          },
-        };
-
-        setSettings(merged);
-        setMediaUrl(parsed.url || savedUrl || "");
+        setData({
+          cpuTemp: api.cpu.temperature,
+          cpuLoad: api.cpu.load,
+          cpuClock: api.cpu.clock,
+          liquidTemp: api.liquid.temperature,
+          gpuTemp: api.gpu.temperature,
+          gpuLoad: api.gpu.load,
+          gpuClock: api.gpu.clock,
+        });
       } else {
-        setSettings(DEFAULTS);
-        setMediaUrl(savedUrl || "");
+        // otherwise cycle mock data (smooth animation)
+        setData((prev) => ({
+          cpuTemp: (prev.cpuTemp + 0.3) % 90,
+          cpuLoad: (prev.cpuLoad + 1) % 100,
+          cpuClock: 4500 + (prev.cpuClock % 200),
+          liquidTemp: (prev.liquidTemp + 0.1) % 50,
+          gpuTemp: (prev.gpuTemp + 0.2) % 80,
+          gpuLoad: (prev.gpuLoad + 1.5) % 100,
+          gpuClock: 1800 + (prev.gpuClock % 150),
+        }));
       }
-    } catch {
-      setSettings(DEFAULTS);
-    }
+    }, 100);
+
+    return () => clearInterval(interval);
   }, []);
 
-  // Listen configuration updates
-  useEffect(() => {
-    const handler = (e: StorageEvent) => {
-      if (!e.key) return;
+  return data;
+}
 
-      if (e.key === URL_KEY && e.newValue) {
-        setMediaUrl(e.newValue);
-      }
+/*
+   ================================================================
+   OVERLAY RENDER (SINGLE MODE)
+   ================================================================
+*/
+function SingleOverlay({
+  settings,
+  metrics,
+}: {
+  settings: Settings;
+  metrics: any;
+}) {
+  if (settings.overlay.mode !== "single") return null;
 
-      if ((e.key === CFG_KEY || e.key === CFG_COMPAT) && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          setSettings((p) => ({
-            ...p,
-            ...parsed,
-            overlay: {
-              ...p.overlay!,
-              ...(parsed.overlay || {}),
-            },
-          }));
-        } catch {}
-      }
-    };
+  const key = settings.overlay.primaryMetric;
+  const value = metrics[key];
 
-    window.addEventListener("storage", handler);
-    return () => window.removeEventListener("storage", handler);
-  }, []);
-
-  // monitoring hook
-  useEffect(() => {
-    const w = window as any;
-
-    const nz = w.nzxt || {};
-    const v1 = nz.v1 || {};
-    const prevHandler = v1.onMonitoringDataUpdate;
-
-    w.nzxt = {
-      ...nz,
-      v1: {
-        ...v1,
-        onMonitoringDataUpdate: (data: MonitoringData) => {
-          setMonitoring(data);
-          if (typeof prevHandler === "function") {
-            try {
-              prevHandler(data);
-            } catch {}
-          }
-        },
-      },
-    };
-
-    return () => {
-      const cur = (window as any).nzxt || {};
-      const curv1 = cur.v1 || {};
-
-      (window as any).nzxt = {
-        ...cur,
-        v1: { ...curv1, onMonitoringDataUpdate: prevHandler },
-      };
-    };
-  }, []);
-
-  // Compute objectPosition
-  const objectPosition = useMemo(() => {
-    const a = settings.align;
-    const base = {
-      top: { x: 50, y: 0 },
-      bottom: { x: 50, y: 100 },
-      left: { x: 0, y: 50 },
-      right: { x: 100, y: 50 },
-      center: { x: 50, y: 50 },
-    }[a];
-
-    return `calc(${base.x}% + ${settings.x}px) calc(${base.y}% + ${settings.y}px)`;
-  }, [settings.align, settings.x, settings.y]);
-
-  // Extract value/unit/label
-  const { v, u, lbl } = useMemo(() => {
-    const key = settings.overlay?.primaryMetric || "cpuTemp";
-    const label = readingLabelMap[key];
-
-    const data = monitoring || {};
-    const cpu = data.cpus?.[0] || {};
-    const gpu = data.gpus?.[0] || {};
-    const k = data.kraken || {};
-
-    const safe = (n: any): number | null =>
-      typeof n === "number" && !isNaN(n) ? n : null;
-
-    let raw: number | null = null;
-    let unit = "";
-
-    switch (key) {
-      case "cpuTemp":
-        raw = safe(cpu.temperature) ?? safe(k.cpuTemp);
-        unit = "°C";
-        break;
-
-      case "cpuLoad":
-        raw = safe(cpu.load) ?? safe(k.cpuLoad);
-        unit = "%";
-        break;
-
-      case "cpuClock":
-        raw = safe(cpu.clockSpeed) ?? safe(k.cpuClock);
-        unit = "MHz";
-        break;
-
-      case "liquidTemp":
-        raw = safe(k.liquidTemp) ?? safe(k.liquidTemperature);
-        unit = "°C";
-        break;
-
-      case "gpuTemp":
-        raw = safe(gpu.temperature) ?? safe(k.gpuTemp);
-        unit = "°C";
-        break;
-
-      case "gpuLoad":
-        raw = safe(gpu.load) ?? safe(k.gpuLoad);
-        unit = "%";
-        break;
-
-      case "gpuClock":
-        raw = safe(gpu.clockSpeed) ?? safe(k.gpuClock);
-        unit = "MHz";
-        break;
-    }
-
-    return {
-      v: raw !== null ? Math.round(raw).toString() : "--",
-      u: raw !== null ? unit : "",
-      lbl: label,
-    };
-  }, [monitoring, settings.overlay]);
-
-  const isVideo = isVideoUrl(mediaUrl);
-
-  // Overlay styles
-  const overlayStyle: CSSProperties = {
-    position: "absolute",
-    inset: 0,
-    display: settings.overlay?.mode === "single" ? "flex" : "none",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    pointerEvents: "none",
-  };
-
-  const numberStyle: CSSProperties = {
-    fontSize: "52px",
-    fontWeight: 700,
-    color: settings.overlay?.numberColor || "#fff",
-    display: "flex",
-    alignItems: "baseline",
-    gap: "4px",
-    textShadow: "0 0 6px rgba(0,0,0,0.8)",
-  };
-
-  const unitStyle: CSSProperties = {
-    fontSize: "18px",
-    opacity: 0.9,
-  };
-
-  const labelStyle: CSSProperties = {
-    marginTop: "4px",
-    fontSize: "14px",
-    color: settings.overlay?.textColor || "#fff",
-    opacity: 0.85,
-    textShadow: "0 0 4px rgba(0,0,0,0.8)",
-  };
-
-  // layout container
-  const box: CSSProperties = {
-    width: "100%",
-    height: "100%",
-    background: "#000",
-    overflow: "hidden",
-    position: "relative",
-  };
-
-  const mediaStyle: CSSProperties = {
-    width: "100%",
-    height: "100%",
-    objectFit: settings.fit,
-    objectPosition,
-    transform: `scale(${settings.scale})`,
-  };
+  const numberColor = settings.overlay.numberColor;
+  const textColor = settings.overlay.textColor;
 
   return (
-    <div style={box}>
-      {mediaUrl &&
-        (isVideo ? (
-          <video
-            src={mediaUrl}
-            autoPlay={settings.autoplay}
-            muted={settings.mute}
-            loop={settings.loop}
-            playsInline
-            style={mediaStyle}
-          />
-        ) : (
-          <img src={mediaUrl} style={mediaStyle} alt="" />
-        ))}
-
-      <div style={overlayStyle}>
-        <div style={numberStyle}>
-          <span>{v}</span>
-          {u && <span style={unitStyle}>{u}</span>}
-        </div>
-        <div style={labelStyle}>{lbl}</div>
+    <div
+      style={{
+        position: "absolute",
+        zIndex: 20,
+        width: "100%",
+        height: "100%",
+        top: 0,
+        left: 0,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        pointerEvents: "none",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          fontSize: "80px",
+          fontWeight: "700",
+          color: numberColor,
+          lineHeight: "0.9",
+        }}
+      >
+        {value}
       </div>
+      <div
+        style={{
+          fontSize: "28px",
+          color: textColor,
+          marginTop: "-8px",
+        }}
+      >
+        {key}
+      </div>
+    </div>
+  );
+}
+
+/*
+   ================================================================
+   MAIN LCD RENDER COMPONENT
+   ================================================================
+*/
+export default function KrakenOverlay({ mediaUrl, settings }: Props) {
+  const metrics = useMockOrRealMetrics();
+
+  const isVideo =
+    /\.mp4($|\?)/i.test(mediaUrl) ||
+    mediaUrl.toLowerCase().includes("mp4");
+
+  /*
+    =====================================================================
+    Media Positioning Logic (MUST MATCH CONFIGPREVIEW EXACTLY)
+    =====================================================================
+    LCD panel is 640x640 px.
+    settings.x / settings.y are REAL LCD px offsets.
+    objectPosition must be:
+      baseAlign + x px
+      baseAlign + y px
+  */
+  const lcdSize = 640;
+  const base = getBaseAlign(settings.align);
+
+  const objectPosition = `calc(${base.x}% + ${settings.x}px) calc(${base.y}% + ${settings.y}px)`;
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: `${lcdSize}px`,
+        height: `${lcdSize}px`,
+        overflow: "hidden",
+        borderRadius: "50%",
+        background: "#000",
+      }}
+    >
+      {isVideo ? (
+        <video
+          src={mediaUrl}
+          autoPlay={settings.autoplay}
+          muted={settings.mute}
+          loop={settings.loop}
+          playsInline
+          style={{
+            width: `${lcdSize}px`,
+            height: `${lcdSize}px`,
+            objectFit: settings.fit,
+            objectPosition,
+            transform: `scale(${settings.scale})`,
+            transformOrigin: "center center",
+          }}
+        />
+      ) : (
+        mediaUrl && (
+          <img
+            src={mediaUrl}
+            alt="LCD"
+            style={{
+              width: `${lcdSize}px`,
+              height: `${lcdSize}px`,
+              objectFit: settings.fit,
+              objectPosition,
+              transform: `scale(${settings.scale})`,
+              transformOrigin: "center center",
+            }}
+          />
+        )
+      )}
+
+      {/* Overlay */}
+      <SingleOverlay settings={settings} metrics={metrics} />
     </div>
   );
 }
