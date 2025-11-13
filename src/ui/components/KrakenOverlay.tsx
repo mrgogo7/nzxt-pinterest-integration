@@ -116,27 +116,51 @@ function useMetrics() {
   useEffect(() => {
     const nz = (window as any)?.nzxt?.v1;
 
+    // --- REAL NZXT CAM API AVAILABLE ---
     if (nz && typeof nz.onMonitoringDataUpdate === "function") {
-      console.warn("[NZXT API] ✓ detected");
+      console.log("[NZXT] Real Monitoring API detected.");
 
       nz.onMonitoringDataUpdate((packet: any) => {
+        // Safe parsing: different versions send different names
+        const cpu = packet.cpu || {};
+        const gpu = packet.gpu || {};
+        const liquid = packet.liquid || {};
+
         setData({
-          cpuTemp: packet.cpu?.temperature ?? 0,
-          cpuLoad: packet.cpu?.load ?? 0,
-          cpuClock: packet.cpu?.clock ?? 0,
-          liquidTemp: packet.liquid?.temperature ?? 0,
-          gpuTemp: packet.gpu?.temperature ?? 0,
-          gpuLoad: packet.gpu?.load ?? 0,
-          gpuClock: packet.gpu?.clock ?? 0,
+          cpuTemp: cpu.temperature ?? cpu.temp ?? 0,
+          cpuLoad: cpu.load ?? 0,
+          cpuClock: cpu.clockSpeed ?? cpu.clock ?? 0,
+
+          gpuTemp: gpu.temperature ?? gpu.temp ?? 0,
+          gpuLoad: gpu.load ?? 0,
+          gpuClock: gpu.clockSpeed ?? gpu.clock ?? 0,
+
+          liquidTemp: liquid.temperature ?? liquid.temp ?? 0,
         });
       });
 
-      return;
+      return; // DO NOT start mock mode
     }
 
-    console.warn("[NZXT API] ✗ not detected — metrics remain zero.");
-    // No mock interval — data stays at zeros.
+    // --- NO NZXT API → MOCK MODE ---
+    console.warn("[NZXT] Monitoring API not detected. Using mock values.");
 
+    const interval = setInterval(() => {
+      // Simple stable mock values (no animation)
+      setData({
+        cpuTemp: 40,
+        cpuLoad: 25,
+        cpuClock: 4500,
+
+        gpuTemp: 55,
+        gpuLoad: 32,
+        gpuClock: 1800,
+
+        liquidTemp: 34,
+      });
+    }, 500);
+
+    return () => clearInterval(interval);
   }, []);
 
   return data;
