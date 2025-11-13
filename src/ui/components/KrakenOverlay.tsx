@@ -419,7 +419,6 @@ function SingleOverlay({
               fontSize: `${numberSize}px`,
               fontWeight: 700,
               color: numberColor,
-			  align-self: "flex-start",
             }}
           >
             {valueNumber}
@@ -466,7 +465,6 @@ function SingleOverlay({
         style={{
           fontSize: `${overlay.textSize}px`,
           color: textColor,
-          marginTop: 7,
           textTransform: "uppercase",
           letterSpacing: 1,
         }}
