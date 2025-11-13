@@ -149,34 +149,59 @@ function mapMonitoringToOverlay(data: any): OverlayMetrics {
   const kraken = data?.kraken;
 
   return {
+    // CPU Temperature
     cpuTemp: pickNumeric(
       cpu0?.temperature,
       cpu0?.currentTemperature,
       cpu0?.packageTemperature
     ),
-    cpuLoad: pickNumeric(cpu0?.load, cpu0?.usage, cpu0?.totalLoad),
+
+    // CPU Load
+    cpuLoad: pickNumeric(
+      cpu0?.load,
+      cpu0?.usage,
+      cpu0?.totalLoad,
+      cpu0?.processorLoad
+    ),
+
+    // CPU Clock
     cpuClock: pickNumeric(
       cpu0?.clockSpeed,
-      cpu0?.clock,
+      cpu0?.frequency,
+      cpu0?.frequencyMHz,
       cpu0?.frequencyMhz,
-      cpu0?.frequencyMHz
+      cpu0?.processorFrequency
     ),
+
+    // Liquid Temperature (Kraken)
     liquidTemp: pickNumeric(
       kraken?.liquidTemperature,
-      kraken?.liquidTemp,
-      kraken?.temperature
+      kraken?.temperature,
+      kraken?.liquidTemp
     ),
+
+    // GPU Temperature
     gpuTemp: pickNumeric(
       gpu0?.temperature,
       gpu0?.currentTemperature,
       gpu0?.gpuTemperature
     ),
-    gpuLoad: pickNumeric(gpu0?.load, gpu0?.usage, gpu0?.totalLoad),
+
+    // GPU Load
+    gpuLoad: pickNumeric(
+      gpu0?.load,
+      gpu0?.usage,
+      gpu0?.totalLoad
+    ),
+
+    // GPU Clock
     gpuClock: pickNumeric(
+      gpu0?.coreFrequency,
       gpu0?.clockSpeed,
-      gpu0?.clock,
+      gpu0?.frequency,
+      gpu0?.frequencyMHz,
       gpu0?.frequencyMhz,
-      gpu0?.frequencyMHz
+      gpu0?.gpuFrequency
     ),
   };
 }
