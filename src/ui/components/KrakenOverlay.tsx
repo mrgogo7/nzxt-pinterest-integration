@@ -399,7 +399,7 @@ function SingleOverlay({
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        alignItems: "baseline",
+        alignItems: "center",
         pointerEvents: "none",
         fontFamily: "nzxt-extrabold",
       }}
@@ -409,7 +409,7 @@ function SingleOverlay({
         <div
           style={{
             display: "flex",
-            alignItems: "flex-start",
+            alignItems: "baseline",
             justifyContent: "center",
             lineHeight: 0.9,
           }}
@@ -465,7 +465,7 @@ function SingleOverlay({
         style={{
           fontSize: `${overlay.textSize}px`,
           color: textColor,
-          marginTop: -6,
+          marginTop: 7,
           textTransform: "uppercase",
           letterSpacing: 1,
         }}
