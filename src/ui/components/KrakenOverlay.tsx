@@ -5,17 +5,12 @@ import React, { useEffect, useState } from "react";
    KrakenOverlay
    LCD render surface for NZXT Kraken Elite.
 
-   - Reads media URL + settings from localStorage
-   - Mirrors LCD transform logic (scale, offset, align, fit)
-   - Fully supports Single Infographic overlays:
-       ➤ Number font
-       ➤ Label font
-       ➤ Number size
-       ➤ Label size
-       ➤ °  %  MHz suffixes
-       ➤ CPU / GPU / Liquid label mapping
-   - Registers window.nzxt.v1.onMonitoringDataUpdate so CAM pushes
-     real monitoring data every second.
+   - Reads media URL + settings from localStorage (same keys as ConfigPreview)
+   - Mirrors the LCD transform logic (scale, offset, align, fit)
+   - Adds basic "Single Infographic" overlay support
+   - Registers window.nzxt.v1.onMonitoringDataUpdate so that CAM can
+     push real monitoring data into this component on the Kraken Browser.
+   - Does NOT require any props (safe for ?kraken=1 entry)
   ================================================================
 */
 
@@ -33,15 +28,8 @@ type OverlayMetricKey =
 interface OverlaySettings {
   mode: OverlayMode;
   primaryMetric: OverlayMetricKey;
-
   numberColor: string;
   textColor: string;
-
-  numberFont: string;  // gotham-bold, arial-bold
-  textFont: string;
-
-  numberSize: number;  // px
-  textSize: number;    // px
 }
 
 interface Settings {
@@ -55,20 +43,23 @@ interface Settings {
   mute: boolean;
   resolution: string;
   showGuide?: boolean;
-  overlay?: OverlaySettings;
+  overlay?: OverlaySettings; // optional to stay compatible with old saved configs
 }
 
+/**
+ * Default overlay config when none is stored yet.
+ */
 const DEFAULT_OVERLAY: OverlaySettings = {
   mode: "none",
   primaryMetric: "cpuTemp",
   numberColor: "#ffffff",
   textColor: "#cccccc",
-  numberFont: "arial-bold",
-  textFont: "arial-bold",
-  numberSize: 80,
-  textSize: 26,
 };
 
+/**
+ * Default visual settings (must match ConfigPreview logic).
+ * NOTE: overlay is optional and will be merged with DEFAULT_OVERLAY at runtime.
+ */
 const DEFAULTS: Settings = {
   scale: 1,
   x: 0,
@@ -83,26 +74,47 @@ const DEFAULTS: Settings = {
   overlay: DEFAULT_OVERLAY,
 };
 
+/**
+ * Storage keys shared with the ConfigPreview component.
+ */
 const CFG_KEY = "nzxtPinterestConfig";
 const CFG_COMPAT = "nzxtMediaConfig";
 const URL_KEY = "media_url";
 
+/**
+ * Convert alignment setting to base percentage anchor.
+ */
 function getBaseAlign(align: Settings["align"]) {
   switch (align) {
-    case "top": return { x: 50, y: 0 };
-    case "bottom": return { x: 50, y: 100 };
-    case "left": return { x: 0, y: 50 };
-    case "right": return { x: 100, y: 50 };
-    default: return { x: 50, y: 50 };
+    case "top":
+      return { x: 50, y: 0 };
+    case "bottom":
+      return { x: 50, y: 100 };
+    case "left":
+      return { x: 0, y: 50 };
+    case "right":
+      return { x: 100, y: 50 };
+    default:
+      return { x: 50, y: 50 }; // center
   }
 }
 
-function pickNumeric(...vals: unknown[]): number {
-  for (const v of vals)
-    if (typeof v === "number" && !Number.isNaN(v)) return v;
+/**
+ * Helper to safely pick first numeric value from a list of candidates.
+ * This makes us resilient to small API changes on NZXT side.
+ */
+function pickNumeric(...values: unknown[]): number {
+  for (const v of values) {
+    if (typeof v === "number" && !Number.isNaN(v)) {
+      return v;
+    }
+  }
   return 0;
 }
 
+/**
+ * Shape of the metrics we care about inside the overlay.
+ */
 type OverlayMetrics = {
   cpuTemp: number;
   cpuLoad: number;
@@ -113,6 +125,9 @@ type OverlayMetrics = {
   gpuClock: number;
 };
 
+/**
+ * Default metrics used before the first monitoring payload arrives.
+ */
 const DEFAULT_METRICS: OverlayMetrics = {
   cpuTemp: 0,
   cpuLoad: 0,
@@ -123,44 +138,72 @@ const DEFAULT_METRICS: OverlayMetrics = {
   gpuClock: 0,
 };
 
+/**
+ * Map NZXT MonitoringData into the OverlayMetrics shape.
+ * The field names are inferred from the public docs & types and guarded with
+ * pickNumeric() so that missing properties simply become 0 instead of crashing.
+ */
 function mapMonitoringToOverlay(data: any): OverlayMetrics {
   const cpu0 = data?.cpus?.[0];
   const gpu0 = data?.gpus?.[0];
   const kraken = data?.kraken;
 
+  // Raw loads
   const rawCpuLoad = pickNumeric(
-    cpu0?.load, cpu0?.usage, cpu0?.totalLoad, cpu0?.processorLoad
-  );
-  const rawGpuLoad = pickNumeric(
-    gpu0?.load, gpu0?.usage, gpu0?.totalLoad
+    cpu0?.load,
+    cpu0?.usage,
+    cpu0?.totalLoad,
+    cpu0?.processorLoad
   );
 
+  const rawGpuLoad = pickNumeric(
+    gpu0?.load,
+    gpu0?.usage,
+    gpu0?.totalLoad
+  );
+
+  // Convert if needed (0–1 → 0–100)
   const cpuLoad = rawCpuLoad <= 1 ? rawCpuLoad * 100 : rawCpuLoad;
   const gpuLoad = rawGpuLoad <= 1 ? rawGpuLoad * 100 : rawGpuLoad;
 
   return {
+    // CPU Temp
     cpuTemp: pickNumeric(
       cpu0?.temperature,
       cpu0?.currentTemperature,
       cpu0?.packageTemperature
     ),
+
+    // CPU Load (converted if needed)
     cpuLoad,
+
+    // CPU Clock
     cpuClock: pickNumeric(
       cpu0?.clockSpeed,
       cpu0?.frequency,
-      cpu0?.frequencyMhz,
       cpu0?.frequencyMHz,
+      cpu0?.frequencyMhz,
       cpu0?.processorFrequency
     ),
+
+    // Liquid Temp
     liquidTemp: pickNumeric(
       kraken?.liquidTemperature,
       kraken?.temperature,
       kraken?.liquidTemp
     ),
+
+    // GPU Temp
     gpuTemp: pickNumeric(
-      gpu0?.temperature, gpu0?.currentTemperature, gpu0?.gpuTemperature
+      gpu0?.temperature,
+      gpu0?.currentTemperature,
+      gpu0?.gpuTemperature
     ),
+
+    // GPU Load (converted if needed)
     gpuLoad,
+
+    // GPU Clock
     gpuClock: pickNumeric(
       gpu0?.coreFrequency,
       gpu0?.clockSpeed,
@@ -171,59 +214,96 @@ function mapMonitoringToOverlay(data: any): OverlayMetrics {
     ),
   };
 }
-
+/**
+ * Hook to provide monitoring data.
+ *
+ * - On **Kraken Browser** (`?kraken=1`):
+ *   We register `window.nzxt.v1.onMonitoringDataUpdate = handler`.
+ *   CAM will call this function every second with real monitoring data.
+ *
+ * - On **normal browser**:
+ *   There is no CAM, so we fall back to a lightweight mock animation so
+ *   that the overlay still looks alive during development.
+ */
 function useMonitoringMetrics(): OverlayMetrics {
-  const [metrics, setMetrics] = useState(DEFAULT_METRICS);
+  const [metrics, setMetrics] = useState<OverlayMetrics>(DEFAULT_METRICS);
 
   useEffect(() => {
-    const isKraken = new URLSearchParams(window.location.search).get("kraken") === "1";
+    const searchParams = new URLSearchParams(window.location.search);
+    const isKraken = searchParams.get("kraken") === "1";
 
+    // Kraken Browser path: rely on real NZXT monitoring callback.
     if (isKraken) {
       const handler = (data: any) => {
         try {
           const mapped = mapMonitoringToOverlay(data);
           setMetrics(mapped);
-        } catch (e) {
-          console.warn("[NZXT] Mapping error:", e);
+        } catch (err) {
+          // In case of unexpected payload shape, keep previous metrics.
+          // eslint-disable-next-line no-console
+          console.warn("[KrakenOverlay] Failed to map monitoring data:", err);
         }
       };
 
       const w = window as any;
-      const prev = w.nzxt || {};
-      const prevV1 = prev.v1 || {};
+      const prevNzxt = w.nzxt || {};
+      const prevV1 = prevNzxt.v1 || {};
 
+      // Attach our callback following the official docs (@nzxt/web-integrations-types).
       w.nzxt = {
-        ...prev,
-        v1: { ...prevV1, onMonitoringDataUpdate: handler },
+        ...prevNzxt,
+        v1: {
+          ...prevV1,
+          onMonitoringDataUpdate: handler,
+        },
       };
 
+      // eslint-disable-next-line no-console
+      console.log(
+        "[KrakenOverlay] Registered window.nzxt.v1.onMonitoringDataUpdate callback (Kraken Browser)."
+      );
+
+      // Cleanup: if we are still the active callback, remove ourselves.
       return () => {
-        const cur = (window as any).nzxt?.v1;
-        if (cur?.onMonitoringDataUpdate === handler)
-          delete cur.onMonitoringDataUpdate;
+        const current = (window as any).nzxt?.v1;
+        if (current && current.onMonitoringDataUpdate === handler) {
+          delete current.onMonitoringDataUpdate;
+        }
       };
     }
 
+    // Configuration / normal browser path: simple mock animation for development.
+    // This will NEVER run inside NZXT Kraken Browser (because of the check above).
+    // We keep it lightweight so it does not interfere with real monitoring data.
+    // eslint-disable-next-line no-console
+    console.log(
+      "[KrakenOverlay] Not running as Kraken Browser (?kraken=1 missing). Using mock overlay metrics."
+    );
+
     let t = 0;
-    const intv = setInterval(() => {
-      t++;
+    const interval = setInterval(() => {
+      t += 1;
       setMetrics({
         cpuTemp: 40 + 10 * Math.sin(t / 15),
         cpuLoad: (t * 3) % 100,
         cpuClock: 4500 + (t % 200),
-        liquidTemp: 34 + 5 * Math.sin(t / 40),
-        gpuTemp: 50 + 10 * Math.sin(t / 25),
+        liquidTemp: 35 + 5 * Math.sin(t / 40),
+        gpuTemp: 50 + 15 * Math.sin(t / 25),
         gpuLoad: (t * 2) % 100,
         gpuClock: 1800 + (t % 150),
       });
     }, 1000);
 
-    return () => clearInterval(intv);
+    return () => clearInterval(interval);
   }, []);
 
   return metrics;
 }
 
+/**
+ * Single infographic overlay rendered on top of the media.
+ * This is the first overlay mode we support.
+ */
 function SingleOverlay({
   overlay,
   metrics,
@@ -236,105 +316,155 @@ function SingleOverlay({
   const key = overlay.primaryMetric;
   const value = metrics[key];
 
-  let formatted = Math.round(value).toString();
-  if (key.includes("Temp")) formatted += "°";
-  if (key.includes("Load")) formatted += "%";
-  if (key.includes("Clock")) formatted += " MHz";
-
-  let label = "DATA";
-  if (key.startsWith("cpu")) label = "CPU";
-  if (key.startsWith("gpu")) label = "GPU";
-  if (key.startsWith("liquid")) label = "Liquid";
+  const numberColor = overlay.numberColor;
+  const textColor = overlay.textColor;
 
   return (
     <div
       style={{
         position: "absolute",
-        inset: 0,
         zIndex: 20,
+        inset: 0,
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        flexDirection: "column",
         pointerEvents: "none",
+        fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
       }}
     >
       <div
         style={{
-          fontSize: `${overlay.numberSize}px`,
-          color: overlay.numberColor,
-          fontFamily: overlay.numberFont,
+          fontSize: "80px",
           fontWeight: 700,
+          color: numberColor,
           lineHeight: 0.9,
         }}
       >
-        {formatted}
+        {Math.round(value)}
       </div>
       <div
         style={{
-          marginTop: -4,
-          fontSize: `${overlay.textSize}px`,
-          color: overlay.textColor,
-          fontFamily: overlay.textFont,
+          fontSize: "26px",
+          color: textColor,
+          marginTop: -6,
           textTransform: "uppercase",
           letterSpacing: 1,
         }}
       >
-        {label}
+        {key}
       </div>
     </div>
   );
 }
 
+/**
+ * KrakenOverlay:
+ * - No props
+ * - Reads from localStorage (same data model as ConfigPreview)
+ * - Renders the LCD-sized media (640x640) with the same transform logic
+ * - Draws overlays on top of the media
+ */
 export default function KrakenOverlay() {
-  const [mediaUrl, setMediaUrl] = useState("");
+  const [mediaUrl, setMediaUrl] = useState<string>("");
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const metrics = useMonitoringMetrics();
 
+  // Determine LCD size from NZXT if available, otherwise default to 640.
+  const lcdResolution = (window as any)?.nzxt?.v1?.width || 640;
+  const lcdSize = lcdResolution; // square LCD
+
+  // Load from localStorage on mount
   useEffect(() => {
     const savedUrl = localStorage.getItem(URL_KEY);
-    const savedCfg = localStorage.getItem(CFG_KEY) || localStorage.getItem(CFG_COMPAT);
+    const savedCfg =
+      localStorage.getItem(CFG_KEY) || localStorage.getItem(CFG_COMPAT);
 
     if (savedCfg) {
       try {
         const parsed = JSON.parse(savedCfg);
+
         const cleaned = Object.fromEntries(
-          Object.entries(parsed).filter(([, v]) => v !== undefined && v !== null)
+          Object.entries(parsed).filter(
+            ([, v]) => v !== undefined && v !== null
+          )
         );
 
-        const mergedOverlay = {
+        const mergedOverlay: OverlaySettings = {
           ...DEFAULT_OVERLAY,
           ...(cleaned.overlay || {}),
         };
 
-        setSettings({ ...DEFAULTS, ...cleaned, overlay: mergedOverlay });
+        setSettings({
+          ...DEFAULTS,
+          ...cleaned,
+          overlay: mergedOverlay,
+        });
+
         setMediaUrl(cleaned.url || savedUrl || "");
       } catch {
+        console.warn(
+          "[KrakenOverlay] Failed to parse saved config, using defaults."
+        );
         setSettings(DEFAULTS);
         setMediaUrl(savedUrl || "");
       }
+    } else {
+      setSettings(DEFAULTS);
+      setMediaUrl(savedUrl || "");
     }
   }, []);
 
-  const lcdResolution = (window as any)?.nzxt?.v1?.width || 640;
-  const lcdSize = lcdResolution;
+  // Listen for config changes (ConfigPreview updates localStorage + storage events)
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === URL_KEY && e.newValue !== null) {
+        setMediaUrl(e.newValue);
+      }
+      if (e.key === CFG_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          const mergedOverlay: OverlaySettings = {
+            ...DEFAULT_OVERLAY,
+            ...(parsed.overlay || {}),
+          };
+
+          setSettings((prev) => ({
+            ...prev,
+            ...parsed,
+            overlay: mergedOverlay,
+          }));
+        } catch {
+          // ignore malformed payloads
+        }
+      }
+    };
+
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const isVideo =
+    /\.mp4($|\?)/i.test(mediaUrl) || mediaUrl.toLowerCase().includes("mp4");
 
   const base = getBaseAlign(settings.align);
+
+  // IMPORTANT:
+  // - settings.x / settings.y are stored in REAL LCD px (not scaled).
+  // - Here we apply them directly as px offsets in objectPosition.
   const objectPosition = `calc(${base.x}% + ${settings.x}px) calc(${base.y}% + ${settings.y}px)`;
 
-  const overlay = {
+  const overlayConfig: OverlaySettings = {
     ...DEFAULT_OVERLAY,
     ...(settings.overlay || {}),
   };
 
-  const isVideo = mediaUrl?.toLowerCase().includes("mp4");
-
   return (
     <div
       style={{
+        position: "relative",
         width: `${lcdSize}px`,
         height: `${lcdSize}px`,
-        position: "relative",
         overflow: "hidden",
         borderRadius: "50%",
         background: "#000",
@@ -348,8 +478,8 @@ export default function KrakenOverlay() {
           loop={settings.loop}
           playsInline
           style={{
-            width: lcdSize,
-            height: lcdSize,
+            width: `${lcdSize}px`,
+            height: `${lcdSize}px`,
             objectFit: settings.fit,
             objectPosition,
             transform: `scale(${settings.scale})`,
@@ -360,10 +490,10 @@ export default function KrakenOverlay() {
         mediaUrl && (
           <img
             src={mediaUrl}
-            alt=""
+            alt="NZXT LCD"
             style={{
-              width: lcdSize,
-              height: lcdSize,
+              width: `${lcdSize}px`,
+              height: `${lcdSize}px`,
               objectFit: settings.fit,
               objectPosition,
               transform: `scale(${settings.scale})`,
@@ -373,7 +503,8 @@ export default function KrakenOverlay() {
         )
       )}
 
-      <SingleOverlay overlay={overlay} metrics={metrics} />
+      {/* Single Infographic overlay (more modes will be added later) */}
+      <SingleOverlay overlay={overlayConfig} metrics={metrics} />
     </div>
   );
 }
