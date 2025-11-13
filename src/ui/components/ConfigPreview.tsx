@@ -13,6 +13,49 @@ import {
   AlignVerticalSpaceAround,
 } from "lucide-react";
 
+// -------------------------------------------------------------------------------------------------
+// Overlay system: future-proof settings for LCD metric overlays.
+// This adds no UI yet, but fully integrates model + defaults + load/save merging.
+// -------------------------------------------------------------------------------------------------
+
+export type OverlayMode = "none" | "single" | "dual" | "triple";
+
+export type OverlayMetricKey =
+  | "cpuTemp"
+  | "cpuLoad"
+  | "cpuClock"
+  | "liquidTemp"
+  | "gpuTemp"
+  | "gpuLoad"
+  | "gpuClock";
+
+export interface OverlaySettings {
+  mode: OverlayMode;
+
+  // Which metric to display when in "single" mode
+  primaryMetric?: OverlayMetricKey;
+
+  // Colors for numbers + labels
+  numberColor?: string;
+  textColor?: string;
+
+  // Future: adjustable font sizes
+  numberSize?: number;
+  textSize?: number;
+
+  // Future: NZXT-style circular arc bar
+  circularBar?: {
+    enabled: boolean;
+    color: string;
+    thickness: number;
+    opacity: number;
+  };
+}
+
+// -------------------------------------------------------------------------------------------------
+// Settings: extended to include "overlay" container.
+// -------------------------------------------------------------------------------------------------
+
 type Settings = {
   scale: number;
   x: number;
@@ -24,7 +67,13 @@ type Settings = {
   mute: boolean;
   resolution: string;
   showGuide?: boolean;
+
+  overlay?: OverlaySettings;
 };
+
+// -------------------------------------------------------------------------------------------------
+// DEFAULTS with full overlay system
+// -------------------------------------------------------------------------------------------------
 
 const DEFAULTS: Settings = {
   scale: 1,
@@ -37,7 +86,27 @@ const DEFAULTS: Settings = {
   mute: true,
   resolution: `${window.innerWidth} x ${window.innerHeight}`,
   showGuide: true,
+
+  overlay: {
+    mode: "none",
+    primaryMetric: "cpuTemp",
+
+    numberColor: "#FFFFFF",
+    textColor: "#E5E7EB",
+
+    numberSize: 38,
+    textSize: 14,
+
+    circularBar: {
+      enabled: false,
+      color: "#00A2FF",
+      thickness: 6,
+      opacity: 0.9,
+    },
+  },
 };
+
+// -------------------------------------------------------------------------------------------------
 
 const CFG_KEY = "nzxtPinterestConfig";
 const CFG_COMPAT = "nzxtMediaConfig";
@@ -48,6 +117,7 @@ export default function ConfigPreview() {
   const [mediaUrl, setMediaUrl] = useState<string>("");
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [isDragging, setIsDragging] = useState(false);
+
   const dragStart = useRef<{ x: number; y: number } | null>(null);
   const hasLoadedRef = useRef(false);
   const hasInteractedRef = useRef(false);
@@ -56,7 +126,9 @@ export default function ConfigPreview() {
   const previewSize = 200;
   const offsetScale = previewSize / lcdResolution;
 
-  // === Load from storage on mount ===
+  // -------------------------------------------------------------------------------------------------
+  // Load from storage on mount (deep merge to ensure overlay exists)
+  // -------------------------------------------------------------------------------------------------
   useEffect(() => {
     const savedUrl = localStorage.getItem(URL_KEY);
     const savedCfg =
@@ -65,11 +137,23 @@ export default function ConfigPreview() {
     if (savedCfg) {
       try {
         const parsed = JSON.parse(savedCfg);
-        const cleaned = Object.fromEntries(
-          Object.entries(parsed).filter(([k, v]) => v !== undefined && v !== null)
-        );
-        setSettings({ ...DEFAULTS, ...cleaned });
-        setMediaUrl(cleaned.url || savedUrl || "");
+
+        // Deep-merge settings including nested overlay + circularBar
+        const merged: Settings = {
+          ...DEFAULTS,
+          ...parsed,
+          overlay: {
+            ...DEFAULTS.overlay,
+            ...(parsed.overlay || {}),
+            circularBar: {
+              ...DEFAULTS.overlay?.circularBar,
+              ...(parsed.overlay?.circularBar || {}),
+            },
+          },
+        };
+
+        setSettings(merged);
+        setMediaUrl(parsed.url || savedUrl || "");
       } catch {
         console.warn("⚠️ Failed to parse saved config, using defaults.");
         setSettings(DEFAULTS);
@@ -80,14 +164,16 @@ export default function ConfigPreview() {
       setMediaUrl(savedUrl || "");
     }
 
-    // apply language only if not previously set
-    const langFromStorage = localStorage.getItem(LANG_KEY);
-    if (!langFromStorage) setLang(getInitialLang());
+    if (!localStorage.getItem(LANG_KEY)) {
+      setLang(getInitialLang());
+    }
 
     hasLoadedRef.current = true;
   }, []);
 
-  // === Enable realtime sync only after first user interaction ===
+  // -------------------------------------------------------------------------------------------------
+  // First interaction unlocks realtime syncing
+  // -------------------------------------------------------------------------------------------------
   useEffect(() => {
     const enableRealtime = () => {
       hasInteractedRef.current = true;
@@ -102,23 +188,44 @@ export default function ConfigPreview() {
     };
   }, []);
 
-  // === Listen for external changes (multi-tab / NZXT overlay) ===
+  // -------------------------------------------------------------------------------------------------
+  // Listen for storage updates (multi-tab / NZXT device)
+  // -------------------------------------------------------------------------------------------------
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === URL_KEY && e.newValue !== null) setMediaUrl(e.newValue);
+      if (e.key === URL_KEY && e.newValue !== null) {
+        setMediaUrl(e.newValue);
+      }
       if (e.key === CFG_KEY && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
-          setSettings((p) => ({ ...p, ...parsed }));
+
+          setSettings((prev) => ({
+            ...prev,
+            ...parsed,
+            overlay: {
+              ...prev.overlay,
+              ...(parsed.overlay || {}),
+              circularBar: {
+                ...prev.overlay?.circularBar,
+                ...(parsed.overlay?.circularBar || {}),
+              },
+            },
+          }));
         } catch {}
       }
-      if (e.key === LANG_KEY && e.newValue) setLang(e.newValue as Lang);
+      if (e.key === LANG_KEY && e.newValue) {
+        setLang(e.newValue as Lang);
+      }
     };
+
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  // === Throttled persist (every ~100ms), only after load + user interaction ===
+  // -------------------------------------------------------------------------------------------------
+  // Throttled persist every ~100ms
+  // -------------------------------------------------------------------------------------------------
   const lastSyncRef = useRef(0);
   useEffect(() => {
     if (!hasLoadedRef.current || !hasInteractedRef.current) return;
@@ -130,6 +237,7 @@ export default function ConfigPreview() {
     const save = { url: mediaUrl, ...settings };
     localStorage.setItem(CFG_KEY, JSON.stringify(save));
     localStorage.setItem(CFG_COMPAT, JSON.stringify(save));
+
     window.dispatchEvent(
       new StorageEvent("storage", {
         key: CFG_KEY,
@@ -138,7 +246,10 @@ export default function ConfigPreview() {
     );
   }, [mediaUrl, settings]);
 
-  // === Helpers ===
+  // -------------------------------------------------------------------------------------------------
+  // Helpers
+  // -------------------------------------------------------------------------------------------------
+
   const isVideo =
     /\.mp4($|\?)/i.test(mediaUrl) || mediaUrl.toLowerCase().includes("mp4");
 
@@ -161,27 +272,34 @@ export default function ConfigPreview() {
   const adjY = settings.y * offsetScale;
   const objectPosition = `calc(${base.x}% + ${adjX}px) calc(${base.y}% + ${adjY}px)`;
 
-  // === Drag to move ===
+  // -------------------------------------------------------------------------------------------------
+  // Dragging
+  // -------------------------------------------------------------------------------------------------
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     dragStart.current = { x: e.clientX, y: e.clientY };
     setIsDragging(true);
   };
+
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging || !dragStart.current) return;
     const dx = e.clientX - dragStart.current.x;
     const dy = e.clientY - dragStart.current.y;
+
     dragStart.current = { x: e.clientX, y: e.clientY };
-    setSettings((p) => ({
-      ...p,
-      x: p.x + Math.round(dx / offsetScale),
-      y: p.y + Math.round(dy / offsetScale),
+
+    setSettings((prev) => ({
+      ...prev,
+      x: prev.x + Math.round(dx / offsetScale),
+      y: prev.y + Math.round(dy / offsetScale),
     }));
   };
+
   const handleMouseUp = () => {
     setIsDragging(false);
     dragStart.current = null;
   };
+
   useEffect(() => {
     if (isDragging) {
       window.addEventListener("mousemove", handleMouseMove);
@@ -192,34 +310,48 @@ export default function ConfigPreview() {
     }
   }, [isDragging]);
 
-  // === Wheel zoom ===
+  // -------------------------------------------------------------------------------------------------
+  // Wheel Zoom
+  // -------------------------------------------------------------------------------------------------
   useEffect(() => {
     const circle = document.querySelector(".preview-circle");
     if (!circle) return;
+
     const onWheel = (e: WheelEvent) => {
       if (!circle.contains(e.target as Node)) return;
       e.preventDefault();
+
       const step = e.ctrlKey ? 0.2 : 0.1;
       const delta = e.deltaY < 0 ? step : -step;
-      setSettings((p) => ({
-        ...p,
-        scale: Math.min(Math.max(parseFloat((p.scale + delta).toFixed(2)), 0.1), 5),
+
+      setSettings((prev) => ({
+        ...prev,
+        scale: Math.min(Math.max(parseFloat((prev.scale + delta).toFixed(2)), 0.1), 5),
       }));
     };
+
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
   }, []);
 
+  // -------------------------------------------------------------------------------------------------
+
   const adjustScale = (delta: number) =>
-    setSettings((p) => ({
-      ...p,
-      scale: Math.min(Math.max(parseFloat((p.scale + delta).toFixed(2)), 0.1), 5),
+    setSettings((prev) => ({
+      ...prev,
+      scale: Math.min(
+        Math.max(parseFloat((prev.scale + delta).toFixed(2)), 0.1),
+        5
+      ),
     }));
 
   const resetField = (field: keyof Settings) =>
-    setSettings((p) => ({ ...p, [field]: DEFAULTS[field] }));
+    setSettings((prev) => ({ ...prev, [field]: DEFAULTS[field] }));
 
-  // === Icons ===
+  // -------------------------------------------------------------------------------------------------
+  // Icons
+  // -------------------------------------------------------------------------------------------------
+
   const alignIcons = [
     { key: "center", icon: <AlignVerticalSpaceAround size={16} /> },
     { key: "top", icon: <AlignStartHorizontal size={16} /> },
@@ -234,7 +366,10 @@ export default function ConfigPreview() {
     { key: "fill", icon: <MoveHorizontal size={16} /> },
   ];
 
-  // === Render ===
+  // -------------------------------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------------------------------
+
   return (
     <div className="config-wrapper">
       <div className="preview-column">
@@ -312,7 +447,10 @@ export default function ConfigPreview() {
                   type="checkbox"
                   checked={!!settings.showGuide}
                   onChange={(e) =>
-                    setSettings((p) => ({ ...p, showGuide: e.target.checked }))
+                    setSettings((prev) => ({
+                      ...prev,
+                      showGuide: e.target.checked,
+                    }))
                   }
                 />
                 <span className="slider" />
@@ -333,8 +471,8 @@ export default function ConfigPreview() {
                   step={step || 1}
                   value={(settings as any)[field]}
                   onChange={(e) =>
-                    setSettings((p) => ({
-                      ...p,
+                    setSettings((prev) => ({
+                      ...prev,
                       [field]: parseFloat(e.target.value || "0"),
                     }))
                   }
@@ -357,9 +495,15 @@ export default function ConfigPreview() {
                   <button
                     key={key}
                     className={`icon-btn ${settings.align === key ? "active" : ""}`}
-                    title={t(`align${key[0].toUpperCase() + key.slice(1)}`, lang)}
+                    title={t(
+                      `align${key[0].toUpperCase() + key.slice(1)}`,
+                      lang
+                    )}
                     onClick={() =>
-                      setSettings((p) => ({ ...p, align: key as Settings["align"] }))
+                      setSettings((prev) => ({
+                        ...prev,
+                        align: key as Settings["align"],
+                      }))
                     }
                   >
                     {icon}
@@ -383,9 +527,15 @@ export default function ConfigPreview() {
                   <button
                     key={key}
                     className={`icon-btn ${settings.fit === key ? "active" : ""}`}
-                    title={t(`fit${key[0].toUpperCase() + key.slice(1)}`, lang)}
+                    title={t(
+                      `fit${key[0].toUpperCase() + key.slice(1)}`,
+                      lang
+                    )}
                     onClick={() =>
-                      setSettings((p) => ({ ...p, fit: key as Settings["fit"] }))
+                      setSettings((prev) => ({
+                        ...prev,
+                        fit: key as Settings["fit"],
+                      }))
                     }
                   >
                     {icon}
