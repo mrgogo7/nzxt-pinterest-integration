@@ -426,25 +426,23 @@ function SingleOverlay({
 
 			<div
 			  style={{
+				display: "inline-block",
 				fontSize: `${unitSize}px`,
 				color: numberColor,
 				fontWeight: 700,
 				lineHeight: 1,
 
-				// ° için daha yukarı
-				transform:
-				  valueUnitType === "temp"
-					? "translateY(-35%)"                // derece yukarı hizalama
-					: valueUnitType === "percent"
-					? "translateY(25%)"                 // % aşağı hizalama
-					: "translateY(0)",
-
-				// LCD’de tam hizalama için
-				marginLeft: numberSize * 0.05,
+				verticalAlign:
+				  valueUnitType === "temp"     // ° işareti
+					? "top"
+					: valueUnitType === "percent" // % işareti
+					? "bottom"
+					: "baseline",
 			  }}
 			>
 			  {valueUnit}
 			</div>
+
         </div>
       ) : (
         <>
