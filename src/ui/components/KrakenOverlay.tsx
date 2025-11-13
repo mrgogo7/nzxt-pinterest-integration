@@ -114,24 +114,34 @@ function useMetrics() {
   });
 
   useEffect(() => {
-    const nz = (window as any)?.nzxt?.v1;
+    // ---- FIND REAL NZXT API IN ALL POSSIBLE LOCATIONS ----
+    const api =
+      (window as any)?.nzxt?.v1 ||
+      (window as any)?.NZXT?.v1 ||
+      (window as any)?.NZXTV1 ||
+      (window as any)?.NZXTv1;
 
-    // 1) API VARSA BAĞLAN
-    if (nz) {
-      console.log("[NZXT] API detected. Initializing…");
+    if (api) {
+      console.log("[NZXT] API detected:", api);
 
       try {
-        // Bazı CAM sürümleri veri göndermeden önce request istiyor
-        if (typeof nz.requestMonitoringData === "function") {
-          console.log("[NZXT] requestMonitoringData() called.");
-          nz.requestMonitoringData();
+        // Some CAM versions require initializing data stream
+        if (typeof api.start === "function") {
+          console.log("[NZXT] start() called");
+          api.start();
         }
 
-        // Asıl data callback
-        if (typeof nz.onMonitoringDataUpdate === "function") {
-          console.log("[NZXT] onMonitoringDataUpdate registered.");
+        // Some versions require explicit request for monitoring data
+        if (typeof api.requestMonitoringData === "function") {
+          console.log("[NZXT] requestMonitoringData() called");
+          api.requestMonitoringData();
+        }
 
-          nz.onMonitoringDataUpdate((packet: any) => {
+        // Main listener for monitoring data
+        if (typeof api.onMonitoringDataUpdate === "function") {
+          console.log("[NZXT] onMonitoringDataUpdate registered");
+
+          api.onMonitoringDataUpdate((packet: any) => {
             const cpu = packet.cpu || {};
             const gpu = packet.gpu || {};
             const liquid = packet.liquid || {};
@@ -149,27 +159,27 @@ function useMetrics() {
             });
           });
 
-          return;
+          return; // <<--- IMPORTANT: stop mock mode
         }
       } catch (err) {
-        console.error("[NZXT] API init error:", err);
+        console.error("[NZXT] API error:", err);
       }
     }
 
-    // 2) API YOKSA → MOCK
-    console.warn("[NZXT] Monitoring API NOT available → using stable mock.");
+    // ---- FALLBACK MOCK (browser / unsupported CAM) ----
+    console.warn("[NZXT] Monitoring API not found → using mock values");
 
     const interval = setInterval(() => {
       setData({
-        cpuTemp: 40,
-        cpuLoad: 25,
-        cpuClock: 4500,
-        gpuTemp: 55,
-        gpuLoad: 32,
-        gpuClock: 1800,
-        liquidTemp: 34,
+        cpuTemp: 41,
+        cpuLoad: 28,
+        cpuClock: 4490,
+        liquidTemp: 36,
+        gpuTemp: 52,
+        gpuLoad: 30,
+        gpuClock: 1770,
       });
-    }, 500);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
