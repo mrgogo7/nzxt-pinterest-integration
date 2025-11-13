@@ -311,36 +311,48 @@ function useMonitoringMetrics(): OverlayMetrics {
 function getOverlayLabelAndValue(
   key: OverlayMetricKey,
   rawValue: number
-): { label: string; displayValue: string } {
+): {
+  label: string;
+  valueNumber: string;
+  valueUnit: string;
+  valueUnitType: "temp" | "percent" | "clock" | "none";
+} {
   let label: string;
   let unit = "";
+  let unitType: "temp" | "percent" | "clock" | "none" = "none";
 
-  if (key.startsWith("cpu")) {
-    label = "CPU";
-  } else if (key.startsWith("gpu")) {
-    label = "GPU";
-  } else if (key === "liquidTemp") {
-    label = "Liquid";
-  } else {
-    label = key.toUpperCase();
-  }
+  // CPU / GPU / Liquid label mapping
+  if (key.startsWith("cpu")) label = "CPU";
+  else if (key.startsWith("gpu")) label = "GPU";
+  else if (key === "liquidTemp") label = "Liquid";
+  else label = key.toUpperCase();
 
+  // Units
   if (key === "cpuTemp" || key === "gpuTemp" || key === "liquidTemp") {
     unit = "°";
+    unitType = "temp";
   } else if (key === "cpuLoad" || key === "gpuLoad") {
     unit = "%";
+    unitType = "percent";
   } else if (key === "cpuClock" || key === "gpuClock") {
     unit = "MHz";
+    unitType = "clock";
   }
 
   const rounded = Math.round(rawValue);
-  const displayValue =
+  const valueNumber =
     typeof rounded === "number" && !Number.isNaN(rounded)
-      ? `${rounded}${unit}`
+      ? `${rounded}`
       : "-";
 
-  return { label, displayValue };
+  return {
+    label,
+    valueNumber,
+    valueUnit: unit,
+    valueUnitType: unitType,
+  };
 }
+
 
 /**
  * Single infographic overlay rendered on top of the media.
@@ -358,10 +370,25 @@ function SingleOverlay({
   const key = overlay.primaryMetric;
   const value = metrics[key];
 
-  const { label, displayValue } = getOverlayLabelAndValue(key, value);
+  const {
+    label,
+    valueNumber,
+    valueUnit,
+    valueUnitType,
+  } = getOverlayLabelAndValue(key, value);
 
   const numberColor = overlay.numberColor;
   const textColor = overlay.textColor;
+
+  const numberSize = overlay.numberSize;
+  const unitSize =
+    valueUnitType === "temp"
+      ? numberSize * 0.5
+      : valueUnitType === "percent"
+      ? numberSize * 0.6
+      : numberSize * 0.4;
+
+  const isClock = valueUnitType === "clock";
 
   return (
     <div
@@ -377,16 +404,65 @@ function SingleOverlay({
         fontFamily: "nzxt-extrabold",
       }}
     >
-      <div
-        style={{
-          fontSize: `${overlay.numberSize}px`,
-          fontWeight: 700,
-          color: numberColor,
-          lineHeight: 0.9,
-        }}
-      >
-        {displayValue}
-      </div>
+      {/* Number + Unit (side-by-side if NOT clock) */}
+      {!isClock ? (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            lineHeight: 0.9,
+          }}
+        >
+          <div
+            style={{
+              fontSize: `${numberSize}px`,
+              fontWeight: 700,
+              color: numberColor,
+            }}
+          >
+            {valueNumber}
+          </div>
+
+          <div
+            style={{
+              fontSize: `${unitSize}px`,
+              marginLeft: 4,
+              marginTop: numberSize * 0.15,
+              color: numberColor,
+            }}
+          >
+            {valueUnit}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* CLOCK number */}
+          <div
+            style={{
+              fontSize: `${numberSize}px`,
+              fontWeight: 700,
+              color: numberColor,
+              lineHeight: 0.9,
+            }}
+          >
+            {valueNumber}
+          </div>
+
+          {/* MHz below */}
+          <div
+            style={{
+              fontSize: `${unitSize}px`,
+              marginTop: -numberSize * 0.15,
+              color: numberColor,
+            }}
+          >
+            MHz
+          </div>
+        </>
+      )}
+
+      {/* Label (CPU / GPU / Liquid) */}
       <div
         style={{
           fontSize: `${overlay.textSize}px`,
@@ -401,7 +477,6 @@ function SingleOverlay({
     </div>
   );
 }
-
 /**
  * KrakenOverlay:
  * - No props
