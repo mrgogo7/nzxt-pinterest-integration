@@ -429,7 +429,7 @@ function SingleOverlay({
               fontSize: `${unitSize}px`,
               color: numberColor,
 			  fontWeight: 700,
-			  alignself: "flex-start",
+			  alignSelf: "flex-start",
             }}
           >
             {valueUnit}
