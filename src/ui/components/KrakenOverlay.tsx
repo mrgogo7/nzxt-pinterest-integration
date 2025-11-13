@@ -335,7 +335,7 @@ function SingleOverlay({
     >
       <div
         style={{
-          fontSize: "80px",
+          fontSize: "180px",
           fontWeight: 700,
           color: numberColor,
           lineHeight: 0.9,
@@ -345,7 +345,7 @@ function SingleOverlay({
       </div>
       <div
         style={{
-          fontSize: "26px",
+          fontSize: "126px",
           color: textColor,
           marginTop: -6,
           textTransform: "uppercase",
