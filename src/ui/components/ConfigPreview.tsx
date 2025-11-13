@@ -1,3 +1,9 @@
+@font-face {
+  font-family: "nzxt-extrabold";
+  src: url("./fonts/NZXTExtraBold-Regular.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+}
 import React, { useEffect, useRef, useState } from "react";
 import "../styles/ConfigPreview.css";
 import { LANG_KEY, Lang, t, getInitialLang } from "../../i18n";
@@ -80,6 +86,7 @@ const DEFAULTS: Settings = {
     textColor: "#ffffff",
     numberSize: 180,
     textSize: 80,
+	fontFamily: "nzxt-extrabold",
   },
 };
 
