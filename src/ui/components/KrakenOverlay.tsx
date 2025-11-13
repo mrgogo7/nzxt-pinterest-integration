@@ -8,7 +8,8 @@ import React, { useEffect, useState } from "react";
    - Reads media URL + settings from localStorage (same keys as ConfigPreview)
    - Mirrors the LCD transform logic (scale, offset, align, fit)
    - Adds basic "Single Infographic" overlay support
-   - Does NOT require any props (safe for ?kraken=1 entry)
+   - Uses REAL NZXT API when available
+   - Falls back to MOCK animation only when API is missing
   ================================================================
 */
 
@@ -41,12 +42,9 @@ interface Settings {
   mute: boolean;
   resolution: string;
   showGuide?: boolean;
-  overlay?: OverlaySettings; // optional to stay compatible with old saved configs
+  overlay?: OverlaySettings;
 }
 
-/**
- * Default overlay config when none is stored yet.
- */
 const DEFAULT_OVERLAY: OverlaySettings = {
   mode: "none",
   primaryMetric: "cpuTemp",
@@ -54,10 +52,6 @@ const DEFAULT_OVERLAY: OverlaySettings = {
   textColor: "#cccccc",
 };
 
-/**
- * Default visual settings (must match ConfigPreview logic).
- * NOTE: overlay is optional and will be merged with DEFAULT_OVERLAY at runtime.
- */
 const DEFAULTS: Settings = {
   scale: 1,
   x: 0,
@@ -72,16 +66,13 @@ const DEFAULTS: Settings = {
   overlay: DEFAULT_OVERLAY,
 };
 
-/**
- * Storage keys shared with the ConfigPreview component.
- */
 const CFG_KEY = "nzxtPinterestConfig";
 const CFG_COMPAT = "nzxtMediaConfig";
 const URL_KEY = "media_url";
 
-/**
- * Convert alignment setting to base percentage anchor.
- */
+/* --------------------------------------------------------------- */
+/* Alignment mapping                                               */
+/* --------------------------------------------------------------- */
 function getBaseAlign(align: Settings["align"]) {
   switch (align) {
     case "top":
@@ -93,39 +84,57 @@ function getBaseAlign(align: Settings["align"]) {
     case "right":
       return { x: 100, y: 50 };
     default:
-      return { x: 50, y: 50 }; // center
+      return { x: 50, y: 50 };
   }
 }
 
-/**
- * Hook to provide monitoring data.
- * - In NZXT CAM, this should be replaced by @nzxt/web-integrations data.
- * - In normal browsers, it falls back to smooth mock values so the overlay
- *   still looks alive during development.
- */
+/* --------------------------------------------------------------- */
+/* REAL + MOCK metrics                                             */
+/* --------------------------------------------------------------- */
 function useMockOrRealMetrics() {
   const [data, setData] = useState({
-    cpuTemp: 42,
-    cpuLoad: 17,
-    cpuClock: 4520,
-    liquidTemp: 38,
-    gpuTemp: 55,
-    gpuLoad: 34,
-    gpuClock: 1780,
+    cpuTemp: 0,
+    cpuLoad: 0,
+    cpuClock: 0,
+    liquidTemp: 0,
+    gpuTemp: 0,
+    gpuLoad: 0,
+    gpuClock: 0,
   });
 
+  const [hasRealAPI, setHasRealAPI] = useState(false);
+
   useEffect(() => {
+    const nzxt = (window as any)?.nzxt?.v1;
+
+    /* ---------------------------------------------------------------
+       REAL NZXT CAM API (new v1 event-based system)
+       If available → use real values and DISABLE mock entirely.
+    --------------------------------------------------------------- */
+    if (nzxt && typeof nzxt.onMonitoringDataUpdate === "function") {
+      setHasRealAPI(true);
+
+      nzxt.onMonitoringDataUpdate((packet: any) => {
+        setData({
+          cpuTemp: packet.cpu?.temperature ?? 0,
+          cpuLoad: packet.cpu?.load ?? 0,
+          cpuClock: packet.cpu?.clock ?? 0,
+          liquidTemp: packet.liquid?.temperature ?? 0,
+          gpuTemp: packet.gpu?.temperature ?? 0,
+          gpuLoad: packet.gpu?.load ?? 0,
+          gpuClock: packet.gpu?.clock ?? 0,
+        });
+      });
+
+      return; // IMPORTANT — mock is skipped
+    }
+
+    /* ---------------------------------------------------------------
+       MOCK MODE — only used in browser preview (!CAM)
+    --------------------------------------------------------------- */
+    setHasRealAPI(false);
+
     const interval = setInterval(() => {
-      const nzxt = (window as any)?.nzxt?.v1;
-
-      // Real NZXT data path (to be aligned with @nzxt/web-integrations)
-      if (nzxt && typeof nzxt.onMonitoringDataUpdate === "function") {
-        // If user wires @nzxt/web-integrations, they can override this hook.
-        // For now, we keep mock behaviour here and rely on future integration.
-        // This block is left intentionally simple for forward compatibility.
-      }
-
-      // Mock animation for browser preview / development
       setData((prev) => ({
         cpuTemp: (prev.cpuTemp + 0.3) % 90,
         cpuLoad: (prev.cpuLoad + 1) % 100,
@@ -143,10 +152,9 @@ function useMockOrRealMetrics() {
   return data;
 }
 
-/**
- * Single infographic overlay rendered on top of the media.
- * This is the first overlay mode we support.
- */
+/* --------------------------------------------------------------- */
+/* SINGLE overlay render                                           */
+/* --------------------------------------------------------------- */
 function SingleOverlay({
   overlay,
   metrics,
@@ -159,15 +167,12 @@ function SingleOverlay({
   const key = overlay.primaryMetric;
   const value = (metrics as any)[key];
 
-  const numberColor = overlay.numberColor;
-  const textColor = overlay.textColor;
-
   return (
     <div
       style={{
         position: "absolute",
-        zIndex: 20,
         inset: 0,
+        zIndex: 20,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -180,19 +185,20 @@ function SingleOverlay({
         style={{
           fontSize: "80px",
           fontWeight: 700,
-          color: numberColor,
+          color: overlay.numberColor,
           lineHeight: 0.9,
         }}
       >
         {typeof value === "number" ? Math.round(value) : value}
       </div>
+
       <div
         style={{
-          fontSize: "26px",
-          color: textColor,
-          marginTop: -6,
+          fontSize: "24px",
+          marginTop: -4,
           textTransform: "uppercase",
           letterSpacing: 1,
+          color: overlay.textColor,
         }}
       >
         {key}
@@ -201,23 +207,18 @@ function SingleOverlay({
   );
 }
 
-/**
- * KrakenOverlay:
- * - No props
- * - Reads from localStorage (same data model as ConfigPreview)
- * - Renders the LCD-sized media (640x640) with the same transform logic
- * - Draws overlays on top of the media
- */
+/* --------------------------------------------------------------- */
+/* MAIN COMPONENT                                                  */
+/* --------------------------------------------------------------- */
 export default function KrakenOverlay() {
   const [mediaUrl, setMediaUrl] = useState<string>("");
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const metrics = useMockOrRealMetrics();
 
-  // Determine LCD size from NZXT if available, otherwise default to 640.
   const lcdResolution = (window as any)?.nzxt?.v1?.width || 640;
-  const lcdSize = lcdResolution; // square LCD
+  const lcdSize = lcdResolution;
 
-  // Load from localStorage on mount
+  /* Load from storage on mount */
   useEffect(() => {
     const savedUrl = localStorage.getItem(URL_KEY);
     const savedCfg =
@@ -227,28 +228,19 @@ export default function KrakenOverlay() {
       try {
         const parsed = JSON.parse(savedCfg);
 
-        const cleaned = Object.fromEntries(
-          Object.entries(parsed).filter(
-            ([, v]) => v !== undefined && v !== null,
-          ),
-        );
-
         const mergedOverlay: OverlaySettings = {
           ...DEFAULT_OVERLAY,
-          ...(cleaned.overlay || {}),
+          ...(parsed.overlay || {}),
         };
 
         setSettings({
           ...DEFAULTS,
-          ...cleaned,
+          ...parsed,
           overlay: mergedOverlay,
         });
 
-        setMediaUrl(cleaned.url || savedUrl || "");
+        setMediaUrl(parsed.url || savedUrl || "");
       } catch {
-        console.warn(
-          "[KrakenOverlay] Failed to parse saved config, using defaults.",
-        );
         setSettings(DEFAULTS);
         setMediaUrl(savedUrl || "");
       }
@@ -258,7 +250,7 @@ export default function KrakenOverlay() {
     }
   }, []);
 
-  // Listen for config changes (ConfigPreview updates localStorage + storage events)
+  /* Listen for ConfigPreview changes */
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (e.key === URL_KEY && e.newValue !== null) {
@@ -267,19 +259,18 @@ export default function KrakenOverlay() {
       if (e.key === CFG_KEY && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
+
           const mergedOverlay: OverlaySettings = {
             ...DEFAULT_OVERLAY,
             ...(parsed.overlay || {}),
           };
 
-          setSettings((prev) => ({
-            ...prev,
+          setSettings({
+            ...DEFAULTS,
             ...parsed,
             overlay: mergedOverlay,
-          }));
-        } catch {
-          // ignore malformed payloads
-        }
+          });
+        } catch {}
       }
     };
 
@@ -291,13 +282,9 @@ export default function KrakenOverlay() {
     /\.mp4($|\?)/i.test(mediaUrl) || mediaUrl.toLowerCase().includes("mp4");
 
   const base = getBaseAlign(settings.align);
-
-  // IMPORTANT:
-  // - settings.x / settings.y are stored in REAL LCD px (not scaled).
-  // - Here we apply them directly as px offsets in objectPosition.
   const objectPosition = `calc(${base.x}% + ${settings.x}px) calc(${base.y}% + ${settings.y}px)`;
 
-  const overlayConfig: OverlaySettings = {
+  const overlayCfg = {
     ...DEFAULT_OVERLAY,
     ...(settings.overlay || {}),
   };
@@ -346,8 +333,8 @@ export default function KrakenOverlay() {
         )
       )}
 
-      {/* Single Infographic overlay (more modes will be added later) */}
-      <SingleOverlay overlay={overlayConfig} metrics={metrics} />
+      {/* Overlay */}
+      <SingleOverlay overlay={overlayCfg} metrics={metrics} />
     </div>
   );
 }
