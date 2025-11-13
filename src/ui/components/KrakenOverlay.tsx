@@ -8,8 +8,9 @@ import React, { useEffect, useState } from "react";
    - Reads media URL + settings from localStorage (same keys as ConfigPreview)
    - Mirrors the LCD transform logic (scale, offset, align, fit)
    - Adds basic "Single Infographic" overlay support
-   - Uses REAL NZXT API if available
-   - If NZXT API is not available (browser), metrics stay static (no auto-increase)
+   - Registers window.nzxt.v1.onMonitoringDataUpdate so that CAM can
+     push real monitoring data into this component on the Kraken Browser.
+   - Does NOT require any props (safe for ?kraken=1 entry)
   ================================================================
 */
 
@@ -42,7 +43,7 @@ interface Settings {
   mute: boolean;
   resolution: string;
   showGuide?: boolean;
-  overlay?: OverlaySettings; // keep optional for backward compatibility
+  overlay?: OverlaySettings; // optional to stay compatible with old saved configs
 }
 
 /**
@@ -57,6 +58,7 @@ const DEFAULT_OVERLAY: OverlaySettings = {
 
 /**
  * Default visual settings (must match ConfigPreview logic).
+ * NOTE: overlay is optional and will be merged with DEFAULT_OVERLAY at runtime.
  */
 const DEFAULTS: Settings = {
   scale: 1,
@@ -98,115 +100,198 @@ function getBaseAlign(align: Settings["align"]) {
 }
 
 /**
- * Metrics hook:
- * - If NZXT CAM API is present → subscribe to onMonitoringDataUpdate
- * - If not present (plain browser) → keep defaults, DO NOT animate
+ * Helper to safely pick first numeric value from a list of candidates.
+ * This makes us resilient to small API changes on NZXT side.
  */
-function useMetrics() {
-  const [data, setData] = useState({
-    cpuTemp: 0,
-    cpuLoad: 0,
-    cpuClock: 0,
-    liquidTemp: 0,
-    gpuTemp: 0,
-    gpuLoad: 0,
-    gpuClock: 0,
-  });
+function pickNumeric(...values: unknown[]): number {
+  for (const v of values) {
+    if (typeof v === "number" && !Number.isNaN(v)) {
+      return v;
+    }
+  }
+  return 0;
+}
+
+/**
+ * Shape of the metrics we care about inside the overlay.
+ */
+type OverlayMetrics = {
+  cpuTemp: number;
+  cpuLoad: number;
+  cpuClock: number;
+  liquidTemp: number;
+  gpuTemp: number;
+  gpuLoad: number;
+  gpuClock: number;
+};
+
+/**
+ * Default metrics used before the first monitoring payload arrives.
+ */
+const DEFAULT_METRICS: OverlayMetrics = {
+  cpuTemp: 0,
+  cpuLoad: 0,
+  cpuClock: 0,
+  liquidTemp: 0,
+  gpuTemp: 0,
+  gpuLoad: 0,
+  gpuClock: 0,
+};
+
+/**
+ * Map NZXT MonitoringData into the OverlayMetrics shape.
+ * The field names are inferred from the public docs & types and guarded with
+ * pickNumeric() so that missing properties simply become 0 instead of crashing.
+ */
+function mapMonitoringToOverlay(data: any): OverlayMetrics {
+  const cpu0 = data?.cpus?.[0];
+  const gpu0 = data?.gpus?.[0];
+  const kraken = data?.kraken;
+
+  return {
+    cpuTemp: pickNumeric(
+      cpu0?.temperature,
+      cpu0?.currentTemperature,
+      cpu0?.packageTemperature
+    ),
+    cpuLoad: pickNumeric(cpu0?.load, cpu0?.usage, cpu0?.totalLoad),
+    cpuClock: pickNumeric(
+      cpu0?.clockSpeed,
+      cpu0?.clock,
+      cpu0?.frequencyMhz,
+      cpu0?.frequencyMHz
+    ),
+    liquidTemp: pickNumeric(
+      kraken?.liquidTemperature,
+      kraken?.liquidTemp,
+      kraken?.temperature
+    ),
+    gpuTemp: pickNumeric(
+      gpu0?.temperature,
+      gpu0?.currentTemperature,
+      gpu0?.gpuTemperature
+    ),
+    gpuLoad: pickNumeric(gpu0?.load, gpu0?.usage, gpu0?.totalLoad),
+    gpuClock: pickNumeric(
+      gpu0?.clockSpeed,
+      gpu0?.clock,
+      gpu0?.frequencyMhz,
+      gpu0?.frequencyMHz
+    ),
+  };
+}
+
+/**
+ * Hook to provide monitoring data.
+ *
+ * - On **Kraken Browser** (`?kraken=1`):
+ *   We register `window.nzxt.v1.onMonitoringDataUpdate = handler`.
+ *   CAM will call this function every second with real monitoring data.
+ *
+ * - On **normal browser**:
+ *   There is no CAM, so we fall back to a lightweight mock animation so
+ *   that the overlay still looks alive during development.
+ */
+function useMonitoringMetrics(): OverlayMetrics {
+  const [metrics, setMetrics] = useState<OverlayMetrics>(DEFAULT_METRICS);
 
   useEffect(() => {
-    // ---- FIND REAL NZXT API IN ALL POSSIBLE LOCATIONS ----
-    const api =
-      (window as any)?.nzxt?.v1 ||
-      (window as any)?.NZXT?.v1 ||
-      (window as any)?.NZXTV1 ||
-      (window as any)?.NZXTv1;
+    const searchParams = new URLSearchParams(window.location.search);
+    const isKraken = searchParams.get("kraken") === "1";
 
-    if (api) {
-      console.log("[NZXT] API detected:", api);
-
-      try {
-        // Some CAM versions require initializing data stream
-        if (typeof api.start === "function") {
-          console.log("[NZXT] start() called");
-          api.start();
+    // Kraken Browser path: rely on real NZXT monitoring callback.
+    if (isKraken) {
+      const handler = (data: any) => {
+        try {
+          const mapped = mapMonitoringToOverlay(data);
+          setMetrics(mapped);
+        } catch (err) {
+          // In case of unexpected payload shape, keep previous metrics.
+          // eslint-disable-next-line no-console
+          console.warn("[KrakenOverlay] Failed to map monitoring data:", err);
         }
+      };
 
-        // Some versions require explicit request for monitoring data
-        if (typeof api.requestMonitoringData === "function") {
-          console.log("[NZXT] requestMonitoringData() called");
-          api.requestMonitoringData();
+      const w = window as any;
+      const prevNzxt = w.nzxt || {};
+      const prevV1 = prevNzxt.v1 || {};
+
+      // Attach our callback following the official docs (@nzxt/web-integrations-types).
+      w.nzxt = {
+        ...prevNzxt,
+        v1: {
+          ...prevV1,
+          onMonitoringDataUpdate: handler,
+        },
+      };
+
+      // eslint-disable-next-line no-console
+      console.log(
+        "[KrakenOverlay] Registered window.nzxt.v1.onMonitoringDataUpdate callback (Kraken Browser)."
+      );
+
+      // Cleanup: if we are still the active callback, remove ourselves.
+      return () => {
+        const current = (window as any).nzxt?.v1;
+        if (current && current.onMonitoringDataUpdate === handler) {
+          delete current.onMonitoringDataUpdate;
         }
-
-        // Main listener for monitoring data
-        if (typeof api.onMonitoringDataUpdate === "function") {
-          console.log("[NZXT] onMonitoringDataUpdate registered");
-
-          api.onMonitoringDataUpdate((packet: any) => {
-            const cpu = packet.cpu || {};
-            const gpu = packet.gpu || {};
-            const liquid = packet.liquid || {};
-
-            setData({
-              cpuTemp: cpu.temperature ?? cpu.temp ?? 0,
-              cpuLoad: cpu.load ?? 0,
-              cpuClock: cpu.clockSpeed ?? cpu.clock ?? 0,
-
-              gpuTemp: gpu.temperature ?? gpu.temp ?? 0,
-              gpuLoad: gpu.load ?? 0,
-              gpuClock: gpu.clockSpeed ?? gpu.clock ?? 0,
-
-              liquidTemp: liquid.temperature ?? liquid.temp ?? 0,
-            });
-          });
-
-          return; // <<--- IMPORTANT: stop mock mode
-        }
-      } catch (err) {
-        console.error("[NZXT] API error:", err);
-      }
+      };
     }
 
-    // ---- FALLBACK MOCK (browser / unsupported CAM) ----
-    console.warn("[NZXT] Monitoring API not found → using mock values");
+    // Configuration / normal browser path: simple mock animation for development.
+    // This will NEVER run inside NZXT Kraken Browser (because of the check above).
+    // We keep it lightweight so it does not interfere with real monitoring data.
+    // eslint-disable-next-line no-console
+    console.log(
+      "[KrakenOverlay] Not running as Kraken Browser (?kraken=1 missing). Using mock overlay metrics."
+    );
 
+    let t = 0;
     const interval = setInterval(() => {
-      setData({
-        cpuTemp: 41,
-        cpuLoad: 28,
-        cpuClock: 4490,
-        liquidTemp: 36,
-        gpuTemp: 52,
-        gpuLoad: 30,
-        gpuClock: 1770,
+      t += 1;
+      setMetrics({
+        cpuTemp: 40 + 10 * Math.sin(t / 15),
+        cpuLoad: (t * 3) % 100,
+        cpuClock: 4500 + (t % 200),
+        liquidTemp: 35 + 5 * Math.sin(t / 40),
+        gpuTemp: 50 + 15 * Math.sin(t / 25),
+        gpuLoad: (t * 2) % 100,
+        gpuClock: 1800 + (t % 150),
       });
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  return data;
+  return metrics;
 }
+
 /**
  * Single infographic overlay rendered on top of the media.
+ * This is the first overlay mode we support.
  */
 function SingleOverlay({
   overlay,
   metrics,
 }: {
   overlay: OverlaySettings;
-  metrics: ReturnType<typeof useMetrics>;
+  metrics: OverlayMetrics;
 }) {
   if (overlay.mode !== "single") return null;
 
   const key = overlay.primaryMetric;
-  const value = (metrics as any)[key];
+  const value = metrics[key];
+
+  const numberColor = overlay.numberColor;
+  const textColor = overlay.textColor;
 
   return (
     <div
       style={{
         position: "absolute",
-        inset: 0,
         zIndex: 20,
+        inset: 0,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -219,16 +304,16 @@ function SingleOverlay({
         style={{
           fontSize: "80px",
           fontWeight: 700,
-          color: overlay.numberColor,
+          color: numberColor,
           lineHeight: 0.9,
         }}
       >
-        {typeof value === "number" ? Math.round(value) : value}
+        {Math.round(value)}
       </div>
       <div
         style={{
           fontSize: "26px",
-          color: overlay.textColor,
+          color: textColor,
           marginTop: -6,
           textTransform: "uppercase",
           letterSpacing: 1,
@@ -242,7 +327,7 @@ function SingleOverlay({
 
 /**
  * KrakenOverlay:
- * - No props (safe for ?kraken=1 entry)
+ * - No props
  * - Reads from localStorage (same data model as ConfigPreview)
  * - Renders the LCD-sized media (640x640) with the same transform logic
  * - Draws overlays on top of the media
@@ -250,7 +335,7 @@ function SingleOverlay({
 export default function KrakenOverlay() {
   const [mediaUrl, setMediaUrl] = useState<string>("");
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
-  const metrics = useMetrics();
+  const metrics = useMonitoringMetrics();
 
   // Determine LCD size from NZXT if available, otherwise default to 640.
   const lcdResolution = (window as any)?.nzxt?.v1?.width || 640;
@@ -266,21 +351,27 @@ export default function KrakenOverlay() {
       try {
         const parsed = JSON.parse(savedCfg);
 
+        const cleaned = Object.fromEntries(
+          Object.entries(parsed).filter(
+            ([, v]) => v !== undefined && v !== null
+          )
+        );
+
         const mergedOverlay: OverlaySettings = {
           ...DEFAULT_OVERLAY,
-          ...(parsed.overlay || {}),
+          ...(cleaned.overlay || {}),
         };
 
         setSettings({
           ...DEFAULTS,
-          ...parsed,
+          ...cleaned,
           overlay: mergedOverlay,
         });
 
-        setMediaUrl(parsed.url || savedUrl || "");
+        setMediaUrl(cleaned.url || savedUrl || "");
       } catch {
         console.warn(
-          "[KrakenOverlay] Failed to parse saved config, using defaults.",
+          "[KrakenOverlay] Failed to parse saved config, using defaults."
         );
         setSettings(DEFAULTS);
         setMediaUrl(savedUrl || "");
@@ -305,11 +396,11 @@ export default function KrakenOverlay() {
             ...(parsed.overlay || {}),
           };
 
-          setSettings({
-            ...DEFAULTS,
+          setSettings((prev) => ({
+            ...prev,
             ...parsed,
             overlay: mergedOverlay,
-          });
+          }));
         } catch {
           // ignore malformed payloads
         }
@@ -325,7 +416,9 @@ export default function KrakenOverlay() {
 
   const base = getBaseAlign(settings.align);
 
-  // settings.x / settings.y are REAL LCD px offsets
+  // IMPORTANT:
+  // - settings.x / settings.y are stored in REAL LCD px (not scaled).
+  // - Here we apply them directly as px offsets in objectPosition.
   const objectPosition = `calc(${base.x}% + ${settings.x}px) calc(${base.y}% + ${settings.y}px)`;
 
   const overlayConfig: OverlaySettings = {
