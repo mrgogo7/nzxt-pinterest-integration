@@ -30,6 +30,8 @@ interface OverlaySettings {
   primaryMetric: OverlayMetricKey;
   numberColor: string;
   textColor: string;
+  numberSize: number;
+  textSize: number;
 }
 
 interface Settings {
@@ -54,6 +56,8 @@ const DEFAULT_OVERLAY: OverlaySettings = {
   primaryMetric: "cpuTemp",
   numberColor: "#ffffff",
   textColor: "#cccccc",
+  numberSize: 180,
+  textSize: 80,
 };
 
 /**
@@ -214,6 +218,7 @@ function mapMonitoringToOverlay(data: any): OverlayMetrics {
     ),
   };
 }
+
 /**
  * Hook to provide monitoring data.
  *
@@ -301,6 +306,43 @@ function useMonitoringMetrics(): OverlayMetrics {
 }
 
 /**
+ * Decide label + value string (with unit) for the given metric key.
+ */
+function getOverlayLabelAndValue(
+  key: OverlayMetricKey,
+  rawValue: number
+): { label: string; displayValue: string } {
+  let label: string;
+  let unit = "";
+
+  if (key.startsWith("cpu")) {
+    label = "CPU";
+  } else if (key.startsWith("gpu")) {
+    label = "GPU";
+  } else if (key === "liquidTemp") {
+    label = "Liquid";
+  } else {
+    label = key.toUpperCase();
+  }
+
+  if (key === "cpuTemp" || key === "gpuTemp" || key === "liquidTemp") {
+    unit = "°";
+  } else if (key === "cpuLoad" || key === "gpuLoad") {
+    unit = "%";
+  } else if (key === "cpuClock" || key === "gpuClock") {
+    unit = "MHz";
+  }
+
+  const rounded = Math.round(rawValue);
+  const displayValue =
+    typeof rounded === "number" && !Number.isNaN(rounded)
+      ? `${rounded}${unit}`
+      : "-";
+
+  return { label, displayValue };
+}
+
+/**
  * Single infographic overlay rendered on top of the media.
  * This is the first overlay mode we support.
  */
@@ -315,6 +357,8 @@ function SingleOverlay({
 
   const key = overlay.primaryMetric;
   const value = metrics[key];
+
+  const { label, displayValue } = getOverlayLabelAndValue(key, value);
 
   const numberColor = overlay.numberColor;
   const textColor = overlay.textColor;
@@ -335,24 +379,24 @@ function SingleOverlay({
     >
       <div
         style={{
-          fontSize: "180px",
+          fontSize: `${overlay.numberSize}px`,
           fontWeight: 700,
           color: numberColor,
           lineHeight: 0.9,
         }}
       >
-        {Math.round(value)}
+        {displayValue}
       </div>
       <div
         style={{
-          fontSize: "80px",
+          fontSize: `${overlay.textSize}px`,
           color: textColor,
           marginTop: -6,
           textTransform: "uppercase",
           letterSpacing: 1,
         }}
       >
-        {key}
+        {label}
       </div>
     </div>
   );
