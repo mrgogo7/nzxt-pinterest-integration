@@ -13,7 +13,7 @@ import {
   AlignVerticalSpaceAround,
 } from 'lucide-react';
 import { DEFAULT_SETTINGS, type AppSettings } from '../../constants/defaults';
-import { DEFAULT_OVERLAY, type OverlayMode, type OverlayMetricKey } from '../../types/overlay';
+import { DEFAULT_OVERLAY, type OverlayMode, type OverlayMetricKey, type OverlaySettings } from '../../types/overlay';
 import { NZXT_DEFAULTS } from '../../constants/nzxt';
 import { useConfig } from '../../hooks/useConfig';
 import { useMediaUrl } from '../../hooks/useMediaUrl';

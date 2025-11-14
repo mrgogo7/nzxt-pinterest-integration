@@ -27,8 +27,7 @@ export default function ColorPicker({ value, onChange }: ColorPickerProps) {
         const r = parseInt(match[1]);
         const g = parseInt(match[2]);
         const b = parseInt(match[3]);
-        const a = match[4] ? parseFloat(match[4]) : 1;
-        // Convert to hex (react-color uses hex)
+        // Convert to hex (react-color uses hex, alpha is handled separately)
         const hex = `#${[r, g, b].map(x => {
           const hex = x.toString(16);
           return hex.length === 1 ? '0' + hex : hex;
@@ -41,19 +40,7 @@ export default function ColorPicker({ value, onChange }: ColorPickerProps) {
     return '#ffffff';
   };
 
-  // Get alpha from rgba string
-  const getAlpha = (color: string): number => {
-    if (color.startsWith('rgba')) {
-      const match = color.match(/rgba\([\d\s,]+,\s*([\d.]+)\)/);
-      if (match) {
-        return parseFloat(match[1]);
-      }
-    }
-    return 1;
-  };
-
   const currentColor = parseColor(value);
-  const currentAlpha = getAlpha(value);
 
   // Handle color change from react-color
   const handleColorChange = (color: ColorResult) => {

@@ -48,8 +48,7 @@ export default function DualInfographic({
     isClock: boolean,
     unitSize: number,
     numSize: number,
-    numColor: string,
-    txtColor: string
+    numColor: string
   ) => {
     if (!isClock) {
       return (
@@ -184,7 +183,7 @@ export default function DualInfographic({
           alignItems: "center",
         }}
       >
-        {renderMetric(primaryInfo, primaryIsClock, primaryUnitSize, primaryNumberSize, primaryNumberColor, primaryTextColor)}
+        {renderMetric(primaryInfo, primaryIsClock, primaryUnitSize, primaryNumberSize, primaryNumberColor)}
 
         {/* Label */}
         <div
@@ -222,7 +221,7 @@ export default function DualInfographic({
           alignItems: "center",
         }}
       >
-        {renderMetric(secondaryInfo, secondaryIsClock, secondaryUnitSize, secondaryNumberSize, secondaryNumberColor, secondaryTextColor)}
+        {renderMetric(secondaryInfo, secondaryIsClock, secondaryUnitSize, secondaryNumberSize, secondaryNumberColor)}
 
         {/* Label */}
         <div
