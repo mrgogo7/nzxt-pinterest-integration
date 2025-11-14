@@ -266,6 +266,17 @@ export default function ConfigPreview() {
     }
   }, [isDraggingOverlay, handleOverlayMouseMove, handleOverlayMouseUp]);
 
+  useEffect(() => {
+    if (isDraggingSecondaryTertiary) {
+      window.addEventListener('mousemove', handleSecondaryTertiaryMouseMove);
+      window.addEventListener('mouseup', handleSecondaryTertiaryMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleSecondaryTertiaryMouseMove);
+        window.removeEventListener('mouseup', handleSecondaryTertiaryMouseUp);
+      };
+    }
+  }, [isDraggingSecondaryTertiary, handleSecondaryTertiaryMouseMove, handleSecondaryTertiaryMouseUp]);
+
   // Zoom handler for background
   useEffect(() => {
     const circle = document.querySelector('.preview-circle');
