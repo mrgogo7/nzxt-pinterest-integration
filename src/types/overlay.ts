@@ -17,6 +17,8 @@ export type OverlayMetricKey =
 export interface OverlaySettings {
   mode: OverlayMode;
   primaryMetric: OverlayMetricKey;
+  secondaryMetric?: OverlayMetricKey; // For dual and triple modes
+  tertiaryMetric?: OverlayMetricKey; // For triple mode
   numberColor: string;
   textColor: string;
   numberSize: number;
@@ -42,6 +44,8 @@ export type OverlayMetrics = {
 export const DEFAULT_OVERLAY: OverlaySettings = {
   mode: "none",
   primaryMetric: "cpuTemp",
+  secondaryMetric: "gpuTemp", // Default for dual/triple modes
+  tertiaryMetric: "liquidTemp", // Default for triple mode
   numberColor: "rgba(255, 255, 255, 1)", // White with full opacity
   textColor: "rgba(255, 255, 255, 1)", // White with full opacity (changed from #cccccc)
   numberSize: 180,

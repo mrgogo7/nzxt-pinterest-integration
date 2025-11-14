@@ -21,6 +21,8 @@ import { useMonitoringMock } from '../../hooks/useMonitoring';
 import { calculateOffsetScale, previewToLcd, lcdToPreview, getBaseAlign } from '../../utils/positioning';
 import { isVideoUrl } from '../../utils/media';
 import SingleInfographic from './SingleInfographic';
+import DualInfographic from './DualInfographic';
+import TripleInfographic from './TripleInfographic';
 import ColorPicker from './ColorPicker';
 
 /**
@@ -491,7 +493,9 @@ export default function ConfigPreview() {
                   onMouseDown={handleOverlayMouseDown}
                   style={{ position: 'relative', width: '200px', height: '200px' }}
                 >
-                  {overlayConfig.mode === 'single' && (
+                  {(overlayConfig.mode === 'single' ||
+                    overlayConfig.mode === 'dual' ||
+                    overlayConfig.mode === 'triple') && (
                     <div
                       style={{
                         position: 'absolute',
@@ -500,7 +504,15 @@ export default function ConfigPreview() {
                         pointerEvents: 'none',
                       }}
                     >
-                      <SingleInfographic overlay={overlayConfig} metrics={metrics} scale={overlayPreviewScale} />
+                      {overlayConfig.mode === 'single' && (
+                        <SingleInfographic overlay={overlayConfig} metrics={metrics} scale={overlayPreviewScale} />
+                      )}
+                      {overlayConfig.mode === 'dual' && (
+                        <DualInfographic overlay={overlayConfig} metrics={metrics} scale={overlayPreviewScale} />
+                      )}
+                      {overlayConfig.mode === 'triple' && (
+                        <TripleInfographic overlay={overlayConfig} metrics={metrics} scale={overlayPreviewScale} />
+                      )}
                     </div>
                   )}
                 </div>
@@ -544,32 +556,97 @@ export default function ConfigPreview() {
                 </div>
 
                 {/* PRIMARY READING */}
-                {overlayConfig.mode === 'single' && (
+                {(overlayConfig.mode === 'single' ||
+                  overlayConfig.mode === 'dual' ||
+                  overlayConfig.mode === 'triple') && (
+                  <div className="setting-row">
+                    <label>{t('primaryReading', lang)}</label>
+                    <select
+                      className="url-input select-narrow"
+                      value={overlayConfig.primaryMetric}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          overlay: {
+                            ...overlayConfig,
+                            primaryMetric: e.target.value as OverlayMetricKey,
+                          },
+                        })
+                      }
+                    >
+                      <option value="cpuTemp">CPU Temperature</option>
+                      <option value="cpuLoad">CPU Load</option>
+                      <option value="cpuClock">CPU Clock</option>
+                      <option value="liquidTemp">Liquid Temperature</option>
+                      <option value="gpuTemp">GPU Temperature</option>
+                      <option value="gpuLoad">GPU Load</option>
+                      <option value="gpuClock">GPU Clock</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* SECONDARY READING */}
+                {(overlayConfig.mode === 'dual' ||
+                  overlayConfig.mode === 'triple') && (
+                  <div className="setting-row">
+                    <label>{t('secondaryReading', lang)}</label>
+                    <select
+                      className="url-input select-narrow"
+                      value={overlayConfig.secondaryMetric || overlayConfig.primaryMetric}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          overlay: {
+                            ...overlayConfig,
+                            secondaryMetric: e.target.value as OverlayMetricKey,
+                          },
+                        })
+                      }
+                    >
+                      <option value="cpuTemp">CPU Temperature</option>
+                      <option value="cpuLoad">CPU Load</option>
+                      <option value="cpuClock">CPU Clock</option>
+                      <option value="liquidTemp">Liquid Temperature</option>
+                      <option value="gpuTemp">GPU Temperature</option>
+                      <option value="gpuLoad">GPU Load</option>
+                      <option value="gpuClock">GPU Clock</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* TERTIARY READING */}
+                {overlayConfig.mode === 'triple' && (
+                  <div className="setting-row">
+                    <label>{t('tertiaryReading', lang)}</label>
+                    <select
+                      className="url-input select-narrow"
+                      value={overlayConfig.tertiaryMetric || overlayConfig.primaryMetric}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          overlay: {
+                            ...overlayConfig,
+                            tertiaryMetric: e.target.value as OverlayMetricKey,
+                          },
+                        })
+                      }
+                    >
+                      <option value="cpuTemp">CPU Temperature</option>
+                      <option value="cpuLoad">CPU Load</option>
+                      <option value="cpuClock">CPU Clock</option>
+                      <option value="liquidTemp">Liquid Temperature</option>
+                      <option value="gpuTemp">GPU Temperature</option>
+                      <option value="gpuLoad">GPU Load</option>
+                      <option value="gpuClock">GPU Clock</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* Overlay settings (X/Y Offset, Colors, Sizes) - shown for all modes */}
+                {(overlayConfig.mode === 'single' ||
+                  overlayConfig.mode === 'dual' ||
+                  overlayConfig.mode === 'triple') && (
                   <>
-                    <div className="setting-row">
-                      <label>{t('primaryReading', lang)}</label>
-                      <select
-                        className="url-input select-narrow"
-                        value={overlayConfig.primaryMetric}
-                        onChange={(e) =>
-                          setSettings({
-                            ...settings,
-                            overlay: {
-                              ...overlayConfig,
-                              primaryMetric: e.target.value as OverlayMetricKey,
-                            },
-                          })
-                        }
-                      >
-                        <option value="cpuTemp">CPU Temperature</option>
-                        <option value="cpuLoad">CPU Load</option>
-                        <option value="cpuClock">CPU Clock</option>
-                        <option value="liquidTemp">Liquid Temperature</option>
-                        <option value="gpuTemp">GPU Temperature</option>
-                        <option value="gpuLoad">GPU Load</option>
-                        <option value="gpuClock">GPU Clock</option>
-                      </select>
-                    </div>
 
                     {/* Overlay X/Y Offset */}
                     <div className="setting-row">

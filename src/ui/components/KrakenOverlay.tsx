@@ -5,6 +5,8 @@ import { useMediaUrl } from '../../hooks/useMediaUrl';
 import { useMonitoring } from '../../hooks/useMonitoring';
 import MediaRenderer from './MediaRenderer';
 import SingleInfographic from './SingleInfographic';
+import DualInfographic from './DualInfographic';
+import TripleInfographic from './TripleInfographic';
 import styles from '../styles/KrakenOverlay.module.css';
 
 /**
@@ -54,7 +56,15 @@ export default function KrakenOverlay() {
             pointerEvents: 'none',
           }}
         >
-          <SingleInfographic overlay={overlayConfig} metrics={metrics} />
+          {overlayConfig.mode === 'single' && (
+            <SingleInfographic overlay={overlayConfig} metrics={metrics} />
+          )}
+          {overlayConfig.mode === 'dual' && (
+            <DualInfographic overlay={overlayConfig} metrics={metrics} />
+          )}
+          {overlayConfig.mode === 'triple' && (
+            <TripleInfographic overlay={overlayConfig} metrics={metrics} />
+          )}
         </div>
       )}
     </div>
