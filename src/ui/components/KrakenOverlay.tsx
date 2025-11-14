@@ -419,10 +419,10 @@ function SingleOverlay({
 			  <span
 				style={{
 				  display: "inline-flex",
-				  alignItems: "flex-start",
+				  flexDirection: "column",
+				  justifyContent: "flex-start",
 				  paddingLeft: 4,
-				  lineHeight: 0.75,
-				  marginTop: `-${unitSize * 0.18}px`,
+				  transform: "translateY(-15%)",
 				}}
 			  >
 				<span
