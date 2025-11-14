@@ -177,6 +177,11 @@ export default function TripleInfographic({
   const secondaryIsClock = secondaryInfo.valueUnitType === "clock";
   const tertiaryIsClock = tertiaryInfo.valueUnitType === "clock";
 
+  // Calculate gapLeftRight - allow negative values for closer positioning
+  const gapLeftRightValue = overlay.gapLeftRight !== undefined 
+    ? overlay.gapLeftRight * scale 
+    : primaryNumberSize * 0.2;
+
   return (
     <div
       style={{
@@ -187,7 +192,7 @@ export default function TripleInfographic({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        gap: overlay.gapLeftRight ? `${overlay.gapLeftRight * scale}px` : `${primaryNumberSize * 0.2}px`, // Space between left and right sections (configurable)
+        gap: gapLeftRightValue >= 0 ? `${gapLeftRightValue}px` : '0px', // CSS gap doesn't support negative, use margin instead
         pointerEvents: "none",
         fontFamily: "nzxt-extrabold",
       }}
@@ -200,6 +205,7 @@ export default function TripleInfographic({
           justifyContent: "center",
           alignItems: "center",
           flex: 1,
+          marginRight: gapLeftRightValue < 0 ? `${gapLeftRightValue}px` : undefined, // Negative gap = negative margin
         }}
       >
         {renderMetric(
@@ -246,6 +252,7 @@ export default function TripleInfographic({
           alignItems: "center",
           gap: overlay.gapSecondaryTertiary ? `${overlay.gapSecondaryTertiary * scale}px` : `${secondaryNumberSize * 0.4}px`, // Space between secondary and tertiary (configurable)
           flex: 1,
+          marginLeft: gapLeftRightValue < 0 ? `${-gapLeftRightValue}px` : undefined, // Negative gap = positive margin on right side
         }}
       >
         {/* Secondary metric (top) */}

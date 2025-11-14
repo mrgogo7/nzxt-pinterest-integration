@@ -69,8 +69,8 @@ export const DEFAULT_OVERLAY: OverlaySettings = {
   tertiaryMetric: "liquidTemp", // Default for triple mode
   numberColor: "rgba(255, 255, 255, 1)", // White with full opacity
   textColor: "rgba(255, 255, 255, 1)", // White with full opacity (changed from #cccccc)
-  numberSize: 180,
-  textSize: 45, // Changed from 80 to 45
+  numberSize: 180, // Used for single mode and as base for dual/triple
+  textSize: 45, // Used for single mode and as base for dual/triple
   // Dual mode defaults
   primaryNumberColor: "rgba(255, 255, 255, 1)",
   primaryTextColor: "rgba(255, 255, 255, 1)",
@@ -78,18 +78,18 @@ export const DEFAULT_OVERLAY: OverlaySettings = {
   secondaryTextColor: "rgba(255, 255, 255, 1)",
   secondaryNumberSize: 120,
   secondaryTextSize: 35,
-  // Triple mode defaults
+  // Triple mode defaults - these override numberSize/textSize when mode is triple
   tertiaryNumberColor: "rgba(255, 255, 255, 1)",
   tertiaryTextColor: "rgba(255, 255, 255, 1)",
-  tertiaryNumberSize: 108, // 60% of 180 (primary size)
-  tertiaryTextSize: 32, // ~70% of 45 (primary text size)
-  showDivider: false,
+  tertiaryNumberSize: 80, // Updated default
+  tertiaryTextSize: 20, // Updated default
+  showDivider: true, // Default to ON for dual and triple modes
   dividerWidth: 60, // Percentage of height
   dividerThickness: 2,
   dividerColor: "rgba(255, 255, 255, 0.3)", // Default divider color
   gap: 36, // Default gap for dual mode (120 * 0.3)
-  gapLeftRight: 36, // Default gap between left and right sections in triple mode
-  gapSecondaryTertiary: 24, // Default gap between secondary and tertiary in triple mode
+  gapLeftRight: 8, // Default gap between left and right sections in triple mode
+  gapSecondaryTertiary: 20, // Default gap between secondary and tertiary in triple mode
   x: 0,
   y: 0,
 };

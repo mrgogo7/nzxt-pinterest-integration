@@ -555,6 +555,24 @@ export default function ConfigPreview() {
                           updates.gap = overlayConfig.gap || DEFAULT_OVERLAY.gap;
                         }
                         
+                        // Set default values when switching to triple mode
+                        if (newMode === 'triple') {
+                          updates.numberSize = 155; // Primary Number Size
+                          updates.textSize = 35; // Primary Text Size
+                          updates.secondaryNumberSize = 80;
+                          updates.secondaryTextSize = 20;
+                          updates.tertiaryNumberSize = 80;
+                          updates.tertiaryTextSize = 20;
+                          updates.gapLeftRight = 8;
+                          updates.gapSecondaryTertiary = 20;
+                          updates.primaryNumberColor = overlayConfig.primaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
+                          updates.primaryTextColor = overlayConfig.primaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
+                          updates.secondaryNumberColor = overlayConfig.secondaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
+                          updates.secondaryTextColor = overlayConfig.secondaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
+                          updates.tertiaryNumberColor = overlayConfig.tertiaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
+                          updates.tertiaryTextColor = overlayConfig.tertiaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
+                        }
+                        
                         setSettings({
                           ...settings,
                           overlay: {
@@ -1249,7 +1267,7 @@ export default function ConfigPreview() {
                                 ...settings,
                                 overlay: {
                                   ...overlayConfig,
-                                  numberSize: parseInt(e.target.value || '180', 10),
+                                  numberSize: parseInt(e.target.value || '155', 10),
                                 },
                               })
                             }
@@ -1274,7 +1292,7 @@ export default function ConfigPreview() {
                                 ...settings,
                                 overlay: {
                                   ...overlayConfig,
-                                  textSize: parseInt(e.target.value || '45', 10),
+                                  textSize: parseInt(e.target.value || '35', 10),
                                 },
                               })
                             }
@@ -1294,13 +1312,13 @@ export default function ConfigPreview() {
                           <label>{t('secondaryNumberSize', lang)}</label>
                           <input
                             type="number"
-                            value={overlayConfig.secondaryNumberSize || DEFAULT_OVERLAY.secondaryNumberSize || 108}
+                            value={overlayConfig.secondaryNumberSize || DEFAULT_OVERLAY.secondaryNumberSize || 80}
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
                                 overlay: {
                                   ...overlayConfig,
-                                  secondaryNumberSize: parseInt(e.target.value || '108', 10),
+                                  secondaryNumberSize: parseInt(e.target.value || '80', 10),
                                 },
                               })
                             }
@@ -1327,13 +1345,13 @@ export default function ConfigPreview() {
                           <label>{t('secondaryTextSize', lang)}</label>
                           <input
                             type="number"
-                            value={overlayConfig.secondaryTextSize || DEFAULT_OVERLAY.secondaryTextSize || 32}
+                            value={overlayConfig.secondaryTextSize || DEFAULT_OVERLAY.secondaryTextSize || 20}
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
                                 overlay: {
                                   ...overlayConfig,
-                                  secondaryTextSize: parseInt(e.target.value || '32', 10),
+                                  secondaryTextSize: parseInt(e.target.value || '20', 10),
                                 },
                               })
                             }
@@ -1358,16 +1376,16 @@ export default function ConfigPreview() {
 
                         {/* Tertiary sizes */}
                         <div className="setting-row">
-                          <label>{t('tertiaryNumberSize', lang) || 'Tertiary Number Size'}</label>
+                          <label>{t('tertiaryNumberSize', lang)}</label>
                           <input
                             type="number"
-                            value={overlayConfig.tertiaryNumberSize || DEFAULT_OVERLAY.tertiaryNumberSize || 108}
+                            value={overlayConfig.tertiaryNumberSize || DEFAULT_OVERLAY.tertiaryNumberSize || 80}
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
                                 overlay: {
                                   ...overlayConfig,
-                                  tertiaryNumberSize: parseInt(e.target.value || '108', 10),
+                                  tertiaryNumberSize: parseInt(e.target.value || '80', 10),
                                 },
                               })
                             }
@@ -1391,16 +1409,16 @@ export default function ConfigPreview() {
                         </div>
 
                         <div className="setting-row">
-                          <label>{t('tertiaryTextSize', lang) || 'Tertiary Text Size'}</label>
+                          <label>{t('tertiaryTextSize', lang)}</label>
                           <input
                             type="number"
-                            value={overlayConfig.tertiaryTextSize || DEFAULT_OVERLAY.tertiaryTextSize || 32}
+                            value={overlayConfig.tertiaryTextSize || DEFAULT_OVERLAY.tertiaryTextSize || 20}
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
                                 overlay: {
                                   ...overlayConfig,
-                                  tertiaryTextSize: parseInt(e.target.value || '32', 10),
+                                  tertiaryTextSize: parseInt(e.target.value || '20', 10),
                                 },
                               })
                             }
@@ -1425,16 +1443,16 @@ export default function ConfigPreview() {
 
                         {/* Gap settings for triple mode */}
                         <div className="setting-row">
-                          <label>{t('gapLeftRight', lang) || 'Gap (Left-Right)'}</label>
+                          <label>{t('gapLeftRight', lang)}</label>
                           <input
                             type="number"
-                            value={overlayConfig.gapLeftRight || DEFAULT_OVERLAY.gapLeftRight || 36}
+                            value={overlayConfig.gapLeftRight ?? DEFAULT_OVERLAY.gapLeftRight ?? 8}
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
                                 overlay: {
                                   ...overlayConfig,
-                                  gapLeftRight: parseInt(e.target.value || '36', 10),
+                                  gapLeftRight: parseInt(e.target.value || '8', 10),
                                 },
                               })
                             }
@@ -1458,16 +1476,16 @@ export default function ConfigPreview() {
                         </div>
 
                         <div className="setting-row">
-                          <label>{t('gapSecondaryTertiary', lang) || 'Gap (Secondary-Tertiary)'}</label>
+                          <label>{t('gapSecondaryTertiary', lang)}</label>
                           <input
                             type="number"
-                            value={overlayConfig.gapSecondaryTertiary || DEFAULT_OVERLAY.gapSecondaryTertiary || 24}
+                            value={overlayConfig.gapSecondaryTertiary ?? DEFAULT_OVERLAY.gapSecondaryTertiary ?? 20}
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
                                 overlay: {
                                   ...overlayConfig,
-                                  gapSecondaryTertiary: parseInt(e.target.value || '24', 10),
+                                  gapSecondaryTertiary: parseInt(e.target.value || '20', 10),
                                 },
                               })
                             }
