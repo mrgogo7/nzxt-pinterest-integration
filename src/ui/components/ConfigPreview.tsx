@@ -45,6 +45,7 @@ export default function ConfigPreview() {
   const hasLoadedRef = useRef(false);
   const hasInteractedRef = useRef(false);
   const lastSync = useRef(0);
+  const settingsRef = useRef(settings);
 
   // CRITICAL: offsetScale formula - must be preserved
   const lcdResolution = window.nzxt?.v1?.width || NZXT_DEFAULTS.LCD_WIDTH;
@@ -52,6 +53,11 @@ export default function ConfigPreview() {
   const offsetScale = calculateOffsetScale(previewSize, lcdResolution);
   // Scale factor for overlay preview (200px preview / 640px LCD)
   const overlayPreviewScale = previewSize / lcdResolution;
+
+  // Keep settings ref in sync
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
 
   // Overlay config
   const overlayConfig = {
@@ -134,11 +140,13 @@ export default function ConfigPreview() {
     const lcdDx = previewToLcd(dx, offsetScale);
     const lcdDy = previewToLcd(dy, offsetScale);
 
-    setSettings((prevSettings) => ({
-      ...prevSettings,
-      x: prevSettings.x + lcdDx,
-      y: prevSettings.y + lcdDy,
-    }));
+    // Use ref to get current settings value
+    const currentSettings = settingsRef.current;
+    setSettings({
+      ...currentSettings,
+      x: currentSettings.x + lcdDx,
+      y: currentSettings.y + lcdDy,
+    });
   }, [offsetScale, setSettings]);
 
   const handleBackgroundMouseUp = useCallback(() => {
@@ -165,16 +173,16 @@ export default function ConfigPreview() {
     const lcdDx = previewToLcd(dx, offsetScale);
     const lcdDy = previewToLcd(dy, offsetScale);
 
-    setSettings((prevSettings) => {
-      const prevOverlay = prevSettings.overlay || DEFAULT_OVERLAY;
-      return {
-        ...prevSettings,
-        overlay: {
-          ...prevOverlay,
-          x: (prevOverlay.x || 0) + lcdDx,
-          y: (prevOverlay.y || 0) + lcdDy,
-        },
-      };
+    // Use ref to get current settings value
+    const currentSettings = settingsRef.current;
+    const currentOverlay = currentSettings.overlay || DEFAULT_OVERLAY;
+    setSettings({
+      ...currentSettings,
+      overlay: {
+        ...currentOverlay,
+        x: (currentOverlay.x || 0) + lcdDx,
+        y: (currentOverlay.y || 0) + lcdDy,
+      },
     });
   }, [offsetScale, setSettings]);
 
