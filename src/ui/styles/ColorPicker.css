@@ -1,0 +1,130 @@
+.color-picker-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.color-picker-trigger {
+  width: 40px;
+  height: 32px;
+  border: 1px solid #2d3140;
+  border-radius: 6px;
+  background: #181a21;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.color-picker-trigger:hover {
+  border-color: #4a5683;
+}
+
+.color-picker-preview {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  background: currentColor;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.color-picker-popup {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 1000;
+  background: #121317;
+  border: 1px solid #242734;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  min-width: 240px;
+}
+
+.color-picker-saturation-lightness {
+  width: 100%;
+  height: 160px;
+  position: relative;
+  border-radius: 4px;
+  cursor: crosshair;
+  margin-bottom: 8px;
+  background-image: 
+    linear-gradient(to bottom, transparent, black),
+    linear-gradient(to right, white, transparent);
+}
+
+.color-picker-hue {
+  width: 100%;
+  height: 12px;
+  position: relative;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  background: linear-gradient(to right,
+    #ff0000 0%,
+    #ffff00 16.66%,
+    #00ff00 33.33%,
+    #00ffff 50%,
+    #0000ff 66.66%,
+    #ff00ff 83.33%,
+    #ff0000 100%
+  );
+}
+
+.color-picker-alpha {
+  width: 100%;
+  height: 12px;
+  position: relative;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  background-image: 
+    repeating-linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc),
+    repeating-linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
+  background-position: 0 0, 8px 8px;
+  background-size: 16px 16px;
+}
+
+.color-picker-pointer {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  top: 50%;
+}
+
+.color-picker-saturation-lightness .color-picker-pointer {
+  width: 16px;
+  height: 16px;
+}
+
+.color-picker-presets {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.color-picker-preset {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid #2d3140;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+  background: none;
+}
+
+.color-picker-preset:hover {
+  transform: scale(1.1);
+  border-color: #4a5683;
+  z-index: 1;
+  position: relative;
+}
+

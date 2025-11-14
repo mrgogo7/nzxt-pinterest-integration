@@ -42,10 +42,10 @@ export type OverlayMetrics = {
 export const DEFAULT_OVERLAY: OverlaySettings = {
   mode: "none",
   primaryMetric: "cpuTemp",
-  numberColor: "#ffffff",
-  textColor: "#cccccc",
+  numberColor: "rgba(255, 255, 255, 1)", // White with full opacity
+  textColor: "rgba(255, 255, 255, 1)", // White with full opacity (changed from #cccccc)
   numberSize: 180,
-  textSize: 80,
+  textSize: 45, // Changed from 80 to 45
   x: 0,
   y: 0,
 };

@@ -21,6 +21,7 @@ import { useMonitoringMock } from '../../hooks/useMonitoring';
 import { calculateOffsetScale, previewToLcd, lcdToPreview, getBaseAlign } from '../../utils/positioning';
 import { isVideoUrl } from '../../utils/media';
 import SingleInfographic from './SingleInfographic';
+import ColorPicker from './ColorPicker';
 
 /**
  * ConfigPreview component.
@@ -623,15 +624,14 @@ export default function ConfigPreview() {
 
                     <div className="setting-row">
                       <label>{t('numberColor', lang)}</label>
-                      <input
-                        type="color"
+                      <ColorPicker
                         value={overlayConfig.numberColor}
-                        onChange={(e) =>
+                        onChange={(color) =>
                           setSettings({
                             ...settings,
                             overlay: {
                               ...overlayConfig,
-                              numberColor: e.target.value,
+                              numberColor: color,
                             },
                           })
                         }
@@ -647,15 +647,14 @@ export default function ConfigPreview() {
 
                     <div className="setting-row">
                       <label>{t('textColor', lang)}</label>
-                      <input
-                        type="color"
+                      <ColorPicker
                         value={overlayConfig.textColor}
-                        onChange={(e) =>
+                        onChange={(color) =>
                           setSettings({
                             ...settings,
                             overlay: {
                               ...overlayConfig,
-                              textColor: e.target.value,
+                              textColor: color,
                             },
                           })
                         }
