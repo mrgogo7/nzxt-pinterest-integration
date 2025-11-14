@@ -624,11 +624,15 @@ export default function ConfigPreview() {
                           updates.textSize = 35;
                           updates.secondaryNumberSize = 120;
                           updates.secondaryTextSize = 35;
+                          updates.dividerGap = 27;
+                          updates.x = 0; // Primary X Offset
+                          updates.y = 0; // Primary Y Offset
+                          updates.secondaryOffsetX = 0; // Secondary X Offset
+                          updates.secondaryOffsetY = 0; // Secondary Y Offset
                           updates.primaryNumberColor = overlayConfig.primaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
                           updates.primaryTextColor = overlayConfig.primaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
                           updates.secondaryNumberColor = overlayConfig.secondaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
                           updates.secondaryTextColor = overlayConfig.secondaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                          updates.gap = overlayConfig.gap || DEFAULT_OVERLAY.gap;
                         }
                         
                         // Set default values when switching to triple mode
