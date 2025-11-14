@@ -205,7 +205,7 @@ export default function TripleInfographic({
           justifyContent: "center",
           alignItems: "center",
           flex: 1,
-          transform: gapLeftRightValue < 0 ? `translateX(${gapLeftRightValue / 2}px)` : undefined, // Move left by half of negative gap to bring closer
+          transform: gapLeftRightValue < 0 ? `translateX(${-gapLeftRightValue / 2}px)` : undefined, // Move right (positive translateX) when gap is negative to bring closer
         }}
       >
         {renderMetric(
@@ -257,7 +257,7 @@ export default function TripleInfographic({
           alignItems: "center",
           gap: overlay.gapSecondaryTertiary ? `${overlay.gapSecondaryTertiary * scale}px` : `${secondaryNumberSize * 0.4}px`, // Space between secondary and tertiary (configurable)
           flex: 1,
-          transform: gapLeftRightValue < 0 ? `translateX(${-gapLeftRightValue / 2}px)` : undefined, // Move right by half of negative gap to bring closer
+          transform: gapLeftRightValue < 0 ? `translateX(${gapLeftRightValue / 2}px)` : undefined, // Move left (negative translateX) when gap is negative to bring closer
         }}
       >
         {/* Secondary metric (top) */}
