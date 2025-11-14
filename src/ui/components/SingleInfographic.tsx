@@ -3,7 +3,7 @@ import {
   OverlaySettings,
   OverlayMetrics,
   getOverlayLabelAndValue,
-} from "./overlayTypes";
+} from "../../types/overlay";
 
 /**
  * SingleInfographic
