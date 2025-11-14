@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import '../styles/ConfigPreview.css';
 import { LANG_KEY, Lang, t, getInitialLang } from '../../i18n';
 import {
@@ -27,6 +27,10 @@ import SingleInfographic from './SingleInfographic';
  * Provides interactive preview and settings panel for media configuration.
  * 
  * CRITICAL: offsetScale formula must be preserved (previewSize / lcdResolution)
+ * 
+ * Structure:
+ * - Background Preview: Only background + guide (no overlay)
+ * - Overlay Preview: Only overlay (no background), draggable
  */
 export default function ConfigPreview() {
   const [lang, setLang] = useState<Lang>(getInitialLang());
@@ -34,8 +38,10 @@ export default function ConfigPreview() {
   const { mediaUrl } = useMediaUrl();
   const metrics = useMonitoringMock(); // Mock data for preview (NZXT API not available)
   const [isDragging, setIsDragging] = useState(false);
+  const [isDraggingOverlay, setIsDraggingOverlay] = useState(false);
 
   const dragStart = useRef<{ x: number; y: number } | null>(null);
+  const overlayDragStart = useRef<{ x: number; y: number } | null>(null);
   const hasLoadedRef = useRef(false);
   const hasInteractedRef = useRef(false);
   const lastSync = useRef(0);
@@ -44,6 +50,12 @@ export default function ConfigPreview() {
   const lcdResolution = window.nzxt?.v1?.width || NZXT_DEFAULTS.LCD_WIDTH;
   const previewSize = 200;
   const offsetScale = calculateOffsetScale(previewSize, lcdResolution);
+
+  // Overlay config
+  const overlayConfig = {
+    ...DEFAULT_OVERLAY,
+    ...(settings.overlay || {}),
+  };
 
   // Language sync
   useEffect(() => {
@@ -95,20 +107,20 @@ export default function ConfigPreview() {
   // Video detection
   const isVideo = isVideoUrl(mediaUrl);
 
-  // Positioning - CRITICAL: offsetScale must be used
+  // Background positioning - CRITICAL: offsetScale must be used
   const base = getBaseAlign(settings.align);
   const adjX = lcdToPreview(settings.x, offsetScale);
   const adjY = lcdToPreview(settings.y, offsetScale);
   const objectPosition = `calc(${base.x}% + ${adjX}px) calc(${base.y}% + ${adjY}px)`;
 
-  // Drag handler - CRITICAL: LCD pixel conversion
-  const handleMouseDown = (e: React.MouseEvent) => {
+  // Background drag handler - CRITICAL: LCD pixel conversion
+  const handleBackgroundMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     dragStart.current = { x: e.clientX, y: e.clientY };
     setIsDragging(true);
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleBackgroundMouseMove = (e: MouseEvent) => {
     if (!isDragging || !dragStart.current) return;
 
     const dx = e.clientX - dragStart.current.x;
@@ -126,22 +138,66 @@ export default function ConfigPreview() {
     });
   };
 
-  const handleMouseUp = () => {
+  const handleBackgroundMouseUp = () => {
     setIsDragging(false);
     dragStart.current = null;
   };
 
+  // Overlay drag handler
+  const handleOverlayMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    overlayDragStart.current = { x: e.clientX, y: e.clientY };
+    setIsDraggingOverlay(true);
+  };
+
+  const handleOverlayMouseMove = (e: MouseEvent) => {
+    if (!isDraggingOverlay || !overlayDragStart.current) return;
+
+    const dx = e.clientX - overlayDragStart.current.x;
+    const dy = e.clientY - overlayDragStart.current.y;
+    overlayDragStart.current = { x: e.clientX, y: e.clientY };
+
+    // Convert preview pixels to LCD pixels for overlay
+    const lcdDx = previewToLcd(dx, offsetScale);
+    const lcdDy = previewToLcd(dy, offsetScale);
+
+    setSettings({
+      ...settings,
+      overlay: {
+        ...overlayConfig,
+        x: (overlayConfig.x || 0) + lcdDx,
+        y: (overlayConfig.y || 0) + lcdDy,
+      },
+    });
+  };
+
+  const handleOverlayMouseUp = () => {
+    setIsDraggingOverlay(false);
+    overlayDragStart.current = null;
+  };
+
   useEffect(() => {
     if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mousemove', handleBackgroundMouseMove);
+      window.addEventListener('mouseup', handleBackgroundMouseUp);
     } else {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleBackgroundMouseMove);
+      window.removeEventListener('mouseup', handleBackgroundMouseUp);
     }
   }, [isDragging]);
 
-  // Zoom handler
+  useEffect(() => {
+    if (isDraggingOverlay) {
+      window.addEventListener('mousemove', handleOverlayMouseMove);
+      window.addEventListener('mouseup', handleOverlayMouseUp);
+    } else {
+      window.removeEventListener('mousemove', handleOverlayMouseMove);
+      window.removeEventListener('mouseup', handleOverlayMouseUp);
+    }
+  }, [isDraggingOverlay]);
+
+  // Zoom handler for background
   useEffect(() => {
     const circle = document.querySelector('.preview-circle');
     if (!circle) return;
@@ -184,6 +240,17 @@ export default function ConfigPreview() {
     });
   };
 
+  const resetOverlayField = (field: keyof typeof DEFAULT_OVERLAY) => {
+    const defaultValue = DEFAULT_OVERLAY[field];
+    setSettings({
+      ...settings,
+      overlay: {
+        ...overlayConfig,
+        [field]: defaultValue,
+      },
+    });
+  };
+
   // Icon data
   const alignIcons = [
     { key: 'center', icon: <AlignVerticalSpaceAround size={16} /> },
@@ -199,21 +266,19 @@ export default function ConfigPreview() {
     { key: 'fill', icon: <MoveHorizontal size={16} /> },
   ];
 
-  // Overlay config
-  const overlayConfig = {
-    ...DEFAULT_OVERLAY,
-    ...(settings.overlay || {}),
-  };
+  // Overlay positioning for preview
+  const overlayAdjX = lcdToPreview(overlayConfig.x || 0, offsetScale);
+  const overlayAdjY = lcdToPreview(overlayConfig.y || 0, offsetScale);
 
   return (
     <div className="config-wrapper">
-      {/* LEFT PREVIEW */}
+      {/* LEFT: Background Preview */}
       <div className="preview-column">
         <div className="preview-title">{t('previewTitle', lang)}</div>
 
         <div
           className={`preview-circle ${isDragging ? 'dragging' : ''}`}
-          onMouseDown={handleMouseDown}
+          onMouseDown={handleBackgroundMouseDown}
         >
           <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
 
@@ -250,7 +315,7 @@ export default function ConfigPreview() {
             )
           )}
 
-          {/* Overlay guide */}
+          {/* Overlay guide - only for alignment reference */}
           {settings.showGuide && (
             <div
               className="overlay-guide"
@@ -264,11 +329,6 @@ export default function ConfigPreview() {
             </div>
           )}
 
-          {/* Single Infographic overlay preview */}
-          {overlayConfig.mode === 'single' && (
-            <SingleInfographic overlay={overlayConfig} metrics={metrics} />
-          )}
-
           <div className="zoom-buttons-bottom">
             <button onClick={() => adjustScale(-0.1)}>−</button>
             <button onClick={() => adjustScale(0.1)}>＋</button>
@@ -278,7 +338,7 @@ export default function ConfigPreview() {
 
       {/* RIGHT COLUMN */}
       <div className="settings-column">
-        {/* MAIN PANEL */}
+        {/* Background Settings Panel */}
         <div className="panel">
           <div className="panel-header">
             <h3>{t('settingsTitle', lang)}</h3>
@@ -395,16 +455,43 @@ export default function ConfigPreview() {
           </div>
         </div>
 
-        {/* OVERLAY PANEL */}
+        {/* Overlay Preview */}
+        {overlayConfig.mode !== 'none' && (
+          <div className="panel panel-spaced">
+            <div className="panel-header">
+              <h3>{t('overlayPreviewTitle', lang)}</h3>
+            </div>
+
+            <div
+              className={`preview-circle overlay-preview ${isDraggingOverlay ? 'dragging' : ''}`}
+              onMouseDown={handleOverlayMouseDown}
+              style={{ position: 'relative', width: '200px', height: '200px', margin: '0 auto' }}
+            >
+              {overlayConfig.mode === 'single' && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    transform: `translate(${overlayAdjX}px, ${overlayAdjY}px)`,
+                  }}
+                >
+                  <SingleInfographic overlay={overlayConfig} metrics={metrics} />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Overlay Options Panel */}
         <div className="panel panel-spaced">
           <div className="panel-header">
-            <h3>Overlay Options</h3>
+            <h3>{t('overlaySettingsTitle', lang)}</h3>
           </div>
 
           <div className="settings-grid-modern">
             {/* Overlay Mode */}
             <div className="setting-row">
-              <label>Overlay</label>
+              <label>{t('overlayMode', lang)}</label>
               <select
                 className="url-input select-narrow"
                 value={overlayConfig.mode}
@@ -429,7 +516,7 @@ export default function ConfigPreview() {
             {overlayConfig.mode === 'single' && (
               <>
                 <div className="setting-row">
-                  <label>Primary Reading</label>
+                  <label>{t('primaryReading', lang)}</label>
                   <select
                     className="url-input select-narrow"
                     value={overlayConfig.primaryMetric}
@@ -453,8 +540,59 @@ export default function ConfigPreview() {
                   </select>
                 </div>
 
+                {/* Overlay X/Y Offset */}
                 <div className="setting-row">
-                  <label>Number Color</label>
+                  <label>{t('overlayXOffset', lang)}</label>
+                  <input
+                    type="number"
+                    value={overlayConfig.x || 0}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        overlay: {
+                          ...overlayConfig,
+                          x: parseFloat(e.target.value || '0'),
+                        },
+                      })
+                    }
+                    className="input-narrow"
+                  />
+                  <button
+                    className="reset-icon"
+                    title="Reset"
+                    onClick={() => resetOverlayField('x')}
+                  >
+                    <RefreshCw size={14} />
+                  </button>
+                </div>
+
+                <div className="setting-row">
+                  <label>{t('overlayYOffset', lang)}</label>
+                  <input
+                    type="number"
+                    value={overlayConfig.y || 0}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        overlay: {
+                          ...overlayConfig,
+                          y: parseFloat(e.target.value || '0'),
+                        },
+                      })
+                    }
+                    className="input-narrow"
+                  />
+                  <button
+                    className="reset-icon"
+                    title="Reset"
+                    onClick={() => resetOverlayField('y')}
+                  >
+                    <RefreshCw size={14} />
+                  </button>
+                </div>
+
+                <div className="setting-row">
+                  <label>{t('numberColor', lang)}</label>
                   <input
                     type="color"
                     value={overlayConfig.numberColor}
@@ -468,10 +606,17 @@ export default function ConfigPreview() {
                       })
                     }
                   />
+                  <button
+                    className="reset-icon"
+                    title="Reset"
+                    onClick={() => resetOverlayField('numberColor')}
+                  >
+                    <RefreshCw size={14} />
+                  </button>
                 </div>
 
                 <div className="setting-row">
-                  <label>Text Color</label>
+                  <label>{t('textColor', lang)}</label>
                   <input
                     type="color"
                     value={overlayConfig.textColor}
@@ -485,10 +630,17 @@ export default function ConfigPreview() {
                       })
                     }
                   />
+                  <button
+                    className="reset-icon"
+                    title="Reset"
+                    onClick={() => resetOverlayField('textColor')}
+                  >
+                    <RefreshCw size={14} />
+                  </button>
                 </div>
 
                 <div className="setting-row">
-                  <label>Number Size</label>
+                  <label>{t('numberSize', lang)}</label>
                   <input
                     type="number"
                     value={overlayConfig.numberSize}
@@ -503,10 +655,17 @@ export default function ConfigPreview() {
                     }
                     className="input-narrow"
                   />
+                  <button
+                    className="reset-icon"
+                    title="Reset"
+                    onClick={() => resetOverlayField('numberSize')}
+                  >
+                    <RefreshCw size={14} />
+                  </button>
                 </div>
 
                 <div className="setting-row">
-                  <label>Text Size</label>
+                  <label>{t('textSize', lang)}</label>
                   <input
                     type="number"
                     value={overlayConfig.textSize}
@@ -521,6 +680,13 @@ export default function ConfigPreview() {
                     }
                     className="input-narrow"
                   />
+                  <button
+                    className="reset-icon"
+                    title="Reset"
+                    onClick={() => resetOverlayField('textSize')}
+                  >
+                    <RefreshCw size={14} />
+                  </button>
                 </div>
               </>
             )}

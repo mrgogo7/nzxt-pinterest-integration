@@ -21,6 +21,8 @@ export interface OverlaySettings {
   textColor: string;
   numberSize: number;
   textSize: number;
+  x?: number; // Overlay X offset
+  y?: number; // Overlay Y offset
 }
 
 export type OverlayMetrics = {
@@ -44,6 +46,8 @@ export const DEFAULT_OVERLAY: OverlaySettings = {
   textColor: "#cccccc",
   numberSize: 180,
   textSize: 80,
+  x: 0,
+  y: 0,
 };
 
 export type OverlayValueUnitType = "temp" | "percent" | "clock" | "none";

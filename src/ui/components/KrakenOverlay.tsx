@@ -32,6 +32,10 @@ export default function KrakenOverlay() {
     ...(settings.overlay || {}),
   };
 
+  // Apply overlay offset if present
+  const overlayOffsetX = overlayConfig.x || 0;
+  const overlayOffsetY = overlayConfig.y || 0;
+
   return (
     <div
       className={styles.krakenOverlay}
@@ -41,7 +45,18 @@ export default function KrakenOverlay() {
       }}
     >
       <MediaRenderer url={mediaUrl} settings={settings} />
-      <SingleInfographic overlay={overlayConfig} metrics={metrics} />
+      {overlayConfig.mode !== 'none' && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            transform: `translate(${overlayOffsetX}px, ${overlayOffsetY}px)`,
+            pointerEvents: 'none',
+          }}
+        >
+          <SingleInfographic overlay={overlayConfig} metrics={metrics} />
+        </div>
+      )}
     </div>
   );
 }

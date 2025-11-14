@@ -57,12 +57,20 @@
 }
 
 /* ==== URL section ==== */
-.url-section { margin: 10px 0 18px; }
+.url-section { 
+  margin: 10px 0 18px; 
+  background: #121317;
+  border: 1px solid #242734;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+}
 .url-label {
   display:block;
   margin-bottom: 6px;
-  color:#ccc;
+  color:#d8e0f5;
   font-weight:600;
+  font-size: 14px;
 }
 .url-row { display:flex; gap:8px; align-items:center; }
 .url-input {
@@ -276,6 +284,23 @@
 
 .input-narrow {
   width: 80px;
+}
+
+/* Overlay Preview */
+.overlay-preview {
+  min-height: 200px;
+  cursor: move;
+  border: 2px solid #444;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay-preview.dragging {
+  cursor: grabbing;
 }
 
 /* responsive */
