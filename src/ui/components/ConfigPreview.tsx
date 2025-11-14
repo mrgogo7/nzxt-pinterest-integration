@@ -396,7 +396,7 @@ export default function ConfigPreview() {
         </div>
 
         {/* OVERLAY PANEL */}
-        <div className="panel" style={{ marginTop: 16 }}>
+        <div className="panel panel-spaced">
           <div className="panel-header">
             <h3>Overlay Options</h3>
           </div>
@@ -406,8 +406,7 @@ export default function ConfigPreview() {
             <div className="setting-row">
               <label>Overlay</label>
               <select
-                className="url-input"
-                style={{ maxWidth: 180 }}
+                className="url-input select-narrow"
                 value={overlayConfig.mode}
                 onChange={(e) =>
                   setSettings({
@@ -432,8 +431,7 @@ export default function ConfigPreview() {
                 <div className="setting-row">
                   <label>Primary Reading</label>
                   <select
-                    className="url-input"
-                    style={{ maxWidth: 180 }}
+                    className="url-input select-narrow"
                     value={overlayConfig.primaryMetric}
                     onChange={(e) =>
                       setSettings({
@@ -503,7 +501,7 @@ export default function ConfigPreview() {
                         },
                       })
                     }
-                    style={{ width: 80 }}
+                    className="input-narrow"
                   />
                 </div>
 
@@ -521,7 +519,7 @@ export default function ConfigPreview() {
                         },
                       })
                     }
-                    style={{ width: 80 }}
+                    className="input-narrow"
                   />
                 </div>
               </>
