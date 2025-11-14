@@ -414,46 +414,55 @@ function SingleOverlay({
           }}
         >
           {/* Number kutusu */}
-          <div
-            style={{
-              position: "relative",
-              display: "inline-block",
-            }}
-          >
-            <div
-              style={{
-                fontSize: `${numberSize}px`,
-                fontWeight: 700,
-                color: numberColor,
-              }}
-            >
-              {valueNumber}
-            </div>
+			{/* Number + Unit (inline layout → doğal hizalama) */}
+			<div
+			  style={{
+				display: "flex",
+				alignItems: "baseline",
+				justifyContent: "center",
+				lineHeight: 0.9,
+				pointerEvents: "none",
+			  }}
+			>
+			  {/* NUMBER */}
+			  <div
+				style={{
+				  display: "inline-block",
+				  fontSize: `${numberSize}px`,
+				  fontWeight: 700,
+				  color: numberColor,
+				  lineHeight: 0.9,
+				}}
+			  >
+				{valueNumber}
+			  </div>
 
-            {/* Unit: ° üst köşe, % alt köşe */}
-            {valueUnit && (
-              <div
-                style={{
-                  position: "absolute",
-                  right: -unitSize * 0.15,
-                  top:
-                    valueUnitType === "temp"
-                      ? numberSize * 0.05 // ° için yukarıya yakın
-                      : undefined,
-                  bottom:
-                    valueUnitType === "percent"
-                      ? numberSize * 0.05 // % için aşağıya yakın
-                      : undefined,
-                  fontSize: `${unitSize}px`,
-                  color: numberColor,
-                  fontWeight: 700,
-                  lineHeight: 1,
-                }}
-              >
-                {valueUnit}
-              </div>
-            )}
-          </div>
+			  {/* UNIT (° or %) — DOĞAL TİPOGRAFİK HİZALAMA */}
+			  {valueUnit && (
+				<div
+				  style={{
+					display: "inline-block",
+					fontSize: `${unitSize}px`,
+					marginLeft: numberSize * 0.05, // sayıdan biraz uzaklaştır
+					color: numberColor,
+					fontWeight: 700,
+					lineHeight: 0.9,
+
+					// BURASI KRİTİK:
+					// ° → doğal olarak yukarı gelir, baseline bozma
+					// % → doğal olarak aşağı kayar, baseline bozma
+					verticalAlign:
+					  valueUnitType === "temp"
+						? "top"       // ° için
+						: valueUnitType === "percent"
+						? "bottom"    // % için
+						: "baseline",
+				  }}
+				>
+				  {valueUnit}
+				</div>
+			  )}
+			</div>
         </div>
       ) : (
         <>
