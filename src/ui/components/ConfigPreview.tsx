@@ -224,14 +224,27 @@ export default function ConfigPreview() {
     // Use ref to get current settings value
     const currentSettings = settingsRef.current;
     const currentOverlay = currentSettings.overlay || DEFAULT_OVERLAY;
-    setSettings({
-      ...currentSettings,
-      overlay: {
-        ...currentOverlay,
-        dualReadersOffsetX: (currentOverlay.dualReadersOffsetX || 0) + lcdDx,
-        dualReadersOffsetY: (currentOverlay.dualReadersOffsetY || 0) + lcdDy,
-      },
-    });
+    
+    // For dual mode, update secondaryOffsetX/Y; for triple mode, update dualReadersOffsetX/Y
+    if (currentOverlay.mode === 'dual') {
+      setSettings({
+        ...currentSettings,
+        overlay: {
+          ...currentOverlay,
+          secondaryOffsetX: (currentOverlay.secondaryOffsetX || 0) + lcdDx,
+          secondaryOffsetY: (currentOverlay.secondaryOffsetY || 0) + lcdDy,
+        },
+      });
+    } else if (currentOverlay.mode === 'triple') {
+      setSettings({
+        ...currentSettings,
+        overlay: {
+          ...currentOverlay,
+          dualReadersOffsetX: (currentOverlay.dualReadersOffsetX || 0) + lcdDx,
+          dualReadersOffsetY: (currentOverlay.dualReadersOffsetY || 0) + lcdDy,
+        },
+      });
+    }
   }, [offsetScale, setSettings]);
 
   const handleOverlayMouseUp = useCallback(() => {
