@@ -265,6 +265,14 @@
 /* Modern settings grid: label | control | reset-icon (inline, compact) */
 .settings-grid-modern { display:flex; flex-direction:column; gap:8px; }
 .setting-row { display:flex; align-items:center; gap:8px; }
+
+/* Horizontal divider for visual separation */
+.settings-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 12px 0;
+  border: none;
+}
 .setting-row label {
   flex: 1;
   color:#bfc6d4; font-size:12px; white-space:nowrap;
