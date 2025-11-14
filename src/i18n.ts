@@ -63,8 +63,11 @@ const dict: Record<Lang, Record<string, string>> = {
     gap: "Gap",
     gapSecondaryTertiary: "Gap (Secondary-Tertiary)",
     dividerColor: "Divider Color",
-    primaryDividerPosition: "Primary/Divider Position",
-    secondaryTertiaryPosition: "Secondary/Tertiary Position",
+    dividerGap: "Divider Gap",
+    primaryXOffset: "Primary X Offset",
+    primaryYOffset: "Primary Y Offset",
+    dualReadersXOffset: "Dual Readers X Offset",
+    dualReadersYOffset: "Dual Readers Y Offset",
   },
   tr: {
     appTitle: "NZXT Medya Ayarları",
@@ -124,8 +127,11 @@ const dict: Record<Lang, Record<string, string>> = {
     gap: "Mesafe",
     gapSecondaryTertiary: "Mesafe (İkincil-Üçüncül)",
     dividerColor: "Ayırıcı Rengi",
-    primaryDividerPosition: "Birincil/Ayırıcı Konumu",
-    secondaryTertiaryPosition: "İkincil/Üçüncül Konumu",
+    dividerGap: "Ayırıcı Boşluğu",
+    primaryXOffset: "Birincil X Ofset",
+    primaryYOffset: "Birincil Y Ofset",
+    dualReadersXOffset: "İkili Okuyucular X Ofset",
+    dualReadersYOffset: "İkili Okuyucular Y Ofset",
   },
 };
 

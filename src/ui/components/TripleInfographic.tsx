@@ -181,9 +181,12 @@ export default function TripleInfographic({
   const primaryOffsetX = (overlay.x || 0) * scale;
   const primaryOffsetY = (overlay.y || 0) * scale;
   
-  // Secondary/Tertiary offset (separate from primary/divider)
-  const secondaryTertiaryOffsetX = (overlay.secondaryTertiaryOffsetX || 0) * scale;
-  const secondaryTertiaryOffsetY = (overlay.secondaryTertiaryOffsetY || 0) * scale;
+  // Dual Readers offset (secondary/tertiary section)
+  const dualReadersOffsetX = (overlay.dualReadersOffsetX || 0) * scale;
+  const dualReadersOffsetY = (overlay.dualReadersOffsetY || 0) * scale;
+  
+  // Divider gap - space between primary and divider
+  const dividerGap = (overlay.dividerGap || 8) * scale;
 
   return (
     <div
@@ -213,13 +216,13 @@ export default function TripleInfographic({
         />
       )}
 
-      {/* Left section: Primary metric (large) - Attached to divider */}
+      {/* Left section: Primary metric (large) - Attached to divider with gap */}
       <div
         style={{
           position: "absolute",
           left: "50%",
           top: "50%",
-          transform: `translate(calc(-100% + ${primaryOffsetX}px), calc(-50% + ${primaryOffsetY}px))`,
+          transform: `translate(calc(-100% - ${dividerGap}px + ${primaryOffsetX}px), calc(-50% + ${primaryOffsetY}px))`,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
@@ -267,13 +270,13 @@ export default function TripleInfographic({
         />
       )}
 
-      {/* Right section: Secondary and tertiary metrics (stacked) - Separate offset */}
+      {/* Right section: Secondary and tertiary metrics (stacked) - Dual Readers offset */}
       <div
         style={{
           position: "absolute",
           left: "50%",
           top: "50%",
-          transform: `translate(${secondaryTertiaryOffsetX}px, calc(-50% + ${secondaryTertiaryOffsetY}px))`,
+          transform: `translate(${dualReadersOffsetX}px, calc(-50% + ${dualReadersOffsetY}px))`,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
