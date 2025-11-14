@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import '../styles/ConfigPreview.css';
 import { LANG_KEY, Lang, t, getInitialLang } from '../../i18n';
 import {
@@ -122,8 +122,9 @@ export default function ConfigPreview() {
     setIsDragging(true);
   };
 
-  const handleBackgroundMouseMove = (e: MouseEvent) => {
-    if (!isDragging || !dragStart.current) return;
+  // Use useCallback to memoize handlers and prevent stale closures
+  const handleBackgroundMouseMove = useCallback((e: MouseEvent) => {
+    if (!dragStart.current) return;
 
     const dx = e.clientX - dragStart.current.x;
     const dy = e.clientY - dragStart.current.y;
@@ -133,17 +134,17 @@ export default function ConfigPreview() {
     const lcdDx = previewToLcd(dx, offsetScale);
     const lcdDy = previewToLcd(dy, offsetScale);
 
-    setSettings({
-      ...settings,
-      x: settings.x + lcdDx,
-      y: settings.y + lcdDy,
-    });
-  };
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      x: prevSettings.x + lcdDx,
+      y: prevSettings.y + lcdDy,
+    }));
+  }, [offsetScale, setSettings]);
 
-  const handleBackgroundMouseUp = () => {
+  const handleBackgroundMouseUp = useCallback(() => {
     setIsDragging(false);
     dragStart.current = null;
-  };
+  }, []);
 
   // Overlay drag handler - FIXED: Use correct offsetScale
   const handleOverlayMouseDown = (e: React.MouseEvent) => {
@@ -153,8 +154,8 @@ export default function ConfigPreview() {
     setIsDraggingOverlay(true);
   };
 
-  const handleOverlayMouseMove = (e: MouseEvent) => {
-    if (!isDraggingOverlay || !overlayDragStart.current) return;
+  const handleOverlayMouseMove = useCallback((e: MouseEvent) => {
+    if (!overlayDragStart.current) return;
 
     const dx = e.clientX - overlayDragStart.current.x;
     const dy = e.clientY - overlayDragStart.current.y;
@@ -164,40 +165,45 @@ export default function ConfigPreview() {
     const lcdDx = previewToLcd(dx, offsetScale);
     const lcdDy = previewToLcd(dy, offsetScale);
 
-    setSettings({
-      ...settings,
-      overlay: {
-        ...overlayConfig,
-        x: (overlayConfig.x || 0) + lcdDx,
-        y: (overlayConfig.y || 0) + lcdDy,
-      },
+    setSettings((prevSettings) => {
+      const prevOverlay = prevSettings.overlay || DEFAULT_OVERLAY;
+      return {
+        ...prevSettings,
+        overlay: {
+          ...prevOverlay,
+          x: (prevOverlay.x || 0) + lcdDx,
+          y: (prevOverlay.y || 0) + lcdDy,
+        },
+      };
     });
-  };
+  }, [offsetScale, setSettings]);
 
-  const handleOverlayMouseUp = () => {
+  const handleOverlayMouseUp = useCallback(() => {
     setIsDraggingOverlay(false);
     overlayDragStart.current = null;
-  };
+  }, []);
 
   useEffect(() => {
     if (isDragging) {
       window.addEventListener('mousemove', handleBackgroundMouseMove);
       window.addEventListener('mouseup', handleBackgroundMouseUp);
-    } else {
-      window.removeEventListener('mousemove', handleBackgroundMouseMove);
-      window.removeEventListener('mouseup', handleBackgroundMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleBackgroundMouseMove);
+        window.removeEventListener('mouseup', handleBackgroundMouseUp);
+      };
     }
-  }, [isDragging]);
+  }, [isDragging, handleBackgroundMouseMove, handleBackgroundMouseUp]);
 
   useEffect(() => {
     if (isDraggingOverlay) {
       window.addEventListener('mousemove', handleOverlayMouseMove);
       window.addEventListener('mouseup', handleOverlayMouseUp);
-    } else {
-      window.removeEventListener('mousemove', handleOverlayMouseMove);
-      window.removeEventListener('mouseup', handleOverlayMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleOverlayMouseMove);
+        window.removeEventListener('mouseup', handleOverlayMouseUp);
+      };
     }
-  }, [isDraggingOverlay]);
+  }, [isDraggingOverlay, handleOverlayMouseMove, handleOverlayMouseUp]);
 
   // Zoom handler for background
   useEffect(() => {
