@@ -1,52 +1,81 @@
-// ------------------------------------------------------------
-// NZXT Pinterest Integration - Shared Storage Layer
-// ------------------------------------------------------------
-// Bu dosya, hem Config hem Display sayfası için ortak depolama
-// alanını yönetir. (localStorage + cookie yedekli yapı)
+// ============================================================================
+// NZXT Web Integration – Shared Storage Layer
+// ----------------------------------------------------------------------------
+// This module provides a robust shared storage mechanism for both the
+// Config page (settings UI) and the Display page (LCD renderer).
 //
-// - NZXT CAM’de bazen Config ve Display ayrı Chromium process’lerinde
-//   açıldığı için localStorage paylaşımı olmaz.
-// - Bu durumda cookie yedeği devreye girer.
-// ------------------------------------------------------------
+// Why this exists:
+// - NZXT CAM sometimes launches Config and Display in SEPARATE Chromium
+//   processes, causing localStorage isolation.
+// - To avoid desync, we mirror the URL into a cookie as a fallback layer.
+// - Cookies work across CAM’s embedded browser instances when secure attributes
+//   are applied (SameSite=None; Secure).
+//
+// Storage priority:
+//  1. localStorage   (best performance)
+//  2. cookie fallback (cross-process compatibility for CAM)
+//
+// This file also implements a small observer system so Display can react
+// instantly when Config updates the media URL.
+// ============================================================================
 
-const KEY = 'pinterest_url'
+// Primary storage key used in both localStorage and storage events.
+// NOTE: Changing this string will reset previously saved URLs.
+// (CAM will treat it as a brand-new storage namespace.)
+const KEY = 'media_url_primary'
+
+// Cookie key for cross-process fallback
 const COOKIE = 'media_url'
 
-// URL yaz (hem localStorage hem cookie olarak)
+// ============================================================================
+// Media URL – Read & Write
+// ============================================================================
+
+/**
+ * Persist media URL (image/video) to both localStorage and cookie.
+ * This ensures maximum compatibility inside NZXT CAM.
+ */
 export function setMediaUrl(url: string) {
   try {
     localStorage.setItem(KEY, url)
   } catch (e) {
-    console.warn('[NZXT] localStorage erişilemedi:', e)
+    console.warn('[NZXT] localStorage write failed:', e)
   }
 
-  // 👇 NZXT CAM güvenli context ister → SameSite=None; Secure eklenmeli
+  // CAM requires secure cookie attributes to allow cross-process sharing.
   document.cookie = `${COOKIE}=${encodeURIComponent(url)}; path=/; SameSite=None; Secure`
 }
 
-// URL oku (önce localStorage, sonra cookie fallback)
+/**
+ * Retrieve the stored media URL.
+ * Priority:
+ *   1. localStorage
+ *   2. cookie fallback (used when CAM isolates localStorage)
+ */
 export function getMediaUrl(): string {
   try {
     const v = localStorage.getItem(KEY)
     if (v) return v
   } catch (e) {
-    console.warn('[NZXT] localStorage okunamadı:', e)
+    console.warn('[NZXT] localStorage read failed:', e)
   }
 
   const match = document.cookie.match(/(?:^|;\s*)media_url=([^;]+)/)
-  if (match) return decodeURIComponent(match[1])
-
-  return ''
+  return match ? decodeURIComponent(match[1]) : ''
 }
 
-// ------------------------------------------------------------
-// Gözlemci mekanizması (Config → Display senkronizasyonu)
-// ------------------------------------------------------------
+// ============================================================================
+// Observer System – Sync Config → Display
+// ============================================================================
+// CAM sometimes does NOT trigger the normal "storage" event.
+// To avoid desync, we implement a polling fallback to detect changes.
 
-type Listener = (val: string) => void
+type Listener = (value: string) => void
 const listeners = new Set<Listener>()
 
 let lastVal = ''
+
+/** Poll for changes every 2 seconds (NZXT CAM fallback). */
 function poll() {
   const v = getMediaUrl()
   if (v !== lastVal) {
@@ -55,31 +84,39 @@ function poll() {
   }
 }
 
-// NZXT CAM bazen storage event yaymaz → polling fallback
 setInterval(poll, 2000)
 
-// Standart storage event (normal tarayıcıda anlık tetiklenir)
+// Native browser storage event (fires instantly outside of CAM)
 window.addEventListener('storage', (e) => {
   if (e.key === KEY) poll()
 })
 
+/**
+ * Subscribe to media URL updates.
+ * Immediately calls listener with current value.
+ */
 export function subscribe(fn: Listener) {
   listeners.add(fn)
-  fn(getMediaUrl()) // ilk değer
+  fn(getMediaUrl()) // send initial state
   return () => listeners.delete(fn)
 }
 
-// ------------------------------------------------------------
-// Yardımcı fonksiyonlar
-// ------------------------------------------------------------
+// ============================================================================
+// Helpers
+// ============================================================================
 
-// NZXT CAM viewstate (LCD çözünürlüğü) değerini cookie’den çek
+/**
+ * Retrieve CAM LCD viewstate (expected resolution or scale factor).
+ * Stored as "viewstate=<number>" inside a cookie.
+ */
 export function getViewState(): number {
   const match = document.cookie.match(/viewstate=(\d+)/)
   return match ? Number(match[1]) : 640
 }
 
-// CAM tarafında mı çalışıyoruz?
+/**
+ * Determine if running inside NZXT CAM (kraken=1 query flag).
+ */
 export function isKraken(): boolean {
   const sp = new URLSearchParams(location.search)
   return sp.get('kraken') === '1'
