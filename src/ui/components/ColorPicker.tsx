@@ -27,6 +27,8 @@ export default function ColorPicker({ value, onChange }: ColorPickerProps) {
   const [lightness, setLightness] = useState(50);
   const [alpha, setAlpha] = useState(1);
   const pickerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [popupPosition, setPopupPosition] = useState<{ top?: string; bottom?: string; left?: string; right?: string }>({});
 
   // Parse color value (supports hex, rgb, rgba)
   useEffect(() => {
@@ -157,6 +159,52 @@ export default function ColorPicker({ value, onChange }: ColorPickerProps) {
     updateColor(hue, saturation, lightness, newAlpha);
   };
 
+  // Calculate popup position to avoid viewport overflow
+  useEffect(() => {
+    if (isOpen && triggerRef.current) {
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      const popupWidth = 240; // min-width from CSS
+      const popupHeight = 280; // approximate height
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const spacing = 8; // gap between trigger and popup
+
+      const position: { top?: string; bottom?: string; left?: string; right?: string } = {};
+
+      // Horizontal positioning: prefer left (for NZXT CAM compatibility)
+      // Check if there's enough space on the left
+      if (triggerRect.left >= popupWidth + spacing) {
+        // Enough space on left, open to the left
+        position.right = '0';
+      } else {
+        // Not enough space on left, try right
+        if (triggerRect.right + popupWidth + spacing <= viewportWidth) {
+          position.left = '0';
+        } else {
+          // Not enough space on either side, open to the left anyway (will be clipped but visible)
+          position.right = '0';
+        }
+      }
+
+      // Vertical positioning: prefer top (for NZXT CAM compatibility)
+      // Check if there's enough space above
+      if (triggerRect.top >= popupHeight + spacing) {
+        // Enough space above, open above
+        position.bottom = 'calc(100% + 8px)';
+      } else {
+        // Not enough space above, try below
+        if (triggerRect.bottom + popupHeight + spacing <= viewportHeight) {
+          position.top = 'calc(100% + 8px)';
+        } else {
+          // Not enough space on either side, open above anyway (will be clipped but visible)
+          position.bottom = 'calc(100% + 8px)';
+        }
+      }
+
+      setPopupPosition(position);
+    }
+  }, [isOpen]);
+
   // Close picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -185,6 +233,7 @@ export default function ColorPicker({ value, onChange }: ColorPickerProps) {
   return (
     <div className="color-picker-wrapper" ref={pickerRef}>
       <button
+        ref={triggerRef}
         type="button"
         className="color-picker-trigger"
         onClick={() => setIsOpen(!isOpen)}
@@ -196,7 +245,10 @@ export default function ColorPicker({ value, onChange }: ColorPickerProps) {
       </button>
 
       {isOpen && (
-        <div className="color-picker-popup">
+        <div 
+          className="color-picker-popup"
+          style={popupPosition}
+        >
           {/* Saturation/Lightness area */}
           <div
             className="color-picker-saturation-lightness"
