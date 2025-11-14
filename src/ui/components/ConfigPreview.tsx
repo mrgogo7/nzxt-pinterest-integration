@@ -40,10 +40,23 @@ export default function ConfigPreview() {
   const { settings, setSettings } = useConfig();
   const { mediaUrl } = useMediaUrl();
   // Use real monitoring data if NZXT API is available, otherwise use mock data
-  const hasNzxtApi = typeof window !== 'undefined' && window.nzxt?.v1;
+  // Check if NZXT API exists and has monitoring capability
+  const hasNzxtApi = typeof window !== 'undefined' && 
+    window.nzxt?.v1 && 
+    typeof window.nzxt.v1.onMonitoringDataUpdate === 'function';
+  
   const realMetrics = useMonitoring();
   const mockMetrics = useMonitoringMock();
-  const metrics = hasNzxtApi ? realMetrics : mockMetrics;
+  
+  // Use mock data if API is not available or if real metrics are still at defaults (no data received)
+  const isRealDataReceived = hasNzxtApi && (
+    realMetrics.cpuTemp > 0 || 
+    realMetrics.gpuTemp > 0 || 
+    realMetrics.cpuLoad > 0 || 
+    realMetrics.gpuLoad > 0
+  );
+  
+  const metrics = isRealDataReceived ? realMetrics : mockMetrics;
   const [isDragging, setIsDragging] = useState(false);
   const [isDraggingOverlay, setIsDraggingOverlay] = useState(false);
   const [isDraggingSecondaryTertiary, setIsDraggingSecondaryTertiary] = useState(false);
