@@ -849,6 +849,9 @@ export default function ConfigPreview() {
                           </button>
                         </div>
 
+                        {/* Horizontal divider */}
+                        <hr className="settings-divider" />
+
                         {/* SECONDARY SETTINGS */}
                         <div className="setting-row">
                           <label>{t('secondaryNumberColor', lang)}</label>
