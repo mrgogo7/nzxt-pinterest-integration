@@ -715,7 +715,7 @@ export default function ConfigPreview() {
                       </button>
                     </div>
 
-                    {/* Colors - different for dual mode */}
+                    {/* Colors - different for dual and triple modes */}
                     {overlayConfig.mode === 'dual' ? (
                       <>
                         <div className="setting-row">
@@ -876,6 +876,197 @@ export default function ConfigPreview() {
                           </button>
                         </div>
                       </>
+                    ) : overlayConfig.mode === 'triple' ? (
+                      <>
+                        {/* Primary colors */}
+                        <div className="setting-row">
+                          <label>{t('primaryNumberColor', lang)}</label>
+                          <ColorPicker
+                            value={overlayConfig.primaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor}
+                            onChange={(color) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  primaryNumberColor: color,
+                                },
+                              })
+                            }
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  primaryNumberColor: DEFAULT_OVERLAY.primaryNumberColor,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        <div className="setting-row">
+                          <label>{t('primaryTextColor', lang)}</label>
+                          <ColorPicker
+                            value={overlayConfig.primaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor}
+                            onChange={(color) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  primaryTextColor: color,
+                                },
+                              })
+                            }
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  primaryTextColor: DEFAULT_OVERLAY.primaryTextColor,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        {/* Secondary colors */}
+                        <div className="setting-row">
+                          <label>{t('secondaryNumberColor', lang)}</label>
+                          <ColorPicker
+                            value={overlayConfig.secondaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor}
+                            onChange={(color) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  secondaryNumberColor: color,
+                                },
+                              })
+                            }
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  secondaryNumberColor: DEFAULT_OVERLAY.secondaryNumberColor,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        <div className="setting-row">
+                          <label>{t('secondaryTextColor', lang)}</label>
+                          <ColorPicker
+                            value={overlayConfig.secondaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor}
+                            onChange={(color) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  secondaryTextColor: color,
+                                },
+                              })
+                            }
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  secondaryTextColor: DEFAULT_OVERLAY.secondaryTextColor,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        {/* Tertiary colors */}
+                        <div className="setting-row">
+                          <label>{t('tertiaryNumberColor', lang) || 'Tertiary Number Color'}</label>
+                          <ColorPicker
+                            value={overlayConfig.tertiaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor}
+                            onChange={(color) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  tertiaryNumberColor: color,
+                                },
+                              })
+                            }
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  tertiaryNumberColor: DEFAULT_OVERLAY.tertiaryNumberColor,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        <div className="setting-row">
+                          <label>{t('tertiaryTextColor', lang) || 'Tertiary Text Color'}</label>
+                          <ColorPicker
+                            value={overlayConfig.tertiaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor}
+                            onChange={(color) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  tertiaryTextColor: color,
+                                },
+                              })
+                            }
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  tertiaryTextColor: DEFAULT_OVERLAY.tertiaryTextColor,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+                      </>
                     ) : (
                       <>
                         <div className="setting-row">
@@ -926,7 +1117,7 @@ export default function ConfigPreview() {
                       </>
                     )}
 
-                    {/* Number Size and Text Size - different labels for dual mode */}
+                    {/* Number Size and Text Size - different labels for dual and triple modes */}
                     {overlayConfig.mode === 'dual' ? (
                       <>
                         <div className="setting-row">
@@ -1044,6 +1235,260 @@ export default function ConfigPreview() {
                             <RefreshCw size={14} />
                           </button>
                         </div>
+                      </>
+                    ) : overlayConfig.mode === 'triple' ? (
+                      <>
+                        {/* Primary sizes */}
+                        <div className="setting-row">
+                          <label>{t('primaryNumberSize', lang)}</label>
+                          <input
+                            type="number"
+                            value={overlayConfig.numberSize}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  numberSize: parseInt(e.target.value || '180', 10),
+                                },
+                              })
+                            }
+                            className="input-narrow"
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => resetOverlayField('numberSize')}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        <div className="setting-row">
+                          <label>{t('primaryTextSize', lang)}</label>
+                          <input
+                            type="number"
+                            value={overlayConfig.textSize}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  textSize: parseInt(e.target.value || '45', 10),
+                                },
+                              })
+                            }
+                            className="input-narrow"
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => resetOverlayField('textSize')}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        {/* Secondary sizes */}
+                        <div className="setting-row">
+                          <label>{t('secondaryNumberSize', lang)}</label>
+                          <input
+                            type="number"
+                            value={overlayConfig.secondaryNumberSize || DEFAULT_OVERLAY.secondaryNumberSize || 108}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  secondaryNumberSize: parseInt(e.target.value || '108', 10),
+                                },
+                              })
+                            }
+                            className="input-narrow"
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  secondaryNumberSize: DEFAULT_OVERLAY.secondaryNumberSize,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        <div className="setting-row">
+                          <label>{t('secondaryTextSize', lang)}</label>
+                          <input
+                            type="number"
+                            value={overlayConfig.secondaryTextSize || DEFAULT_OVERLAY.secondaryTextSize || 32}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  secondaryTextSize: parseInt(e.target.value || '32', 10),
+                                },
+                              })
+                            }
+                            className="input-narrow"
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  secondaryTextSize: DEFAULT_OVERLAY.secondaryTextSize,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        {/* Tertiary sizes */}
+                        <div className="setting-row">
+                          <label>{t('tertiaryNumberSize', lang) || 'Tertiary Number Size'}</label>
+                          <input
+                            type="number"
+                            value={overlayConfig.tertiaryNumberSize || DEFAULT_OVERLAY.tertiaryNumberSize || 108}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  tertiaryNumberSize: parseInt(e.target.value || '108', 10),
+                                },
+                              })
+                            }
+                            className="input-narrow"
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  tertiaryNumberSize: DEFAULT_OVERLAY.tertiaryNumberSize,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        <div className="setting-row">
+                          <label>{t('tertiaryTextSize', lang) || 'Tertiary Text Size'}</label>
+                          <input
+                            type="number"
+                            value={overlayConfig.tertiaryTextSize || DEFAULT_OVERLAY.tertiaryTextSize || 32}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  tertiaryTextSize: parseInt(e.target.value || '32', 10),
+                                },
+                              })
+                            }
+                            className="input-narrow"
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  tertiaryTextSize: DEFAULT_OVERLAY.tertiaryTextSize,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        {/* Gap settings for triple mode */}
+                        <div className="setting-row">
+                          <label>{t('gapLeftRight', lang) || 'Gap (Left-Right)'}</label>
+                          <input
+                            type="number"
+                            value={overlayConfig.gapLeftRight || DEFAULT_OVERLAY.gapLeftRight || 36}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  gapLeftRight: parseInt(e.target.value || '36', 10),
+                                },
+                              })
+                            }
+                            className="input-narrow"
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  gapLeftRight: DEFAULT_OVERLAY.gapLeftRight,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
+
+                        <div className="setting-row">
+                          <label>{t('gapSecondaryTertiary', lang) || 'Gap (Secondary-Tertiary)'}</label>
+                          <input
+                            type="number"
+                            value={overlayConfig.gapSecondaryTertiary || DEFAULT_OVERLAY.gapSecondaryTertiary || 24}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  gapSecondaryTertiary: parseInt(e.target.value || '24', 10),
+                                },
+                              })
+                            }
+                            className="input-narrow"
+                          />
+                          <button
+                            className="reset-icon"
+                            title="Reset"
+                            onClick={() => {
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  gapSecondaryTertiary: DEFAULT_OVERLAY.gapSecondaryTertiary,
+                                },
+                              });
+                            }}
+                          >
+                            <RefreshCw size={14} />
+                          </button>
+                        </div>
 
                         {/* Divider settings */}
                         <div className="setting-row">
@@ -1125,6 +1570,160 @@ export default function ConfigPreview() {
                                     overlay: {
                                       ...overlayConfig,
                                       dividerThickness: DEFAULT_OVERLAY.dividerThickness,
+                                    },
+                                  });
+                                }}
+                              >
+                                <RefreshCw size={14} />
+                              </button>
+                            </div>
+
+                            <div className="setting-row">
+                              <label>{t('dividerColor', lang) || 'Divider Color'}</label>
+                              <ColorPicker
+                                value={overlayConfig.dividerColor || DEFAULT_OVERLAY.dividerColor || 'rgba(255, 255, 255, 0.3)'}
+                                onChange={(color) =>
+                                  setSettings({
+                                    ...settings,
+                                    overlay: {
+                                      ...overlayConfig,
+                                      dividerColor: color,
+                                    },
+                                  })
+                                }
+                              />
+                              <button
+                                className="reset-icon"
+                                title="Reset"
+                                onClick={() => {
+                                  setSettings({
+                                    ...settings,
+                                    overlay: {
+                                      ...overlayConfig,
+                                      dividerColor: DEFAULT_OVERLAY.dividerColor,
+                                    },
+                                  });
+                                }}
+                              >
+                                <RefreshCw size={14} />
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </>
+                    ) : overlayConfig.mode === 'triple' ? (
+                      <>
+                        {/* Divider settings for triple mode */}
+                        <div className="setting-row">
+                          <label>{t('showDivider', lang)}</label>
+                          <input
+                            type="checkbox"
+                            checked={overlayConfig.showDivider || false}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                overlay: {
+                                  ...overlayConfig,
+                                  showDivider: e.target.checked,
+                                },
+                              })
+                            }
+                            className="input-narrow"
+                            style={{ width: 'auto' }}
+                          />
+                        </div>
+
+                        {overlayConfig.showDivider && (
+                          <>
+                            <div className="setting-row">
+                              <label>{t('dividerWidth', lang)}</label>
+                              <input
+                                type="number"
+                                value={overlayConfig.dividerWidth || 60}
+                                onChange={(e) =>
+                                  setSettings({
+                                    ...settings,
+                                    overlay: {
+                                      ...overlayConfig,
+                                      dividerWidth: parseInt(e.target.value || '60', 10),
+                                    },
+                                  })
+                                }
+                                className="input-narrow"
+                              />
+                              <button
+                                className="reset-icon"
+                                title="Reset"
+                                onClick={() => {
+                                  setSettings({
+                                    ...settings,
+                                    overlay: {
+                                      ...overlayConfig,
+                                      dividerWidth: DEFAULT_OVERLAY.dividerWidth,
+                                    },
+                                  });
+                                }}
+                              >
+                                <RefreshCw size={14} />
+                              </button>
+                            </div>
+
+                            <div className="setting-row">
+                              <label>{t('dividerThickness', lang)}</label>
+                              <input
+                                type="number"
+                                value={overlayConfig.dividerThickness || 2}
+                                onChange={(e) =>
+                                  setSettings({
+                                    ...settings,
+                                    overlay: {
+                                      ...overlayConfig,
+                                      dividerThickness: parseInt(e.target.value || '2', 10),
+                                    },
+                                  })
+                                }
+                                className="input-narrow"
+                              />
+                              <button
+                                className="reset-icon"
+                                title="Reset"
+                                onClick={() => {
+                                  setSettings({
+                                    ...settings,
+                                    overlay: {
+                                      ...overlayConfig,
+                                      dividerThickness: DEFAULT_OVERLAY.dividerThickness,
+                                    },
+                                  });
+                                }}
+                              >
+                                <RefreshCw size={14} />
+                              </button>
+                            </div>
+
+                            <div className="setting-row">
+                              <label>{t('dividerColor', lang) || 'Divider Color'}</label>
+                              <ColorPicker
+                                value={overlayConfig.dividerColor || DEFAULT_OVERLAY.dividerColor || 'rgba(255, 255, 255, 0.3)'}
+                                onChange={(color) =>
+                                  setSettings({
+                                    ...settings,
+                                    overlay: {
+                                      ...overlayConfig,
+                                      dividerColor: color,
+                                    },
+                                  })
+                                }
+                              />
+                              <button
+                                className="reset-icon"
+                                title="Reset"
+                                onClick={() => {
+                                  setSettings({
+                                    ...settings,
+                                    overlay: {
+                                      ...overlayConfig,
+                                      dividerColor: DEFAULT_OVERLAY.dividerColor,
                                     },
                                   });
                                 }}

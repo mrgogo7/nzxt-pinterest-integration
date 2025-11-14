@@ -22,19 +22,28 @@ export interface OverlaySettings {
   numberColor: string;
   textColor: string;
   // Dual mode specific colors
-  primaryNumberColor?: string; // For dual mode
-  primaryTextColor?: string; // For dual mode
-  secondaryNumberColor?: string; // For dual mode
-  secondaryTextColor?: string; // For dual mode
+  primaryNumberColor?: string; // For dual and triple modes
+  primaryTextColor?: string; // For dual and triple modes
+  secondaryNumberColor?: string; // For dual and triple modes
+  secondaryTextColor?: string; // For dual and triple modes
+  // Triple mode specific colors
+  tertiaryNumberColor?: string; // For triple mode
+  tertiaryTextColor?: string; // For triple mode
   numberSize: number;
   textSize: number;
   // Dual mode specific settings
-  secondaryNumberSize?: number; // For dual mode
-  secondaryTextSize?: number; // For dual mode
-  showDivider?: boolean; // Show divider between dual metrics
-  dividerWidth?: number; // Divider line width
-  dividerThickness?: number; // Divider line thickness
+  secondaryNumberSize?: number; // For dual and triple modes
+  secondaryTextSize?: number; // For dual and triple modes
+  // Triple mode specific settings
+  tertiaryNumberSize?: number; // For triple mode
+  tertiaryTextSize?: number; // For triple mode
+  showDivider?: boolean; // Show divider between metrics (dual and triple modes)
+  dividerWidth?: number; // Divider line width (percentage of height)
+  dividerThickness?: number; // Divider line thickness (pixels)
+  dividerColor?: string; // Divider line color
   gap?: number; // Space between primary and secondary metrics (dual mode)
+  gapLeftRight?: number; // Space between left (primary) and right (secondary/tertiary) sections (triple mode)
+  gapSecondaryTertiary?: number; // Space between secondary and tertiary metrics (triple mode)
   x?: number; // Overlay X offset
   y?: number; // Overlay Y offset
 }
@@ -69,10 +78,18 @@ export const DEFAULT_OVERLAY: OverlaySettings = {
   secondaryTextColor: "rgba(255, 255, 255, 1)",
   secondaryNumberSize: 120,
   secondaryTextSize: 35,
+  // Triple mode defaults
+  tertiaryNumberColor: "rgba(255, 255, 255, 1)",
+  tertiaryTextColor: "rgba(255, 255, 255, 1)",
+  tertiaryNumberSize: 108, // 60% of 180 (primary size)
+  tertiaryTextSize: 32, // ~70% of 45 (primary text size)
   showDivider: false,
   dividerWidth: 60, // Percentage of height
   dividerThickness: 2,
-  gap: 36, // Default gap (120 * 0.3)
+  dividerColor: "rgba(255, 255, 255, 0.3)", // Default divider color
+  gap: 36, // Default gap for dual mode (120 * 0.3)
+  gapLeftRight: 36, // Default gap between left and right sections in triple mode
+  gapSecondaryTertiary: 24, // Default gap between secondary and tertiary in triple mode
   x: 0,
   y: 0,
 };

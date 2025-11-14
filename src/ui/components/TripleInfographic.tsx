@@ -36,21 +36,29 @@ export default function TripleInfographic({
   const secondaryInfo = getOverlayLabelAndValue(secondaryKey, secondaryValue);
   const tertiaryInfo = getOverlayLabelAndValue(tertiaryKey, tertiaryValue);
 
-  const numberColor = overlay.numberColor;
-  const textColor = overlay.textColor;
+  // Use separate colors for primary, secondary, and tertiary in triple mode
+  const primaryNumberColor = overlay.primaryNumberColor || overlay.numberColor;
+  const primaryTextColor = overlay.primaryTextColor || overlay.textColor;
+  const secondaryNumberColor = overlay.secondaryNumberColor || overlay.numberColor;
+  const secondaryTextColor = overlay.secondaryTextColor || overlay.textColor;
+  const tertiaryNumberColor = overlay.tertiaryNumberColor || overlay.numberColor;
+  const tertiaryTextColor = overlay.tertiaryTextColor || overlay.textColor;
 
-  // Primary metric uses full size, secondary/tertiary use smaller size
+  // Use separate sizes for primary, secondary, and tertiary in triple mode
   const primaryNumberSize = overlay.numberSize * scale;
-  const secondaryNumberSize = overlay.numberSize * scale * 0.6; // 60% of primary size
-  const textSize = overlay.textSize * scale;
-  const secondaryTextSize = overlay.textSize * scale * 0.7; // 70% of primary text size
+  const primaryTextSize = overlay.textSize * scale;
+  const secondaryNumberSize = (overlay.secondaryNumberSize || overlay.numberSize * 0.6) * scale;
+  const secondaryTextSize = (overlay.secondaryTextSize || overlay.textSize * 0.7) * scale;
+  const tertiaryNumberSize = (overlay.tertiaryNumberSize || overlay.numberSize * 0.6) * scale;
+  const tertiaryTextSize = (overlay.tertiaryTextSize || overlay.textSize * 0.7) * scale;
 
   // Helper function to render a single metric value
   const renderMetric = (
     info: typeof primaryInfo,
     isClock: boolean,
     unitSize: number,
-    numSize: number
+    numSize: number,
+    numColor: string
   ) => {
     if (!isClock) {
       return (
@@ -67,7 +75,7 @@ export default function TripleInfographic({
             style={{
               fontSize: `${numSize}px`,
               fontWeight: 700,
-              color: numberColor,
+              color: numColor,
             }}
           >
             {info.valueNumber}
@@ -88,7 +96,7 @@ export default function TripleInfographic({
                 style={{
                   fontSize: `${unitSize}px`,
                   fontWeight: 700,
-                  color: numberColor,
+                  color: numColor,
                   lineHeight: 1,
                 }}
               >
@@ -103,7 +111,7 @@ export default function TripleInfographic({
               style={{
                 fontSize: `${unitSize}px`,
                 fontWeight: 700,
-                color: numberColor,
+                color: numColor,
                 paddingLeft: 4,
                 lineHeight: 1,
               }}
@@ -121,7 +129,7 @@ export default function TripleInfographic({
             style={{
               fontSize: `${numSize}px`,
               fontWeight: 700,
-              color: numberColor,
+              color: numColor,
               lineHeight: 0.9,
             }}
           >
@@ -134,7 +142,7 @@ export default function TripleInfographic({
               fontSize: `${unitSize}px`,
               marginTop: -numSize * 0.15,
               marginBottom: 6,
-              color: numberColor,
+              color: numColor,
             }}
           >
             MHz
@@ -160,10 +168,10 @@ export default function TripleInfographic({
 
   const tertiaryUnitSize =
     tertiaryInfo.valueUnitType === "temp"
-      ? secondaryNumberSize * 0.49
+      ? tertiaryNumberSize * 0.49
       : tertiaryInfo.valueUnitType === "percent"
-      ? secondaryNumberSize * 0.35
-      : secondaryNumberSize * 0.2;
+      ? tertiaryNumberSize * 0.35
+      : tertiaryNumberSize * 0.2;
 
   const primaryIsClock = primaryInfo.valueUnitType === "clock";
   const secondaryIsClock = secondaryInfo.valueUnitType === "clock";
@@ -179,7 +187,7 @@ export default function TripleInfographic({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        gap: primaryNumberSize * 0.2, // Space between left and right sections
+        gap: overlay.gapLeftRight ? `${overlay.gapLeftRight * scale}px` : `${primaryNumberSize * 0.2}px`, // Space between left and right sections (configurable)
         pointerEvents: "none",
         fontFamily: "nzxt-extrabold",
       }}
@@ -198,14 +206,15 @@ export default function TripleInfographic({
           primaryInfo,
           primaryIsClock,
           primaryUnitSize,
-          primaryNumberSize
+          primaryNumberSize,
+          primaryNumberColor
         )}
 
         {/* Label */}
         <div
           style={{
-            fontSize: `${textSize}px`,
-            color: textColor,
+            fontSize: `${primaryTextSize}px`,
+            color: primaryTextColor,
             textTransform: "uppercase",
             letterSpacing: 1,
             marginTop: primaryIsClock ? 0 : 4,
@@ -215,15 +224,18 @@ export default function TripleInfographic({
         </div>
       </div>
 
-      {/* Vertical divider line */}
-      <div
-        style={{
-          width: 2,
-          height: "60%",
-          backgroundColor: "rgba(255, 255, 255, 0.3)",
-          borderRadius: 1,
-        }}
-      />
+      {/* Vertical divider line (optional) */}
+      {overlay.showDivider && (
+        <div
+          style={{
+            width: `${overlay.dividerThickness || 2}px`,
+            height: `${overlay.dividerWidth || 60}%`,
+            backgroundColor: overlay.dividerColor || primaryNumberColor,
+            opacity: overlay.dividerColor ? undefined : 0.3,
+            borderRadius: 1,
+          }}
+        />
+      )}
 
       {/* Right section: Secondary and tertiary metrics (stacked) */}
       <div
@@ -232,7 +244,7 @@ export default function TripleInfographic({
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          gap: secondaryNumberSize * 0.4, // Space between secondary and tertiary
+          gap: overlay.gapSecondaryTertiary ? `${overlay.gapSecondaryTertiary * scale}px` : `${secondaryNumberSize * 0.4}px`, // Space between secondary and tertiary (configurable)
           flex: 1,
         }}
       >
@@ -249,14 +261,15 @@ export default function TripleInfographic({
             secondaryInfo,
             secondaryIsClock,
             secondaryUnitSize,
-            secondaryNumberSize
+            secondaryNumberSize,
+            secondaryNumberColor
           )}
 
           {/* Label */}
           <div
             style={{
               fontSize: `${secondaryTextSize}px`,
-              color: textColor,
+              color: secondaryTextColor,
               textTransform: "uppercase",
               letterSpacing: 1,
               marginTop: secondaryIsClock ? 0 : 2,
@@ -279,14 +292,15 @@ export default function TripleInfographic({
             tertiaryInfo,
             tertiaryIsClock,
             tertiaryUnitSize,
-            secondaryNumberSize
+            tertiaryNumberSize,
+            tertiaryNumberColor
           )}
 
           {/* Label */}
           <div
             style={{
-              fontSize: `${secondaryTextSize}px`,
-              color: textColor,
+              fontSize: `${tertiaryTextSize}px`,
+              color: tertiaryTextColor,
               textTransform: "uppercase",
               letterSpacing: 1,
               marginTop: tertiaryIsClock ? 0 : 2,
