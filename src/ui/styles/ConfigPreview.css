@@ -94,18 +94,47 @@
 .save-btn:hover { background:#2e3a55; }
 .hint { margin-top:6px; color:#9aa3ad; font-size:12px; }
 
-/* ==== Two-column layout ==== */
- .config-wrapper {
-   display: grid;
-   grid-template-columns: 1fr 1fr;
-   gap: 24px;
-   align-items: start;
-   justify-content: center;
- }
+/* ==== Vertical layout with sections ==== */
+.config-wrapper-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
 
+/* Section group (Background/Overlay) */
+.section-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-.preview-column { display:flex; flex-direction:column; align-items:center; }
-.preview-title { font-size: 14px; margin-bottom: 8px; color:#ccc; text-align:center; }
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #d8e0f5;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #242734;
+}
+
+.section-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.preview-column { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+}
+.preview-title { 
+  font-size: 14px; 
+  margin-bottom: 8px; 
+  color: #ccc; 
+  text-align: center; 
+}
 
 /* ==== Circular preview ==== */
 .preview-circle {
@@ -297,13 +326,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .overlay-preview.dragging {
   cursor: grabbing;
 }
 
+.overlay-preview > div {
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+
 /* responsive */
 @media (max-width: 700px) {
-  .config-wrapper { grid-template-columns: 1fr; gap:16px; }
+  .section-content { 
+    grid-template-columns: 1fr; 
+    gap: 16px; 
+  }
 }

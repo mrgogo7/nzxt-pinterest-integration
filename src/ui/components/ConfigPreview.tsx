@@ -29,8 +29,8 @@ import SingleInfographic from './SingleInfographic';
  * CRITICAL: offsetScale formula must be preserved (previewSize / lcdResolution)
  * 
  * Structure:
- * - Background Preview: Only background + guide (no overlay)
- * - Overlay Preview: Only overlay (no background), draggable
+ * - Background Section: Main title + 2 columns (Preview | Settings)
+ * - Overlay Section: Main title + 2 columns (Preview | Options)
  */
 export default function ConfigPreview() {
   const [lang, setLang] = useState<Lang>(getInitialLang());
@@ -50,6 +50,8 @@ export default function ConfigPreview() {
   const lcdResolution = window.nzxt?.v1?.width || NZXT_DEFAULTS.LCD_WIDTH;
   const previewSize = 200;
   const offsetScale = calculateOffsetScale(previewSize, lcdResolution);
+  // Scale factor for overlay preview (200px preview / 640px LCD)
+  const overlayPreviewScale = previewSize / lcdResolution;
 
   // Overlay config
   const overlayConfig = {
@@ -143,7 +145,7 @@ export default function ConfigPreview() {
     dragStart.current = null;
   };
 
-  // Overlay drag handler
+  // Overlay drag handler - FIXED: Use correct offsetScale
   const handleOverlayMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -158,7 +160,7 @@ export default function ConfigPreview() {
     const dy = e.clientY - overlayDragStart.current.y;
     overlayDragStart.current = { x: e.clientX, y: e.clientY };
 
-    // Convert preview pixels to LCD pixels for overlay
+    // CRITICAL: Convert preview pixels to LCD pixels for overlay (same as background)
     const lcdDx = previewToLcd(dx, offsetScale);
     const lcdDy = previewToLcd(dy, offsetScale);
 
@@ -271,425 +273,441 @@ export default function ConfigPreview() {
   const overlayAdjY = lcdToPreview(overlayConfig.y || 0, offsetScale);
 
   return (
-    <div className="config-wrapper">
-      {/* LEFT: Background Preview */}
-      <div className="preview-column">
-        <div className="preview-title">{t('previewTitle', lang)}</div>
-
-        <div
-          className={`preview-circle ${isDragging ? 'dragging' : ''}`}
-          onMouseDown={handleBackgroundMouseDown}
-        >
-          <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
-
-          {isVideo ? (
-            <video
-              src={mediaUrl}
-              autoPlay
-              muted
-              loop
-              playsInline
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: settings.fit,
-                objectPosition,
-                transform: `scale(${settings.scale})`,
-                transformOrigin: 'center center',
-              }}
-            />
-          ) : (
-            mediaUrl && (
-              <img
-                src={mediaUrl}
-                alt="preview"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: settings.fit,
-                  objectPosition,
-                  transform: `scale(${settings.scale})`,
-                  transformOrigin: 'center center',
-                }}
-              />
-            )
-          )}
-
-          {/* Overlay guide - only for alignment reference */}
-          {settings.showGuide && (
+    <div className="config-wrapper-vertical">
+      {/* Background Section */}
+      <div className="section-group">
+        <h2 className="section-title">{t('backgroundSectionTitle', lang)}</h2>
+        <div className="section-content">
+          {/* Background Preview */}
+          <div className="preview-column">
+            <div className="preview-title">{t('previewTitle', lang)}</div>
             <div
-              className="overlay-guide"
-              style={{
-                transform: `translate(${adjX}px, ${adjY}px) scale(${settings.scale})`,
-                transformOrigin: 'center center',
-              }}
+              className={`preview-circle ${isDragging ? 'dragging' : ''}`}
+              onMouseDown={handleBackgroundMouseDown}
             >
-              <div className="crosshair horizontal" />
-              <div className="crosshair vertical" />
-            </div>
-          )}
+              <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
 
-          <div className="zoom-buttons-bottom">
-            <button onClick={() => adjustScale(-0.1)}>−</button>
-            <button onClick={() => adjustScale(0.1)}>＋</button>
+              {isVideo ? (
+                <video
+                  src={mediaUrl}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: settings.fit,
+                    objectPosition,
+                    transform: `scale(${settings.scale})`,
+                    transformOrigin: 'center center',
+                  }}
+                />
+              ) : (
+                mediaUrl && (
+                  <img
+                    src={mediaUrl}
+                    alt="preview"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: settings.fit,
+                      objectPosition,
+                      transform: `scale(${settings.scale})`,
+                      transformOrigin: 'center center',
+                    }}
+                  />
+                )
+              )}
+
+              {/* Overlay guide - only for alignment reference */}
+              {settings.showGuide && (
+                <div
+                  className="overlay-guide"
+                  style={{
+                    transform: `translate(${adjX}px, ${adjY}px) scale(${settings.scale})`,
+                    transformOrigin: 'center center',
+                  }}
+                >
+                  <div className="crosshair horizontal" />
+                  <div className="crosshair vertical" />
+                </div>
+              )}
+
+              <div className="zoom-buttons-bottom">
+                <button onClick={() => adjustScale(-0.1)}>−</button>
+                <button onClick={() => adjustScale(0.1)}>＋</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Background Settings */}
+          <div className="settings-column">
+            <div className="panel">
+              <div className="panel-header">
+                <h3>{t('settingsTitle', lang)}</h3>
+
+                <div className="overlay-toggle-compact">
+                  <span>{t('overlayGuide', lang)}</span>
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={!!settings.showGuide}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          showGuide: e.target.checked,
+                        })
+                      }
+                    />
+                    <span className="slider" />
+                  </label>
+                </div>
+              </div>
+
+              <div className="settings-grid-modern">
+                {/* SCALE / X / Y */}
+                {[
+                  { field: 'scale', label: t('scale', lang), step: 0.1 },
+                  { field: 'x', label: t('xOffset', lang) },
+                  { field: 'y', label: t('yOffset', lang) },
+                ].map(({ field, label, step }) => (
+                  <div className="setting-row" key={field}>
+                    <label>{label}</label>
+
+                    <input
+                      type="number"
+                      step={step || 1}
+                      value={(settings as any)[field]}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          [field]: parseFloat(e.target.value || '0'),
+                        })
+                      }
+                    />
+
+                    <button
+                      className="reset-icon"
+                      title="Reset"
+                      onClick={() => resetField(field as keyof AppSettings)}
+                    >
+                      <RefreshCw size={14} />
+                    </button>
+                  </div>
+                ))}
+
+                {/* ALIGN */}
+                <div className="setting-row">
+                  <label>{t('align', lang)}</label>
+                  <div className="icon-group">
+                    {alignIcons.map(({ key, icon }) => (
+                      <button
+                        key={key}
+                        className={`icon-btn ${settings.align === key ? 'active' : ''}`}
+                        title={t(`align${key[0].toUpperCase() + key.slice(1)}`, lang)}
+                        onClick={() =>
+                          setSettings({
+                            ...settings,
+                            align: key as AppSettings['align'],
+                          })
+                        }
+                      >
+                        {icon}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    className="reset-icon"
+                    title="Reset"
+                    onClick={() => resetField('align')}
+                  >
+                    <RefreshCw size={14} />
+                  </button>
+                </div>
+
+                {/* FIT */}
+                <div className="setting-row">
+                  <label>{t('fit', lang)}</label>
+                  <div className="icon-group">
+                    {fitIcons.map(({ key, icon }) => (
+                      <button
+                        key={key}
+                        className={`icon-btn ${settings.fit === key ? 'active' : ''}`}
+                        title={t(`fit${key[0].toUpperCase() + key.slice(1)}`, lang)}
+                        onClick={() =>
+                          setSettings({
+                            ...settings,
+                            fit: key as AppSettings['fit'],
+                          })
+                        }
+                      >
+                        {icon}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    className="reset-icon"
+                    title="Reset"
+                    onClick={() => resetField('fit')}
+                  >
+                    <RefreshCw size={14} />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* RIGHT COLUMN */}
-      <div className="settings-column">
-        {/* Background Settings Panel */}
-        <div className="panel">
-          <div className="panel-header">
-            <h3>{t('settingsTitle', lang)}</h3>
-
-            <div className="overlay-toggle-compact">
-              <span>{t('overlayGuide', lang)}</span>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={!!settings.showGuide}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      showGuide: e.target.checked,
-                    })
-                  }
-                />
-                <span className="slider" />
-              </label>
-            </div>
-          </div>
-
-          <div className="settings-grid-modern">
-            {/* SCALE / X / Y */}
-            {[
-              { field: 'scale', label: t('scale', lang), step: 0.1 },
-              { field: 'x', label: t('xOffset', lang) },
-              { field: 'y', label: t('yOffset', lang) },
-            ].map(({ field, label, step }) => (
-              <div className="setting-row" key={field}>
-                <label>{label}</label>
-
-                <input
-                  type="number"
-                  step={step || 1}
-                  value={(settings as any)[field]}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      [field]: parseFloat(e.target.value || '0'),
-                    })
-                  }
-                />
-
-                <button
-                  className="reset-icon"
-                  title="Reset"
-                  onClick={() => resetField(field as keyof AppSettings)}
-                >
-                  <RefreshCw size={14} />
-                </button>
-              </div>
-            ))}
-
-            {/* ALIGN */}
-            <div className="setting-row">
-              <label>{t('align', lang)}</label>
-              <div className="icon-group">
-                {alignIcons.map(({ key, icon }) => (
-                  <button
-                    key={key}
-                    className={`icon-btn ${settings.align === key ? 'active' : ''}`}
-                    title={t(`align${key[0].toUpperCase() + key.slice(1)}`, lang)}
-                    onClick={() =>
-                      setSettings({
-                        ...settings,
-                        align: key as AppSettings['align'],
-                      })
-                    }
-                  >
-                    {icon}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                className="reset-icon"
-                title="Reset"
-                onClick={() => resetField('align')}
-              >
-                <RefreshCw size={14} />
-              </button>
-            </div>
-
-            {/* FIT */}
-            <div className="setting-row">
-              <label>{t('fit', lang)}</label>
-              <div className="icon-group">
-                {fitIcons.map(({ key, icon }) => (
-                  <button
-                    key={key}
-                    className={`icon-btn ${settings.fit === key ? 'active' : ''}`}
-                    title={t(`fit${key[0].toUpperCase() + key.slice(1)}`, lang)}
-                    onClick={() =>
-                      setSettings({
-                        ...settings,
-                        fit: key as AppSettings['fit'],
-                      })
-                    }
-                  >
-                    {icon}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                className="reset-icon"
-                title="Reset"
-                onClick={() => resetField('fit')}
-              >
-                <RefreshCw size={14} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Overlay Preview */}
-        {overlayConfig.mode !== 'none' && (
-          <div className="panel panel-spaced">
-            <div className="panel-header">
-              <h3>{t('overlayPreviewTitle', lang)}</h3>
-            </div>
-
-            <div
-              className={`preview-circle overlay-preview ${isDraggingOverlay ? 'dragging' : ''}`}
-              onMouseDown={handleOverlayMouseDown}
-              style={{ position: 'relative', width: '200px', height: '200px', margin: '0 auto' }}
-            >
-              {overlayConfig.mode === 'single' && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    transform: `translate(${overlayAdjX}px, ${overlayAdjY}px)`,
-                  }}
-                >
-                  <SingleInfographic overlay={overlayConfig} metrics={metrics} />
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Overlay Options Panel */}
-        <div className="panel panel-spaced">
-          <div className="panel-header">
-            <h3>{t('overlaySettingsTitle', lang)}</h3>
-          </div>
-
-          <div className="settings-grid-modern">
-            {/* Overlay Mode */}
-            <div className="setting-row">
-              <label>{t('overlayMode', lang)}</label>
-              <select
-                className="url-input select-narrow"
-                value={overlayConfig.mode}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    overlay: {
-                      ...overlayConfig,
-                      mode: e.target.value as OverlayMode,
-                    },
-                  })
-                }
-              >
-                <option value="none">None</option>
-                <option value="single">Single Infographic</option>
-                <option value="dual">Dual Infographic</option>
-                <option value="triple">Triple Infographic</option>
-              </select>
-            </div>
-
-            {/* PRIMARY READING */}
-            {overlayConfig.mode === 'single' && (
+      {/* Overlay Section */}
+      <div className="section-group">
+        <h2 className="section-title">{t('overlaySectionTitle', lang)}</h2>
+        <div className="section-content">
+          {/* Overlay Preview */}
+          <div className="preview-column">
+            {overlayConfig.mode !== 'none' ? (
               <>
+                <div className="preview-title">{t('overlayPreviewTitle', lang)}</div>
+                <div
+                  className={`preview-circle overlay-preview ${isDraggingOverlay ? 'dragging' : ''}`}
+                  onMouseDown={handleOverlayMouseDown}
+                  style={{ position: 'relative', width: '200px', height: '200px' }}
+                >
+                  {overlayConfig.mode === 'single' && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        transform: `translate(${overlayAdjX}px, ${overlayAdjY}px)`,
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      <SingleInfographic overlay={overlayConfig} metrics={metrics} scale={overlayPreviewScale} />
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="preview-title" style={{ opacity: 0.5 }}>
+                {t('overlayPreviewTitle', lang)} - {t('overlayMode', lang)}: None
+              </div>
+            )}
+          </div>
+
+          {/* Overlay Options */}
+          <div className="settings-column">
+            <div className="panel">
+              <div className="panel-header">
+                <h3>{t('overlaySettingsTitle', lang)}</h3>
+              </div>
+
+              <div className="settings-grid-modern">
+                {/* Overlay Mode */}
                 <div className="setting-row">
-                  <label>{t('primaryReading', lang)}</label>
+                  <label>{t('overlayMode', lang)}</label>
                   <select
                     className="url-input select-narrow"
-                    value={overlayConfig.primaryMetric}
+                    value={overlayConfig.mode}
                     onChange={(e) =>
                       setSettings({
                         ...settings,
                         overlay: {
                           ...overlayConfig,
-                          primaryMetric: e.target.value as OverlayMetricKey,
+                          mode: e.target.value as OverlayMode,
                         },
                       })
                     }
                   >
-                    <option value="cpuTemp">CPU Temperature</option>
-                    <option value="cpuLoad">CPU Load</option>
-                    <option value="cpuClock">CPU Clock</option>
-                    <option value="liquidTemp">Liquid Temperature</option>
-                    <option value="gpuTemp">GPU Temperature</option>
-                    <option value="gpuLoad">GPU Load</option>
-                    <option value="gpuClock">GPU Clock</option>
+                    <option value="none">None</option>
+                    <option value="single">Single Infographic</option>
+                    <option value="dual">Dual Infographic</option>
+                    <option value="triple">Triple Infographic</option>
                   </select>
                 </div>
 
-                {/* Overlay X/Y Offset */}
-                <div className="setting-row">
-                  <label>{t('overlayXOffset', lang)}</label>
-                  <input
-                    type="number"
-                    value={overlayConfig.x || 0}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        overlay: {
-                          ...overlayConfig,
-                          x: parseFloat(e.target.value || '0'),
-                        },
-                      })
-                    }
-                    className="input-narrow"
-                  />
-                  <button
-                    className="reset-icon"
-                    title="Reset"
-                    onClick={() => resetOverlayField('x')}
-                  >
-                    <RefreshCw size={14} />
-                  </button>
-                </div>
+                {/* PRIMARY READING */}
+                {overlayConfig.mode === 'single' && (
+                  <>
+                    <div className="setting-row">
+                      <label>{t('primaryReading', lang)}</label>
+                      <select
+                        className="url-input select-narrow"
+                        value={overlayConfig.primaryMetric}
+                        onChange={(e) =>
+                          setSettings({
+                            ...settings,
+                            overlay: {
+                              ...overlayConfig,
+                              primaryMetric: e.target.value as OverlayMetricKey,
+                            },
+                          })
+                        }
+                      >
+                        <option value="cpuTemp">CPU Temperature</option>
+                        <option value="cpuLoad">CPU Load</option>
+                        <option value="cpuClock">CPU Clock</option>
+                        <option value="liquidTemp">Liquid Temperature</option>
+                        <option value="gpuTemp">GPU Temperature</option>
+                        <option value="gpuLoad">GPU Load</option>
+                        <option value="gpuClock">GPU Clock</option>
+                      </select>
+                    </div>
 
-                <div className="setting-row">
-                  <label>{t('overlayYOffset', lang)}</label>
-                  <input
-                    type="number"
-                    value={overlayConfig.y || 0}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        overlay: {
-                          ...overlayConfig,
-                          y: parseFloat(e.target.value || '0'),
-                        },
-                      })
-                    }
-                    className="input-narrow"
-                  />
-                  <button
-                    className="reset-icon"
-                    title="Reset"
-                    onClick={() => resetOverlayField('y')}
-                  >
-                    <RefreshCw size={14} />
-                  </button>
-                </div>
+                    {/* Overlay X/Y Offset */}
+                    <div className="setting-row">
+                      <label>{t('overlayXOffset', lang)}</label>
+                      <input
+                        type="number"
+                        value={overlayConfig.x || 0}
+                        onChange={(e) =>
+                          setSettings({
+                            ...settings,
+                            overlay: {
+                              ...overlayConfig,
+                              x: parseFloat(e.target.value || '0'),
+                            },
+                          })
+                        }
+                        className="input-narrow"
+                      />
+                      <button
+                        className="reset-icon"
+                        title="Reset"
+                        onClick={() => resetOverlayField('x')}
+                      >
+                        <RefreshCw size={14} />
+                      </button>
+                    </div>
 
-                <div className="setting-row">
-                  <label>{t('numberColor', lang)}</label>
-                  <input
-                    type="color"
-                    value={overlayConfig.numberColor}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        overlay: {
-                          ...overlayConfig,
-                          numberColor: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                  <button
-                    className="reset-icon"
-                    title="Reset"
-                    onClick={() => resetOverlayField('numberColor')}
-                  >
-                    <RefreshCw size={14} />
-                  </button>
-                </div>
+                    <div className="setting-row">
+                      <label>{t('overlayYOffset', lang)}</label>
+                      <input
+                        type="number"
+                        value={overlayConfig.y || 0}
+                        onChange={(e) =>
+                          setSettings({
+                            ...settings,
+                            overlay: {
+                              ...overlayConfig,
+                              y: parseFloat(e.target.value || '0'),
+                            },
+                          })
+                        }
+                        className="input-narrow"
+                      />
+                      <button
+                        className="reset-icon"
+                        title="Reset"
+                        onClick={() => resetOverlayField('y')}
+                      >
+                        <RefreshCw size={14} />
+                      </button>
+                    </div>
 
-                <div className="setting-row">
-                  <label>{t('textColor', lang)}</label>
-                  <input
-                    type="color"
-                    value={overlayConfig.textColor}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        overlay: {
-                          ...overlayConfig,
-                          textColor: e.target.value,
-                        },
-                      })
-                    }
-                  />
-                  <button
-                    className="reset-icon"
-                    title="Reset"
-                    onClick={() => resetOverlayField('textColor')}
-                  >
-                    <RefreshCw size={14} />
-                  </button>
-                </div>
+                    <div className="setting-row">
+                      <label>{t('numberColor', lang)}</label>
+                      <input
+                        type="color"
+                        value={overlayConfig.numberColor}
+                        onChange={(e) =>
+                          setSettings({
+                            ...settings,
+                            overlay: {
+                              ...overlayConfig,
+                              numberColor: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                      <button
+                        className="reset-icon"
+                        title="Reset"
+                        onClick={() => resetOverlayField('numberColor')}
+                      >
+                        <RefreshCw size={14} />
+                      </button>
+                    </div>
 
-                <div className="setting-row">
-                  <label>{t('numberSize', lang)}</label>
-                  <input
-                    type="number"
-                    value={overlayConfig.numberSize}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        overlay: {
-                          ...overlayConfig,
-                          numberSize: parseInt(e.target.value || '180', 10),
-                        },
-                      })
-                    }
-                    className="input-narrow"
-                  />
-                  <button
-                    className="reset-icon"
-                    title="Reset"
-                    onClick={() => resetOverlayField('numberSize')}
-                  >
-                    <RefreshCw size={14} />
-                  </button>
-                </div>
+                    <div className="setting-row">
+                      <label>{t('textColor', lang)}</label>
+                      <input
+                        type="color"
+                        value={overlayConfig.textColor}
+                        onChange={(e) =>
+                          setSettings({
+                            ...settings,
+                            overlay: {
+                              ...overlayConfig,
+                              textColor: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                      <button
+                        className="reset-icon"
+                        title="Reset"
+                        onClick={() => resetOverlayField('textColor')}
+                      >
+                        <RefreshCw size={14} />
+                      </button>
+                    </div>
 
-                <div className="setting-row">
-                  <label>{t('textSize', lang)}</label>
-                  <input
-                    type="number"
-                    value={overlayConfig.textSize}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        overlay: {
-                          ...overlayConfig,
-                          textSize: parseInt(e.target.value || '80', 10),
-                        },
-                      })
-                    }
-                    className="input-narrow"
-                  />
-                  <button
-                    className="reset-icon"
-                    title="Reset"
-                    onClick={() => resetOverlayField('textSize')}
-                  >
-                    <RefreshCw size={14} />
-                  </button>
-                </div>
-              </>
-            )}
+                    <div className="setting-row">
+                      <label>{t('numberSize', lang)}</label>
+                      <input
+                        type="number"
+                        value={overlayConfig.numberSize}
+                        onChange={(e) =>
+                          setSettings({
+                            ...settings,
+                            overlay: {
+                              ...overlayConfig,
+                              numberSize: parseInt(e.target.value || '180', 10),
+                            },
+                          })
+                        }
+                        className="input-narrow"
+                      />
+                      <button
+                        className="reset-icon"
+                        title="Reset"
+                        onClick={() => resetOverlayField('numberSize')}
+                      >
+                        <RefreshCw size={14} />
+                      </button>
+                    </div>
+
+                    <div className="setting-row">
+                      <label>{t('textSize', lang)}</label>
+                      <input
+                        type="number"
+                        value={overlayConfig.textSize}
+                        onChange={(e) =>
+                          setSettings({
+                            ...settings,
+                            overlay: {
+                              ...overlayConfig,
+                              textSize: parseInt(e.target.value || '80', 10),
+                            },
+                          })
+                        }
+                        className="input-narrow"
+                      />
+                      <button
+                        className="reset-icon"
+                        title="Reset"
+                        onClick={() => resetOverlayField('textSize')}
+                      >
+                        <RefreshCw size={14} />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

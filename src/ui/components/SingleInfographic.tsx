@@ -12,9 +12,11 @@ import {
 export default function SingleInfographic({
   overlay,
   metrics,
+  scale = 1,
 }: {
   overlay: OverlaySettings;
   metrics: OverlayMetrics;
+  scale?: number; // Scale factor for preview (e.g., 200/640 = 0.3125)
 }) {
   if (overlay.mode !== "single") return null;
 
@@ -31,7 +33,7 @@ export default function SingleInfographic({
   const numberColor = overlay.numberColor;
   const textColor = overlay.textColor;
 
-  const numberSize = overlay.numberSize;
+  const numberSize = overlay.numberSize * scale;
   const unitSize =
     valueUnitType === "temp"
       ? numberSize * 0.49
@@ -146,7 +148,7 @@ export default function SingleInfographic({
       {/* Label (CPU / GPU / Liquid) */}
       <div
         style={{
-          fontSize: `${overlay.textSize}px`,
+          fontSize: `${overlay.textSize * scale}px`,
           color: textColor,
           textTransform: "uppercase",
           letterSpacing: 1,
