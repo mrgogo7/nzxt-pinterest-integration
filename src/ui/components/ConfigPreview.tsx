@@ -1714,7 +1714,6 @@ export default function ConfigPreview() {
                         </div>
                       </>
                     ) : null}
-                )}
 
                 {/* SINGLE MODE SPECIFIC SETTINGS */}
                 {overlayConfig.mode === 'single' && (
