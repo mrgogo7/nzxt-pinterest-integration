@@ -404,35 +404,55 @@ function SingleOverlay({
         fontFamily: "nzxt-extrabold",
       }}
     >
-      {/* Number + Unit (side-by-side if NOT clock) */}
+      {/* Number + Unit */}
       {!isClock ? (
         <div
           style={{
             display: "flex",
-            alignItems: "baseline",
             justifyContent: "center",
             lineHeight: 0.9,
           }}
         >
+          {/* Number kutusu */}
           <div
             style={{
-              fontSize: `${numberSize}px`,
-              fontWeight: 700,
-              color: numberColor,
+              position: "relative",
+              display: "inline-block",
             }}
           >
-            {valueNumber}
-          </div>
+            <div
+              style={{
+                fontSize: `${numberSize}px`,
+                fontWeight: 700,
+                color: numberColor,
+              }}
+            >
+              {valueNumber}
+            </div>
 
-          <div
-            style={{
-              fontSize: `${unitSize}px`,
-              color: numberColor,
-			  fontWeight: 700,
-			  alignSelf: "flex-start",
-            }}
-          >
-            {valueUnit}
+            {/* Unit: ° üst köşe, % alt köşe */}
+            {valueUnit && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: -unitSize * 0.15,
+                  top:
+                    valueUnitType === "temp"
+                      ? numberSize * 0.05 // ° için yukarıya yakın
+                      : undefined,
+                  bottom:
+                    valueUnitType === "percent"
+                      ? numberSize * 0.05 // % için aşağıya yakın
+                      : undefined,
+                  fontSize: `${unitSize}px`,
+                  color: numberColor,
+                  fontWeight: 700,
+                  lineHeight: 1,
+                }}
+              >
+                {valueUnit}
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -454,7 +474,7 @@ function SingleOverlay({
             style={{
               fontSize: `${unitSize}px`,
               marginTop: -numberSize * 0.15,
-			  marginBottom: 6,
+              marginBottom: 6,
               color: numberColor,
             }}
           >
@@ -477,6 +497,7 @@ function SingleOverlay({
     </div>
   );
 }
+
 /**
  * KrakenOverlay:
  * - No props
