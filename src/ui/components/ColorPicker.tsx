@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import '../styles/ColorPicker.css';
-import { normalizeToRgba, normalizeToHex, parseColorToRgba, rgbaObjectToString } from '../../utils/color';
+import { normalizeToRgba, parseColorToRgba, rgbaObjectToString } from '../../utils/color';
 
 // Import ColorPicker component from react-best-gradient-color-picker
 import ColorPickerComponent from 'react-best-gradient-color-picker';
