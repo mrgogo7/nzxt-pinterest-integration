@@ -112,7 +112,6 @@ export default function ColorPicker({
       // Vertical positioning: prefer top (for NZXT CAM compatibility)
       // But ensure popup stays within viewport
       const spaceAbove = triggerRect.top;
-      const spaceBelow = viewportHeight - triggerRect.bottom;
       
       if (spaceAbove >= popupHeight + spacing) {
         // Enough space above, open above
