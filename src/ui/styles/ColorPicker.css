@@ -58,3 +58,33 @@
   color: #ffffff !important;
 }
 
+/* Inline color picker styles */
+.color-picker-inline {
+  display: block;
+  width: 100%;
+}
+
+.color-picker-inline .sketch-picker {
+  background: #121317 !important;
+  border: 1px solid #242734 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35) !important;
+  width: 100% !important;
+}
+
+.color-picker-inline .sketch-picker input {
+  background: #181a21 !important;
+  border: 1px solid #2d3140 !important;
+  color: #ffffff !important;
+}
+
+.color-picker-inline .sketch-picker .flexbox-fix {
+  border-top: 1px solid #242734 !important;
+}
+
+.color-picker-inline .sketch-picker .flexbox-fix input {
+  background: #181a21 !important;
+  border: 1px solid #2d3140 !important;
+  color: #ffffff !important;
+}
+

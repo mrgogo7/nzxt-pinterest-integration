@@ -197,9 +197,12 @@ export default function Config() {
           </>
         ) : (
           <div className="color-picker-section">
+            <h3 className="color-picker-title">{t("colorPickerTitle", lang)}</h3>
+            <p className="color-picker-description">{t("colorPickerDescription", lang)}</p>
             <ColorPicker
               value={settings.backgroundColor || '#000000'}
               onChange={handleBackgroundColorChange}
+              showInline={true}
             />
           </div>
         )}

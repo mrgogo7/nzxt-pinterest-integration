@@ -384,51 +384,38 @@ export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'co
 
   return (
     <div className="config-wrapper-vertical">
-      {/* Background Section */}
-      <div className="section-group">
-        <h2 className="section-title">{t('backgroundSectionTitle', lang)}</h2>
-        <div className="section-content">
-          {/* Background Preview */}
-          <div className="preview-column">
-            <div className="preview-title">{t('previewTitle', lang)}</div>
-            <div
-              className={`preview-circle ${isDragging ? 'dragging' : ''}`}
-              onMouseDown={handleBackgroundMouseDown}
-            >
-              <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
+      {/* Background Section - Only show when Media tab is active */}
+      {(activeTab === undefined || activeTab !== 'color') && (
+        <div className="section-group">
+          <h2 className="section-title">{t('backgroundSectionTitle', lang)}</h2>
+          <div className="section-content">
+            {/* Background Preview */}
+            <div className="preview-column">
+              <div className="preview-title">{t('previewTitle', lang)}</div>
+              <div
+                className={`preview-circle ${isDragging ? 'dragging' : ''}`}
+                onMouseDown={handleBackgroundMouseDown}
+              >
+                <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
 
-              {/* Show color background if no media URL but backgroundColor exists */}
-              {!mediaUrl && settings.backgroundColor ? (
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: settings.backgroundColor,
-                  }}
-                />
-              ) : (
-                <>
-                  {isVideo ? (
-                    <video
-                      src={mediaUrl}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: settings.fit,
-                        objectPosition,
-                        transform: `scale(${settings.scale})`,
-                        transformOrigin: 'center center',
-                      }}
-                    />
-                  ) : (
-                    mediaUrl && (
-                      <img
+                {/* Show color background if no media URL but backgroundColor exists */}
+                {!mediaUrl && settings.backgroundColor ? (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: settings.backgroundColor,
+                    }}
+                  />
+                ) : (
+                  <>
+                    {isVideo ? (
+                      <video
                         src={mediaUrl}
-                        alt="preview"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
                         style={{
                           width: '100%',
                           height: '100%',
@@ -438,34 +425,47 @@ export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'co
                           transformOrigin: 'center center',
                         }}
                       />
-                    )
-                  )}
-                </>
-              )}
+                    ) : (
+                      mediaUrl && (
+                        <img
+                          src={mediaUrl}
+                          alt="preview"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: settings.fit,
+                            objectPosition,
+                            transform: `scale(${settings.scale})`,
+                            transformOrigin: 'center center',
+                          }}
+                        />
+                      )
+                    )}
+                  </>
+                )}
 
-              {/* Overlay guide - only for alignment reference */}
-              {settings.showGuide && (
-                <div
-                  className="overlay-guide"
-                  style={{
-                    transform: `translate(${adjX}px, ${adjY}px) scale(${settings.scale})`,
-                    transformOrigin: 'center center',
-                  }}
-                >
-                  <div className="crosshair horizontal" />
-                  <div className="crosshair vertical" />
+                {/* Overlay guide - only for alignment reference */}
+                {settings.showGuide && (
+                  <div
+                    className="overlay-guide"
+                    style={{
+                      transform: `translate(${adjX}px, ${adjY}px) scale(${settings.scale})`,
+                      transformOrigin: 'center center',
+                    }}
+                  >
+                    <div className="crosshair horizontal" />
+                    <div className="crosshair vertical" />
+                  </div>
+                )}
+
+                <div className="zoom-buttons-bottom">
+                  <button onClick={() => adjustScale(-0.1)}>−</button>
+                  <button onClick={() => adjustScale(0.1)}>＋</button>
                 </div>
-              )}
-
-              <div className="zoom-buttons-bottom">
-                <button onClick={() => adjustScale(-0.1)}>−</button>
-                <button onClick={() => adjustScale(0.1)}>＋</button>
               </div>
             </div>
-          </div>
 
-          {/* Media Settings - Only show when Media tab is active (or activeTab is undefined for backward compatibility) */}
-          {(activeTab === undefined || activeTab !== 'color') && (
+            {/* Media Settings - Only show when Media tab is active */}
             <div className="settings-column">
               <div className="panel">
                 <div className="panel-header">
@@ -588,9 +588,8 @@ export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'co
               </div>
             </div>
           </div>
-          )}
         </div>
-      </div>
+      )}
 
       {/* Overlay Section */}
       <div className="section-group">

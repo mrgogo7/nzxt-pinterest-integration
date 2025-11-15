@@ -130,9 +130,23 @@
 
 .color-picker-section {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
   padding: 8px 0;
+}
+
+.color-picker-title {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #d8e0f5;
+}
+
+.color-picker-description {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  color: #9aa3ad;
+  line-height: 1.4;
 }
 
 .url-row { display:flex; gap:8px; align-items:center; }
