@@ -641,6 +641,70 @@ export default function ConfigPreview() {
             <div className="panel">
               <div className="panel-header">
                 <h3>{t('overlaySettingsTitle', lang)}</h3>
+                {/* Overlay Mode - moved to header */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <label style={{ margin: 0, color: '#bfc6d4', fontSize: '12px', whiteSpace: 'nowrap' }}>{t('overlayMode', lang)}</label>
+                  <select
+                    className="url-input select-narrow"
+                    value={overlayConfig.mode}
+                    onChange={(e) => {
+                      const newMode = e.target.value as OverlayMode;
+                      const updates: Partial<OverlaySettings> = { mode: newMode };
+                      
+                      // Set default values when switching to dual mode
+                      if (newMode === 'dual') {
+                        updates.numberSize = 120;
+                        updates.textSize = 35;
+                        updates.secondaryNumberSize = 120;
+                        updates.secondaryTextSize = 35;
+                        updates.dividerGap = 32;
+                        updates.x = 0; // Primary X Offset
+                        updates.y = 0; // Primary Y Offset
+                        updates.secondaryOffsetX = 50; // Secondary X Offset
+                        updates.secondaryOffsetY = 0; // Secondary Y Offset
+                        updates.primaryNumberColor = overlayConfig.primaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
+                        updates.primaryTextColor = overlayConfig.primaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
+                        updates.secondaryNumberColor = overlayConfig.secondaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
+                        updates.secondaryTextColor = overlayConfig.secondaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
+                      }
+                      
+                      // Set default values when switching to triple mode
+                      if (newMode === 'triple') {
+                        updates.numberSize = 155; // Primary Number Size
+                        updates.textSize = 35; // Primary Text Size
+                        updates.secondaryNumberSize = 80;
+                        updates.secondaryTextSize = 20;
+                        updates.tertiaryNumberSize = 80;
+                        updates.tertiaryTextSize = 20;
+                        updates.gapSecondaryTertiary = 20;
+                        updates.dividerGap = 27;
+                        updates.x = 18; // Primary X Offset
+                        updates.y = 0; // Primary Y Offset
+                        updates.dualReadersOffsetX = 60; // Dual Readers X Offset
+                        updates.dualReadersOffsetY = 0; // Dual Readers Y Offset
+                        updates.primaryNumberColor = overlayConfig.primaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
+                        updates.primaryTextColor = overlayConfig.primaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
+                        updates.secondaryNumberColor = overlayConfig.secondaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
+                        updates.secondaryTextColor = overlayConfig.secondaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
+                        updates.tertiaryNumberColor = overlayConfig.tertiaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
+                        updates.tertiaryTextColor = overlayConfig.tertiaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
+                      }
+                      
+                      setSettings({
+                        ...settings,
+                        overlay: {
+                          ...overlayConfig,
+                          ...updates,
+                        },
+                      });
+                    }}
+                  >
+                    <option value="none">None</option>
+                    <option value="single">Single Infographic</option>
+                    <option value="dual">Dual Infographic</option>
+                    <option value="triple">Triple Infographic</option>
+                  </select>
+                </div>
               </div>
 
               {/* Description and Revert button */}
@@ -716,70 +780,6 @@ export default function ConfigPreview() {
               </div>
 
               <div className="settings-grid-modern">
-                {/* Overlay Mode */}
-                <div className="setting-row">
-                  <label>{t('overlayMode', lang)}</label>
-                    <select
-                      className="url-input select-narrow"
-                      value={overlayConfig.mode}
-                      onChange={(e) => {
-                        const newMode = e.target.value as OverlayMode;
-                        const updates: Partial<OverlaySettings> = { mode: newMode };
-                        
-                        // Set default values when switching to dual mode
-                        if (newMode === 'dual') {
-                          updates.numberSize = 120;
-                          updates.textSize = 35;
-                          updates.secondaryNumberSize = 120;
-                          updates.secondaryTextSize = 35;
-                          updates.dividerGap = 32;
-                          updates.x = 0; // Primary X Offset
-                          updates.y = 0; // Primary Y Offset
-                          updates.secondaryOffsetX = 50; // Secondary X Offset
-                          updates.secondaryOffsetY = 0; // Secondary Y Offset
-                          updates.primaryNumberColor = overlayConfig.primaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
-                          updates.primaryTextColor = overlayConfig.primaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                          updates.secondaryNumberColor = overlayConfig.secondaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
-                          updates.secondaryTextColor = overlayConfig.secondaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                        }
-                        
-                        // Set default values when switching to triple mode
-                        if (newMode === 'triple') {
-                          updates.numberSize = 155; // Primary Number Size
-                          updates.textSize = 35; // Primary Text Size
-                          updates.secondaryNumberSize = 80;
-                          updates.secondaryTextSize = 20;
-                          updates.tertiaryNumberSize = 80;
-                          updates.tertiaryTextSize = 20;
-                          updates.gapSecondaryTertiary = 20;
-                          updates.dividerGap = 27;
-                          updates.x = 18; // Primary X Offset
-                          updates.y = 0; // Primary Y Offset
-                          updates.dualReadersOffsetX = 60; // Dual Readers X Offset
-                          updates.dualReadersOffsetY = 0; // Dual Readers Y Offset
-                          updates.primaryNumberColor = overlayConfig.primaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
-                          updates.primaryTextColor = overlayConfig.primaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                          updates.secondaryNumberColor = overlayConfig.secondaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
-                          updates.secondaryTextColor = overlayConfig.secondaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                          updates.tertiaryNumberColor = overlayConfig.tertiaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
-                          updates.tertiaryTextColor = overlayConfig.tertiaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                        }
-                        
-                        setSettings({
-                          ...settings,
-                          overlay: {
-                            ...overlayConfig,
-                            ...updates,
-                          },
-                        });
-                      }}
-                    >
-                    <option value="none">None</option>
-                    <option value="single">Single Infographic</option>
-                    <option value="dual">Dual Infographic</option>
-                    <option value="triple">Triple Infographic</option>
-                  </select>
-                </div>
 
                 {/* PRIMARY READING */}
                 {(overlayConfig.mode === 'single' ||
