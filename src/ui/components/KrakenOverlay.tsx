@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { } from 'react';
 import { DEFAULT_OVERLAY, type OverlaySettings } from '../../types/overlay';
 import { NZXT_DEFAULTS } from '../../constants/nzxt';
 import { useConfig } from '../../hooks/useConfig';
