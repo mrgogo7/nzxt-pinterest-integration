@@ -99,54 +99,6 @@
   font-size: 14px;
 }
 
-/* Background Mode Header */
-.background-mode-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.background-mode-buttons {
-  display: flex;
-  gap: 6px;
-}
-
-.mode-btn {
-  background: #1c1c1c;
-  border: 1px solid #333;
-  color: #9aa3ad;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.mode-btn:hover {
-  background: #242424;
-  color: #d8e0f5;
-  border-color: #444;
-}
-
-.mode-btn.active {
-  background: #263146;
-  border-color: #3b5a9a;
-  color: #d9e6ff;
-}
-
-.color-picker-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 8px 0;
-}
-
-.color-picker-title {
-  margin: 0 0 4px 0;
   font-size: 14px;
   font-weight: 600;
   color: #d8e0f5;

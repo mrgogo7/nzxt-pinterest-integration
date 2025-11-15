@@ -87,7 +87,7 @@ export default function KrakenOverlay() {
         height: `${lcdSize}px`,
       }}
     >
-      <MediaRenderer url={mediaUrl} settings={settings} forceColorMode={forceColorMode} />
+      <MediaRenderer url={mediaUrl} settings={settings} />
       {overlayConfig.mode !== 'none' && (
         <div
           style={{
