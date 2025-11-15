@@ -22,6 +22,22 @@ export function setMediaUrl(url: string) {
 
   // CAM requires secure cookie attributes to allow cross-process sharing.
   document.cookie = `${COOKIE}=${encodeURIComponent(url)}; path=/; SameSite=None; Secure`
+  
+  // CRITICAL: Update lastVal immediately to trigger listeners in same tab
+  // The storage event only fires for cross-tab changes, not same-tab changes
+  if (url !== lastVal) {
+    lastVal = url
+    listeners.forEach((fn) => fn(url))
+  }
+  
+  // Also dispatch a custom storage event for same-tab listeners
+  window.dispatchEvent(
+    new StorageEvent('storage', {
+      key: KEY,
+      newValue: url,
+      oldValue: lastVal,
+    })
+  )
 }
 
 /**
@@ -54,7 +70,7 @@ const listeners = new Set<Listener>()
 
 let lastVal = ''
 
-/** Poll for changes every 2 seconds (NZXT CAM fallback). */
+/** Poll for changes every 500ms (NZXT CAM fallback - faster for better UX). */
 function poll() {
   const v = getMediaUrl()
   if (v !== lastVal) {
@@ -63,7 +79,10 @@ function poll() {
   }
 }
 
-setInterval(poll, 2000)
+// Initialize lastVal on first poll
+lastVal = getMediaUrl()
+
+setInterval(poll, 500)
 
 // Native browser storage event (fires instantly outside of CAM)
 window.addEventListener('storage', (e) => {

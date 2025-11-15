@@ -69,7 +69,8 @@ export function useMediaUrl() {
     }
   }, true); // immediate = true to get initial value
 
-  // Listen to config object changes (Config.tsx writes URL there too)
+  // Listen to config object changes (ConfigPreview writes URL there for backward compatibility)
+  // But we prioritize storage.ts as the source of truth
   useEffect(() => {
     const checkConfigUrl = () => {
       try {
@@ -77,16 +78,13 @@ export function useMediaUrl() {
                           localStorage.getItem(STORAGE_KEYS.CONFIG_COMPAT);
         if (configStr) {
           const config = JSON.parse(configStr);
-          if (config.url && config.url !== mediaUrl && config.url !== lastCheckedUrlRef.current) {
+          // Only sync from config if storage.ts is empty (backward compatibility)
+          const currentFromStorage = getMediaUrl();
+          if (config.url && !currentFromStorage && config.url !== mediaUrl && config.url !== lastCheckedUrlRef.current) {
             setMediaUrlState(config.url);
             lastCheckedUrlRef.current = config.url;
-            // Also sync to storage.ts and localStorage
+            // Sync to storage.ts (source of truth)
             setMediaUrl(config.url);
-            try {
-              localStorage.setItem(STORAGE_KEYS.MEDIA_URL, config.url);
-            } catch (e) {
-              console.warn('[useMediaUrl] localStorage write failed:', e);
-            }
           }
         }
       } catch (e) {
