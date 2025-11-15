@@ -32,6 +32,8 @@
 .color-picker-popup {
   position: absolute;
   z-index: 1000;
+  /* Ensure popup appears next to trigger */
+  white-space: nowrap;
 }
 
 /* Override react-best-gradient-color-picker styles to match dark theme */

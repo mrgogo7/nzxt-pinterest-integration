@@ -23,8 +23,11 @@ interface ColorPickerProps {
 /**
  * ColorPicker component using react-best-gradient-color-picker.
  * 
- * Uses internal state to handle color changes properly, especially for pointer/slider interactions.
- * The package may return colors in different formats, so we normalize everything to RGBA.
+ * Adapts project to package API:
+ * - Package expects RGBA format strings
+ * - Package onChange receives RGBA strings directly
+ * - Alpha control is managed by hideAlpha prop
+ * - Internal state ensures controlled component behavior
  */
 export default function ColorPicker({ 
   value, 
@@ -43,81 +46,44 @@ export default function ColorPicker({
     right?: string 
   }>({});
 
-  // Internal state for the picker - allows controlled updates
+  // Internal state - package works better with controlled component
   const [internalColor, setInternalColor] = useState(() => normalizeToRgba(value));
 
   // Sync internal state when external value changes
   useEffect(() => {
     const normalized = normalizeToRgba(value);
-    setInternalColor(normalized);
-  }, [value]);
+    if (normalized !== internalColor) {
+      setInternalColor(normalized);
+    }
+  }, [value, internalColor]);
 
   /**
-   * Handle color change from the picker.
-   * Package may return different formats - handle all cases aggressively.
+   * Handle color change from package.
+   * Package returns RGBA string directly when allowAlpha is true.
+   * Package returns RGBA string with alpha=1 when allowAlpha is false.
    */
-  const handleColorChange = useCallback((color: any) => {
-    // Debug: Log what we receive
-    console.log('[ColorPicker] onChange received:', color, 'type:', typeof color);
-    
+  const handleColorChange = useCallback((color: string) => {
     let rgbaString: string;
 
-    // Handle different input types aggressively
     if (typeof color === 'string') {
-      // String input - could be RGBA, HEX, or gradient
-      console.log('[ColorPicker] Processing string:', color);
-      
-      // Check if it's a gradient
+      // Package returns RGBA string or gradient string
       if (color.includes('gradient') || color.includes('linear-gradient')) {
         // Extract first rgba from gradient
         const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
         if (rgbaMatch) {
           rgbaString = `rgba(${rgbaMatch[1]}, ${rgbaMatch[2]}, ${rgbaMatch[3]}, ${rgbaMatch[4] || 1})`;
         } else {
-          // If no rgba found, try to parse as HEX in gradient
-          const hexMatch = color.match(/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})/);
-          if (hexMatch) {
-            rgbaString = normalizeToRgba(hexMatch[0]);
-          } else {
-            // Fallback to current internal color
-            rgbaString = internalColor;
-          }
+          rgbaString = internalColor;
         }
       } else {
-        // Regular color string - try to normalize
-        // First check if it's already valid RGBA
-        if (color.startsWith('rgba(') || color.startsWith('rgb(')) {
-          rgbaString = color;
-        } else if (color.startsWith('#')) {
-          // HEX format
-          rgbaString = normalizeToRgba(color);
-        } else {
-          // Unknown format - try to parse anyway
-          rgbaString = normalizeToRgba(color);
-        }
-      }
-    } else if (typeof color === 'object' && color !== null) {
-      // Object input - could be {r, g, b, a} or similar
-      console.log('[ColorPicker] Processing object:', color);
-      
-      if ('r' in color && 'g' in color && 'b' in color) {
-        rgbaString = rgbaObjectToString({
-          r: Number(color.r),
-          g: Number(color.g),
-          b: Number(color.b),
-          a: allowAlpha ? (Number(color.a) || 1) : 1,
-        });
-      } else {
-        // Unknown object format - fallback
-        rgbaString = internalColor;
+        // Regular RGBA string - use directly
+        rgbaString = color;
       }
     } else {
-      // Unknown type - fallback to current color
-      console.warn('[ColorPicker] Unknown color format:', color);
       rgbaString = internalColor;
     }
 
-    // Ensure alpha is correct
+    // Only override alpha if allowAlpha is false
     if (!allowAlpha) {
       const parsed = parseColorToRgba(rgbaString);
       rgbaString = rgbaObjectToString({
@@ -128,16 +94,13 @@ export default function ColorPicker({
       });
     }
 
-    // Validate the result
+    // Validate
     const parsed = parseColorToRgba(rgbaString);
-    if (isNaN(parsed.r) || isNaN(parsed.g) || isNaN(parsed.b)) {
-      console.error('[ColorPicker] Invalid color after processing:', rgbaString);
-      rgbaString = internalColor; // Fallback to current
+    if (isNaN(parsed.r) || isNaN(parsed.g) || isNaN(parsed.b) || isNaN(parsed.a)) {
+      rgbaString = internalColor;
     }
 
-    console.log('[ColorPicker] Final RGBA:', rgbaString);
-    
-    // Update internal state immediately
+    // Update internal state
     setInternalColor(rgbaString);
     
     // Call parent onChange
@@ -145,7 +108,7 @@ export default function ColorPicker({
   }, [internalColor, allowAlpha, onChange]);
 
   /**
-   * Calculate popup position to avoid viewport overflow.
+   * Calculate popup position - opens next to trigger button.
    */
   useEffect(() => {
     if (isOpen && triggerRef.current && pickerRef.current) {
@@ -159,35 +122,42 @@ export default function ColorPicker({
 
       const position: { top?: string; bottom?: string; left?: string; right?: string } = {};
 
+      // Calculate relative positions
       const triggerLeft = triggerRect.left - wrapperRect.left;
       const triggerTop = triggerRect.top - wrapperRect.top;
+      const triggerRight = triggerRect.right - wrapperRect.left;
       const triggerBottom = triggerRect.bottom - wrapperRect.top;
 
-      // Horizontal positioning
-      if (triggerRect.left >= popupWidth + spacing) {
-        position.right = `${wrapperRect.width - triggerLeft}px`;
+      // Horizontal: prefer right side of trigger
+      if (triggerRect.right + popupWidth + spacing <= viewportWidth) {
+        // Enough space on right - position to the right of trigger
+        position.left = `${triggerRight - wrapperRect.left + spacing}px`;
+      } else if (triggerRect.left >= popupWidth + spacing) {
+        // Enough space on left - position to the left of trigger
+        position.right = `${wrapperRect.width - triggerLeft + spacing}px`;
       } else {
-        if (triggerRect.right + popupWidth + spacing <= viewportWidth) {
-          position.left = `${triggerLeft}px`;
-        } else {
-          position.right = `${wrapperRect.width - triggerLeft}px`;
-        }
+        // Default to right, even if it overflows slightly
+        position.left = `${triggerRight - wrapperRect.left + spacing}px`;
       }
 
-      // Vertical positioning
-      const spaceAbove = triggerRect.top;
-      
-      if (spaceAbove >= popupHeight + spacing) {
+      // Vertical: prefer below trigger, align top with trigger
+      if (triggerRect.bottom + popupHeight + spacing <= viewportHeight) {
+        // Enough space below - align top with trigger top
+        position.top = `${triggerTop}px`;
+      } else if (triggerRect.top >= popupHeight + spacing) {
+        // Enough space above - position above trigger
         position.bottom = `${wrapperRect.height - triggerTop + spacing}px`;
       } else {
-        const popupTopInViewport = triggerRect.bottom + spacing;
+        // Adjust to fit in viewport
+        const spaceBelow = viewportHeight - triggerRect.bottom;
+        const spaceAbove = triggerRect.top;
         
-        if (popupTopInViewport + popupHeight <= viewportHeight) {
-          position.top = `${triggerBottom + spacing}px`;
+        if (spaceBelow >= spaceAbove) {
+          // More space below - use it
+          position.top = `${triggerTop}px`;
         } else {
-          const maxTopInViewport = viewportHeight - popupHeight;
-          const maxTopRelative = maxTopInViewport - (triggerRect.top - wrapperRect.top);
-          position.top = `${Math.max(triggerBottom + spacing, maxTopRelative)}px`;
+          // More space above - position above
+          position.bottom = `${wrapperRect.height - triggerTop + spacing}px`;
         }
       }
 
