@@ -1,0 +1,102 @@
+/**
+ * TripleInfographic CSS Module
+ * Styles for triple metric overlay display
+ */
+
+.container {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  pointer-events: none;
+  font-family: nzxt-extrabold;
+}
+
+.divider {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* transform, width, height, backgroundColor, opacity, borderRadius set via CSS variables */
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+.primarySection {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* transform set via CSS variables */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.dualReadersSection {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* transform, gap set via CSS variables */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.metricContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.numberContainer {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  line-height: 0.9;
+}
+
+.number {
+  font-weight: 700;
+  /* fontSize, color set via CSS variables */
+}
+
+.unitContainer {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-left: 4px;
+  transform: translateY(-65%);
+}
+
+.unit {
+  font-weight: 700;
+  line-height: 1;
+  /* fontSize, color set via CSS variables */
+}
+
+.unitPercent {
+  font-weight: 700;
+  padding-left: 4px;
+  line-height: 1;
+  /* fontSize, color set via CSS variables */
+}
+
+.clockNumber {
+  font-weight: 700;
+  line-height: 0.9;
+  /* fontSize, color set via CSS variables */
+}
+
+.clockLabel {
+  /* fontSize, marginTop, marginBottom, color set via CSS variables */
+}
+
+.label {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  /* fontSize, color, marginTop set via CSS variables */
+}
+

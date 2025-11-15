@@ -3,6 +3,7 @@ import {
   OverlayMetrics,
   getOverlayLabelAndValue,
 } from "../../types/overlay";
+import styles from "../styles/SingleInfographic.module.css";
 
 /**
  * SingleInfographic
@@ -44,34 +45,15 @@ export default function SingleInfographic({
   const isClock = valueUnitType === "clock";
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        zIndex: 20,
-        inset: 0,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        pointerEvents: "none",
-        fontFamily: "nzxt-extrabold",
-      }}
-    >
+    <div className={styles.container}>
       {/* Number + unit */}
       {!isClock ? (
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "baseline",
-            justifyContent: "center",
-            lineHeight: 0.9,
-          }}
-        >
+        <div className={styles.numberContainer}>
           {/* Main numeric value */}
           <span
+            className={styles.number}
             style={{
               fontSize: `${numberSize}px`,
-              fontWeight: 700,
               color: numberColor,
             }}
           >
@@ -80,21 +62,12 @@ export default function SingleInfographic({
 
           {/* Temperature unit (°) with manual visual offset */}
           {valueUnit && valueUnitType === "temp" && (
-            <span
-              style={{
-                display: "inline-flex",
-                flexDirection: "column",
-                justifyContent: "flex-start",
-                paddingLeft: 4,
-                transform: "translateY(-65%)",
-              }}
-            >
+            <span className={styles.unitContainer}>
               <span
+                className={styles.unit}
                 style={{
                   fontSize: `${unitSize}px`,
-                  fontWeight: 700,
                   color: numberColor,
-                  lineHeight: 1,
                 }}
               >
                 {valueUnit}
@@ -105,12 +78,10 @@ export default function SingleInfographic({
           {/* Percentage unit (%) baseline-aligned */}
           {valueUnit && valueUnitType === "percent" && (
             <span
+              className={styles.unitPercent}
               style={{
                 fontSize: `${unitSize}px`,
-                fontWeight: 700,
                 color: numberColor,
-                paddingLeft: 4,
-                lineHeight: 1,
               }}
             >
               {valueUnit}
@@ -121,11 +92,10 @@ export default function SingleInfographic({
         <>
           {/* Clock number */}
           <div
+            className={styles.clockNumber}
             style={{
               fontSize: `${numberSize}px`,
-              fontWeight: 700,
               color: numberColor,
-              lineHeight: 0.9,
             }}
           >
             {valueNumber}
@@ -133,6 +103,7 @@ export default function SingleInfographic({
 
           {/* MHz label below */}
           <div
+            className={styles.clockLabel}
             style={{
               fontSize: `${unitSize}px`,
               marginTop: -numberSize * 0.15,
@@ -147,11 +118,10 @@ export default function SingleInfographic({
 
       {/* Label (CPU / GPU / Liquid) */}
       <div
+        className={styles.label}
         style={{
           fontSize: `${overlay.textSize * scale}px`,
           color: textColor,
-          textTransform: "uppercase",
-          letterSpacing: 1,
         }}
       >
         {label}
