@@ -221,7 +221,6 @@ export default function ColorPicker({
         <ColorPickerComponent
           value={currentColor}
           onChange={handleColorChange}
-          onColorChange={handleColorChange}
           hideAlpha={!allowAlpha}
           hideGradient={!allowGradient}
         />
@@ -255,7 +254,6 @@ export default function ColorPicker({
             <ColorPickerComponent
               value={currentColor}
               onChange={handleColorChange}
-              onColorChange={handleColorChange}
               hideAlpha={!allowAlpha}
               hideGradient={!allowGradient}
             />
