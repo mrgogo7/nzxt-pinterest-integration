@@ -1,0 +1,6 @@
+# GitHub Pages redirects for old URLs to new URLs
+# This file is used by Netlify, but we'll also create a redirect.html for GitHub Pages
+
+/nzxt-web-integration-amc/* /nzxt-esc/:splat 301
+/nzxt-web-integration-amc /nzxt-esc/ 301
+

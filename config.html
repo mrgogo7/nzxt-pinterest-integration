@@ -3,7 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>NZXT Advanced Media Configurator</title>
+    <title>NZXT Elite Screen Customizer</title>
+    <script>
+      // Redirect old URLs to new URLs
+      if (window.location.pathname.includes('/nzxt-web-integration-amc')) {
+        const newPath = window.location.pathname.replace('/nzxt-web-integration-amc', '/nzxt-esc');
+        window.location.replace(newPath + window.location.search + window.location.hash);
+      }
+    </script>
   </head>
   <body style="margin:0;background:#121212;">
     <div id="root"></div>

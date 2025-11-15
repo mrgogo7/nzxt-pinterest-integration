@@ -1,7 +1,7 @@
 # 🔧 NZXT Web Integration - Kapsamlı Refactoring Planı
 
 **Tarih:** 2025  
-**Proje:** NZXT Web Integration AMC  
+**Proje:** NZXT Elite Screen Customizer (NZXT-ESC)  
 **Hedef:** Kod kalitesi, bakım kolaylığı, performans iyileştirmesi
 
 ---
@@ -1081,7 +1081,7 @@ import legacy from '@vitejs/plugin-legacy';
 import { resolve } from 'node:path';
 
 export default defineConfig({
-  base: '/nzxt-web-integration-amc/',
+  base: '/nzxt-esc/',
   plugins: [
     react({
       // React Fast Refresh

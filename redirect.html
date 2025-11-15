@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
+  <script>
+    // Redirect old URLs to new URLs
+    const currentPath = window.location.pathname;
+    const currentSearch = window.location.search;
+    const currentHash = window.location.hash;
+    
+    // Check if we're on the old path
+    if (currentPath.includes('/nzxt-web-integration-amc')) {
+      const newPath = currentPath.replace('/nzxt-web-integration-amc', '/nzxt-esc');
+      window.location.replace(newPath + currentSearch + currentHash);
+    } else if (currentPath === '/' || currentPath === '/index.html') {
+      // If accessing root, check if we need to redirect
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('kraken')) {
+        // Keep the kraken parameter
+        window.location.replace('/nzxt-esc/?kraken=1');
+      } else {
+        window.location.replace('/nzxt-esc/');
+      }
+    }
+  </script>
+  <meta http-equiv="refresh" content="0; url=/nzxt-esc/">
+  <link rel="canonical" href="/nzxt-esc/">
+</head>
+<body>
+  <p>Redirecting to <a href="/nzxt-esc/">NZXT Elite Screen Customizer</a>...</p>
+</body>
+</html>
+

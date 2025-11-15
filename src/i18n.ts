@@ -6,7 +6,7 @@ export const LANG_KEY = "nzxtLang";
 
 const dict: Record<Lang, Record<string, string>> = {
   en: {
-    appTitle: "NZXT Media Config",
+    appTitle: "NZXT Elite Screen Customizer",
     language: "Language",
     reset: "Reset",
     resetConfirm: "Are you sure? This will reset ALL settings including the URL.",
@@ -79,7 +79,7 @@ const dict: Record<Lang, Record<string, string>> = {
     mockDataWarning: "⚠️ Running in browser mode. NZXT CAM API is not available. Displayed values are mock data and do not reflect actual system metrics.",
   },
   tr: {
-    appTitle: "NZXT Medya Ayarları",
+    appTitle: "NZXT Elite Screen Customizer",
     language: "Dil",
     reset: "Sıfırla",
     resetConfirm: "Emin misiniz? Bu işlem URL dahil TÜM ayarları sıfırlar.",

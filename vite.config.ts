@@ -8,7 +8,7 @@ import { resolve } from 'node:path';
  * Supports multi-entry build (index.html + config.html).
  */
 export default defineConfig({
-  base: '/nzxt-web-integration-amc/',
+  base: '/nzxt-esc/',
   plugins: [
     react({
       // React Fast Refresh

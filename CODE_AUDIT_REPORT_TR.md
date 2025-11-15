@@ -1,7 +1,7 @@
 # 🔍 NZXT Web Integration - Kod Denetim Raporu
 
 **Tarih:** 2025  
-**Proje:** NZXT Web Integration AMC (Advanced Media Configurator)  
+**Proje:** NZXT Elite Screen Customizer (NZXT-ESC)  
 **Dil:** TypeScript + React + Vite
 
 ---

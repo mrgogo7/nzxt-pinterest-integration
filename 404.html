@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting to NZXT Elite Screen Customizer...</title>
+  <script>
+    // GitHub Pages 404.html redirect
+    const currentPath = window.location.pathname;
+    const currentSearch = window.location.search;
+    const currentHash = window.location.hash;
+    
+    // Redirect old URLs to new URLs
+    if (currentPath.includes('/nzxt-web-integration-amc')) {
+      const newPath = currentPath.replace('/nzxt-web-integration-amc', '/nzxt-esc');
+      window.location.replace(newPath + currentSearch + currentHash);
+    } else {
+      // Redirect to main page
+      window.location.replace('/nzxt-esc/' + currentSearch + currentHash);
+    }
+  </script>
+  <meta http-equiv="refresh" content="0; url=/nzxt-esc/">
+  <link rel="canonical" href="/nzxt-esc/">
+</head>
+<body>
+  <p>Redirecting to <a href="/nzxt-esc/">NZXT Elite Screen Customizer</a>...</p>
+</body>
+</html>
+
