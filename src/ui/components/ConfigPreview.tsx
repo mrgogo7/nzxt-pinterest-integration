@@ -35,7 +35,9 @@ import ColorPicker from './ColorPicker';
  * - Background Section: Main title + 2 columns (Preview | Settings)
  * - Overlay Section: Main title + 2 columns (Preview | Options)
  */
-export default function ConfigPreview({ activeTab = 'media' }: { activeTab?: 'media' | 'color' }) {
+export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'color' }) {
+  // Default to 'media' if not provided
+  const currentTab = activeTab ?? 'media';
   const [lang, setLang] = useState<Lang>(getInitialLang());
   const { settings, setSettings } = useConfig();
   const { mediaUrl } = useMediaUrl();
@@ -385,7 +387,7 @@ export default function ConfigPreview({ activeTab = 'media' }: { activeTab?: 'me
   return (
     <div className="config-wrapper-vertical">
       {/* Background Section - Only show when Media tab is active */}
-      {(activeTab === undefined || activeTab !== 'color') && (
+      {currentTab !== 'color' && (
         <div className="section-group">
           <h2 className="section-title">{t('backgroundSectionTitle', lang)}</h2>
           <div className="section-content">
@@ -399,7 +401,7 @@ export default function ConfigPreview({ activeTab = 'media' }: { activeTab?: 'me
                 <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
 
                 {/* Show color background if Color tab is active */}
-                {(activeTab === 'color') ? (
+                {currentTab === 'color' ? (
                   <div
                     style={{
                       width: '100%',
