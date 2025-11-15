@@ -443,7 +443,7 @@ export default function ConfigPreview({ activeTab }: { activeTab: 'media' | 'col
                     {/* Show media if URL exists, otherwise show black */}
                     {mediaUrl ? (
                       isVideo ? (
-                        <div key={mediaUrl}>
+                        <div key={mediaUrl} style={{ width: '100%', height: '100%' }}>
                           <VideoPreview
                             src={mediaUrl}
                             style={{
