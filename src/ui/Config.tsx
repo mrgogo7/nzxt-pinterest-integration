@@ -166,29 +166,31 @@ export default function Config() {
         </div>
       </header>
 
-      {/* Background Section with Tabs */}
+      {/* Background Section with Mode Buttons */}
       <section className="url-section">
-        <label className="url-label">
-          {t("background", lang)}
-        </label>
-        
-        {/* Tabs */}
-        <div className="background-tabs">
-          <button
-            className={`background-tab ${activeTab === 'media' ? 'active' : ''}`}
-            onClick={() => setActiveTab('media')}
-          >
-            {t("mediaTab", lang)}
-          </button>
-          <button
-            className={`background-tab ${activeTab === 'color' ? 'active' : ''}`}
-            onClick={() => setActiveTab('color')}
-          >
-            {t("colorTab", lang)}
-          </button>
+        <div className="background-mode-header">
+          <label className="url-label">
+            {t("background", lang)}
+          </label>
+          
+          {/* Mode Selection Buttons */}
+          <div className="background-mode-buttons">
+            <button
+              className={`mode-btn ${activeTab === 'media' ? 'active' : ''}`}
+              onClick={() => setActiveTab('media')}
+            >
+              {t("mediaTab", lang)}
+            </button>
+            <button
+              className={`mode-btn ${activeTab === 'color' ? 'active' : ''}`}
+              onClick={() => setActiveTab('color')}
+            >
+              {t("colorTab", lang)}
+            </button>
+          </div>
         </div>
 
-        {/* Tab Content */}
+        {/* Content based on selected mode */}
         {activeTab === 'media' ? (
           <>
             <div className="url-row">

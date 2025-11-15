@@ -35,9 +35,8 @@ import ColorPicker from './ColorPicker';
  * - Background Section: Main title + 2 columns (Preview | Settings)
  * - Overlay Section: Main title + 2 columns (Preview | Options)
  */
-export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'color' }) {
-  // Default to 'media' if not provided - use type assertion to avoid narrowing
-  const currentTab = (activeTab === 'color' ? 'color' : 'media') as 'media' | 'color';
+export default function ConfigPreview({ activeTab = 'media' }: { activeTab?: 'media' | 'color' }) {
+  // Use activeTab directly, default to 'media'
   const [lang, setLang] = useState<Lang>(getInitialLang());
   const { settings, setSettings } = useConfig();
   const { mediaUrl } = useMediaUrl();
@@ -386,8 +385,8 @@ export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'co
 
   return (
     <div className="config-wrapper-vertical">
-      {/* Background Section - Only show when Media tab is active */}
-      {currentTab !== 'color' && (
+      {/* Background Section - Only show when Media mode is active */}
+      {activeTab !== 'color' && (
         <div className="section-group">
           <h2 className="section-title">{t('backgroundSectionTitle', lang)}</h2>
           <div className="section-content">
@@ -400,8 +399,8 @@ export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'co
               >
                 <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
 
-                {/* Show color background if Color tab is active */}
-                {currentTab === 'color' ? (
+                {/* Show color background if Color mode is active */}
+                {activeTab === 'color' ? (
                   <div
                     style={{
                       width: '100%',

@@ -99,33 +99,43 @@
   font-size: 14px;
 }
 
-/* Background Tabs */
-.background-tabs {
+/* Background Mode Header */
+.background-mode-header {
   display: flex;
-  gap: 4px;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
-  border-bottom: 1px solid #242734;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.background-tab {
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
+.background-mode-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.mode-btn {
+  background: #1c1c1c;
+  border: 1px solid #333;
   color: #9aa3ad;
-  padding: 8px 16px;
+  padding: 6px 14px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   transition: all 0.2s;
 }
 
-.background-tab:hover {
+.mode-btn:hover {
+  background: #242424;
   color: #d8e0f5;
+  border-color: #444;
 }
 
-.background-tab.active {
-  color: #d8e0f5;
-  border-bottom-color: #3b5a9a;
+.mode-btn.active {
+  background: #263146;
+  border-color: #3b5a9a;
+  color: #d9e6ff;
 }
 
 .color-picker-section {
