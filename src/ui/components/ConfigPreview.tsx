@@ -24,6 +24,7 @@ import { isVideoUrl } from '../../utils/media';
 import SingleInfographic from './SingleInfographic';
 import DualInfographic from './DualInfographic';
 import TripleInfographic from './TripleInfographic';
+import ColorPicker from './ColorPicker';
 
 /**
  * ConfigPreview component.
@@ -625,11 +626,11 @@ export default function ConfigPreview() {
                     <RefreshCw size={14} />
                   </button>
                 </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
       {/* Overlay Section */}
       <div className="section-group">
