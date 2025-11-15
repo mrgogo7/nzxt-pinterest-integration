@@ -10,7 +10,7 @@ import { useConfig } from '../hooks/useConfig';
 export default function Config() {
   const [lang, setLangState] = useState<Lang>(getInitialLang());
   const { mediaUrl, setMediaUrl } = useMediaUrl();
-  const { settings, setSettings } = useConfig();
+  const { setSettings } = useConfig();
   const [urlInput, setUrlInput] = useState<string>(mediaUrl);
   const [isInputFocused, setIsInputFocused] = useState(false);
 
