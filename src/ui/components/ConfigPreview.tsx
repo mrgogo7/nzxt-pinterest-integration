@@ -585,6 +585,7 @@ export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'co
                     <RefreshCw size={14} />
                   </button>
                 </div>
+                </div>
               </div>
             </div>
           </div>
