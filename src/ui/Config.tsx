@@ -5,12 +5,11 @@ import './styles/ConfigPreview.css';
 import { DEFAULT_MEDIA_URL, DEFAULT_SETTINGS } from '../constants/defaults';
 import { useMediaUrl } from '../hooks/useMediaUrl';
 import { useConfig } from '../hooks/useConfig';
-import ColorPicker from './components/ColorPicker';
 
 export default function Config() {
   const [lang, setLangState] = useState<Lang>(getInitialLang());
   const { mediaUrl, setMediaUrl } = useMediaUrl();
-  const { settings, setSettings } = useConfig();
+  const { setSettings } = useConfig();
   const [urlInput, setUrlInput] = useState<string>(mediaUrl);
 
   // Sync urlInput with mediaUrl changes
@@ -38,17 +37,6 @@ export default function Config() {
   const handleSave = () => {
     // Update media URL (useMediaUrl hook handles storage sync)
     setMediaUrl(urlInput);
-  };
-
-  const handleClear = () => {
-    // Clear media URL
-    setMediaUrl('');
-    setUrlInput('');
-  };
-
-  const handleBackgroundColorChange = (color: string) => {
-    // Update background color in settings
-    setSettings({ backgroundColor: color });
   };
 
   const handleReset = () => {
@@ -140,10 +128,10 @@ export default function Config() {
 
       {/* URL + Save */}
       <section className="url-section">
+        <label className="url-label" htmlFor="mediaUrl">
+          {t("urlLabel", lang)}
+        </label>
         <div className="url-row">
-          <label className="url-label-inline" htmlFor="mediaUrl">
-            {t("backgroundMediaUrlLabel", lang)}
-          </label>
           <input
             id="mediaUrl"
             type="text"
@@ -155,23 +143,8 @@ export default function Config() {
           <button onClick={handleSave} className="save-btn">
             {t("save", lang)}
           </button>
-          <button onClick={handleClear} className="clear-btn">
-            {t("clear", lang)}
-          </button>
         </div>
         <p className="hint">{t("note", lang)}</p>
-        
-        {/* Background Color Picker */}
-        <div className="background-color-section">
-          <label className="background-color-label">
-            {t("colorPickerTitle", lang)}
-          </label>
-            <ColorPicker
-              value={settings.backgroundColor || '#000000'}
-              onChange={handleBackgroundColorChange}
-              showInline={false}
-            />
-        </div>
       </section>
 
       {/* Preview + Settings */}

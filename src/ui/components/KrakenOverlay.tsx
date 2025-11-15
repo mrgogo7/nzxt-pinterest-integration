@@ -1,46 +1,23 @@
 import { DEFAULT_OVERLAY, type OverlaySettings } from '../../types/overlay';
-import { NZXT_DEFAULTS } from '../../constants/nzxt';
-import { useConfig } from '../../hooks/useConfig';
-import { useMediaUrl } from '../../hooks/useMediaUrl';
+import { type AppSettings } from '../../constants/defaults';
 import { useMonitoring } from '../../hooks/useMonitoring';
+import { useMediaUrl } from '../../hooks/useMediaUrl';
+import { useConfig } from '../../hooks/useConfig';
 import MediaRenderer from './MediaRenderer';
 import SingleInfographic from './SingleInfographic';
 import DualInfographic from './DualInfographic';
 import TripleInfographic from './TripleInfographic';
-import styles from '../styles/KrakenOverlay.module.css';
+import styles from './styles/KrakenOverlay.module.css';
 
-/**
- * KrakenOverlay component.
- * LCD render surface for NZXT Kraken Elite.
- * 
- * - Reads media URL + settings from localStorage (same keys as ConfigPreview)
- * - Mirrors the LCD transform logic (scale, offset, align, fit)
- * - Adds overlay support via dedicated overlay components
- * - Registers window.nzxt.v1.onMonitoringDataUpdate for real monitoring data
- * - Does NOT require any props (safe for ?kraken=1 entry)
- */
 export default function KrakenOverlay() {
-  const { settings } = useConfig();
   const { mediaUrl } = useMediaUrl();
+  const { settings } = useConfig();
   const metrics = useMonitoring();
 
-  // Get LCD resolution from NZXT API or use default
-  const lcdResolution = window.nzxt?.v1?.width || NZXT_DEFAULTS.LCD_WIDTH;
-  const lcdSize = lcdResolution;
-
-  // Merge overlay settings with defaults
-  const overlayConfig: OverlaySettings = {
-    ...DEFAULT_OVERLAY,
-    ...(settings.overlay || {}),
-  };
-
-  // Apply overlay offset if present (only for single mode)
-  // Dual and triple modes handle offsets internally
+  const overlayConfig: OverlaySettings = settings.overlay || DEFAULT_OVERLAY;
+  const lcdSize = 640;
   const overlayOffsetX = (overlayConfig.mode === 'triple' || overlayConfig.mode === 'dual') ? 0 : (overlayConfig.x || 0);
   const overlayOffsetY = (overlayConfig.mode === 'triple' || overlayConfig.mode === 'dual') ? 0 : (overlayConfig.y || 0);
-
-  // Get background color from settings, default to #000000
-  const backgroundColor = settings.backgroundColor || '#000000';
 
   return (
     <div
@@ -48,7 +25,6 @@ export default function KrakenOverlay() {
       style={{
         width: `${lcdSize}px`,
         height: `${lcdSize}px`,
-        background: backgroundColor,
       }}
     >
       <MediaRenderer url={mediaUrl} settings={settings} />
@@ -56,8 +32,10 @@ export default function KrakenOverlay() {
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            transform: `translate(${overlayOffsetX}px, ${overlayOffsetY}px)`,
+            top: 0,
+            left: 0,
+            width: `${lcdSize}px`,
+            height: `${lcdSize}px`,
             pointerEvents: 'none',
           }}
         >
