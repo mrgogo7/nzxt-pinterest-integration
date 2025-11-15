@@ -36,7 +36,8 @@ import ColorPicker from './ColorPicker';
  * - Overlay Section: Main title + 2 columns (Preview | Options)
  */
 export default function ConfigPreview({ activeTab = 'media' }: { activeTab?: 'media' | 'color' }) {
-  // Use activeTab directly, default to 'media'
+  // Explicitly type to avoid TypeScript narrowing
+  const mode: 'media' | 'color' = activeTab;
   const [lang, setLang] = useState<Lang>(getInitialLang());
   const { settings, setSettings } = useConfig();
   const { mediaUrl } = useMediaUrl();
@@ -386,7 +387,7 @@ export default function ConfigPreview({ activeTab = 'media' }: { activeTab?: 'me
   return (
     <div className="config-wrapper-vertical">
       {/* Background Section - Only show when Media mode is active */}
-      {activeTab !== 'color' && (
+      {mode !== 'color' && (
         <div className="section-group">
           <h2 className="section-title">{t('backgroundSectionTitle', lang)}</h2>
           <div className="section-content">
@@ -400,7 +401,7 @@ export default function ConfigPreview({ activeTab = 'media' }: { activeTab?: 'me
                 <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
 
                 {/* Show color background if Color mode is active */}
-                {activeTab === 'color' ? (
+                {mode === 'color' ? (
                   <div
                     style={{
                       width: '100%',
