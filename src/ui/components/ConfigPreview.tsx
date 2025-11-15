@@ -24,7 +24,6 @@ import { isVideoUrl } from '../../utils/media';
 import SingleInfographic from './SingleInfographic';
 import DualInfographic from './DualInfographic';
 import TripleInfographic from './TripleInfographic';
-import ColorPicker from './ColorPicker';
 
 /**
  * ConfigPreview component.
