@@ -51,8 +51,9 @@ export default function ColorPicker({ value, onChange, showInline = false }: Col
 
   // Calculate popup position to avoid viewport overflow
   useEffect(() => {
-    if (isOpen && triggerRef.current) {
+    if (isOpen && triggerRef.current && pickerRef.current) {
       const triggerRect = triggerRef.current.getBoundingClientRect();
+      const wrapperRect = pickerRef.current.getBoundingClientRect();
       const popupWidth = 220; // SketchPicker approximate width
       const popupHeight = 320; // SketchPicker approximate height
       const viewportWidth = window.innerWidth;
@@ -61,31 +62,36 @@ export default function ColorPicker({ value, onChange, showInline = false }: Col
 
       const position: { top?: string; bottom?: string; left?: string; right?: string } = {};
 
+      // Calculate relative position from wrapper
+      const triggerLeft = triggerRect.left - wrapperRect.left;
+      const triggerTop = triggerRect.top - wrapperRect.top;
+      const triggerBottom = triggerRect.bottom - wrapperRect.top;
+
       // Horizontal positioning: prefer left (for NZXT CAM compatibility)
       if (triggerRect.left >= popupWidth + spacing) {
         // Enough space on left, open to the left
-        position.right = '0';
+        position.right = `${wrapperRect.width - triggerLeft}px`;
       } else {
         // Not enough space on left, try right
         if (triggerRect.right + popupWidth + spacing <= viewportWidth) {
-          position.left = '0';
+          position.left = `${triggerLeft}px`;
         } else {
           // Not enough space on either side, open to the left anyway
-          position.right = '0';
+          position.right = `${wrapperRect.width - triggerLeft}px`;
         }
       }
 
       // Vertical positioning: prefer top (for NZXT CAM compatibility)
       if (triggerRect.top >= popupHeight + spacing) {
         // Enough space above, open above
-        position.bottom = 'calc(100% + 8px)';
+        position.bottom = `${wrapperRect.height - triggerTop + spacing}px`;
       } else {
         // Not enough space above, try below
         if (triggerRect.bottom + popupHeight + spacing <= viewportHeight) {
-          position.top = 'calc(100% + 8px)';
+          position.top = `${triggerBottom + spacing}px`;
         } else {
           // Not enough space on either side, open above anyway
-          position.bottom = 'calc(100% + 8px)';
+          position.bottom = `${wrapperRect.height - triggerTop + spacing}px`;
         }
       }
 
@@ -156,7 +162,7 @@ export default function ColorPicker({ value, onChange, showInline = false }: Col
         >
           <SketchPicker
             color={currentColor}
-            onChange={handleColorChange}
+            onChangeComplete={handleColorChange}
             disableAlpha={true}
             presetColors={[
               '#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff',
