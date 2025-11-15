@@ -24,6 +24,13 @@ export default function KrakenOverlay() {
   const { mediaUrl } = useMediaUrl();
   const metrics = useMonitoring();
 
+  // Get activeTab from localStorage (default to 'media')
+  const activeTab = (() => {
+    if (typeof window === 'undefined') return 'media';
+    const saved = localStorage.getItem('nzxtActiveTab');
+    return (saved === 'media' || saved === 'color') ? saved : 'media';
+  })();
+
   // Get LCD resolution from NZXT API or use default
   const lcdResolution = window.nzxt?.v1?.width || NZXT_DEFAULTS.LCD_WIDTH;
   const lcdSize = lcdResolution;
@@ -39,6 +46,9 @@ export default function KrakenOverlay() {
   const overlayOffsetX = (overlayConfig.mode === 'triple' || overlayConfig.mode === 'dual') ? 0 : (overlayConfig.x || 0);
   const overlayOffsetY = (overlayConfig.mode === 'triple' || overlayConfig.mode === 'dual') ? 0 : (overlayConfig.y || 0);
 
+  // Determine if we should force color mode
+  const forceColorMode = activeTab === 'color';
+
   return (
     <div
       className={styles.krakenOverlay}
@@ -47,7 +57,7 @@ export default function KrakenOverlay() {
         height: `${lcdSize}px`,
       }}
     >
-      <MediaRenderer url={mediaUrl} settings={settings} />
+      <MediaRenderer url={mediaUrl} settings={settings} forceColorMode={forceColorMode} />
       {overlayConfig.mode !== 'none' && (
         <div
           style={{

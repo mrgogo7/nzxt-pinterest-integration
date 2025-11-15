@@ -398,35 +398,36 @@ export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'co
               >
                 <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
 
-                {/* Show color background if no media URL but backgroundColor exists */}
-                {!mediaUrl && settings.backgroundColor ? (
+                {/* Show color background if Color tab is active */}
+                {activeTab === 'color' ? (
                   <div
                     style={{
                       width: '100%',
                       height: '100%',
-                      backgroundColor: settings.backgroundColor,
+                      backgroundColor: settings.backgroundColor || '#000000',
                     }}
                   />
                 ) : (
                   <>
-                    {isVideo ? (
-                      <video
-                        src={mediaUrl}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: settings.fit,
-                          objectPosition,
-                          transform: `scale(${settings.scale})`,
-                          transformOrigin: 'center center',
-                        }}
-                      />
-                    ) : (
-                      mediaUrl && (
+                    {/* Show media if URL exists, otherwise show black */}
+                    {mediaUrl ? (
+                      isVideo ? (
+                        <video
+                          src={mediaUrl}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: settings.fit,
+                            objectPosition,
+                            transform: `scale(${settings.scale})`,
+                            transformOrigin: 'center center',
+                          }}
+                        />
+                      ) : (
                         <img
                           src={mediaUrl}
                           alt="preview"
@@ -440,6 +441,14 @@ export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'co
                           }}
                         />
                       )
+                    ) : (
+                      <div
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          backgroundColor: '#000000',
+                        }}
+                      />
                     )}
                   </>
                 )}

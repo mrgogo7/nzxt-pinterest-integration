@@ -117,6 +117,7 @@ export default function ColorPicker({ value, onChange, showInline = false }: Col
         <SketchPicker
           color={currentColor}
           onChange={handleColorChange}
+          onChangeComplete={handleColorChange}
           disableAlpha={true}
           presetColors={[
             '#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff',

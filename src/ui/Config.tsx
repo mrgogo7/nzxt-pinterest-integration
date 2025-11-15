@@ -12,7 +12,15 @@ export default function Config() {
   const { mediaUrl, setMediaUrl } = useMediaUrl();
   const { settings, setSettings } = useConfig();
   const [urlInput, setUrlInput] = useState<string>(mediaUrl);
-  const [activeTab, setActiveTab] = useState<'media' | 'color'>('media');
+  const [activeTab, setActiveTab] = useState<'media' | 'color'>(() => {
+    const saved = localStorage.getItem('nzxtActiveTab');
+    return (saved === 'media' || saved === 'color') ? saved : 'media';
+  });
+
+  // Save activeTab to localStorage
+  useEffect(() => {
+    localStorage.setItem('nzxtActiveTab', activeTab);
+  }, [activeTab]);
 
   // Sync urlInput with mediaUrl changes
   useEffect(() => {
@@ -48,8 +56,11 @@ export default function Config() {
     setMediaUrl('');
     setUrlInput('');
     
-    // 2. Tüm ayarları varsayılana döndür
-    setSettings(DEFAULT_SETTINGS);
+    // 2. Tüm ayarları varsayılana döndür (backgroundColor'ı da temizle)
+    setSettings({
+      ...DEFAULT_SETTINGS,
+      backgroundColor: undefined,
+    });
     
     // 3. Tab'ı Media'ya döndür
     setActiveTab('media');

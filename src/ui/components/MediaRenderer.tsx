@@ -8,6 +8,7 @@ interface MediaRendererProps {
   settings: AppSettings;
   className?: string;
   style?: React.CSSProperties;
+  forceColorMode?: boolean; // If true, ignore URL and use backgroundColor
 }
 
 /**
@@ -19,6 +20,7 @@ export default function MediaRenderer({
   settings,
   className,
   style,
+  forceColorMode = false,
 }: MediaRendererProps) {
   const isVideo = isVideoUrl(url);
   const objectPosition = getObjectPosition(settings.align, settings.x, settings.y);
@@ -33,6 +35,22 @@ export default function MediaRenderer({
     display: 'block',
     ...style,
   };
+
+  // If forceColorMode is true, use backgroundColor (ignore URL)
+  if (forceColorMode) {
+    const bgColor = settings.backgroundColor || '#000000';
+    return (
+      <div
+        className={className}
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: bgColor,
+          ...style,
+        }}
+      />
+    );
+  }
 
   // If no URL but backgroundColor exists, show color background
   if (!url && settings.backgroundColor) {
@@ -49,7 +67,20 @@ export default function MediaRenderer({
     );
   }
 
-  if (!url) return null;
+  // If no URL and no backgroundColor, show black
+  if (!url) {
+    return (
+      <div
+        className={className}
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#000000',
+          ...style,
+        }}
+      />
+    );
+  }
 
   if (isVideo) {
     return (
