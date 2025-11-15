@@ -137,31 +137,39 @@ NZXT-ESC uses the same storage event system as NZXT Web Integration, enabling in
 src/
 ├── ui/
 │   ├── components/
-│   │   ├── ConfigPreview.tsx    # Main configuration UI
-│   │   ├── SingleInfographic.tsx # Single metric overlay
-│   │   ├── DualInfographic.tsx   # Dual metric overlay
-│   │   ├── TripleInfographic.tsx # Triple metric overlay
-│   │   ├── KrakenOverlay.tsx     # LCD display component
-│   │   ├── MediaRenderer.tsx     # Media rendering
-│   │   └── ColorPicker.tsx       # Color selection
+│   │   ├── ConfigPreview.tsx         # Main configuration UI
+│   │   ├── SingleInfographic.tsx     # Single metric overlay
+│   │   ├── DualInfographic.tsx       # Dual metric overlay
+│   │   ├── TripleInfographic.tsx     # Triple metric overlay
+│   │   ├── KrakenOverlay.tsx         # LCD display component
+│   │   ├── MediaRenderer.tsx         # Media rendering
+│   │   └── ColorPicker.tsx           # Color selection
 │   └── styles/
-│       └── ConfigPreview.css    # Main styles
+│       ├── ConfigPreview.css         # Main styles
+│       ├── ColorPicker.css           # Color picker styles
+│       ├── KrakenOverlay.module.css  # LCD overlay styles
+│       ├── SingleInfographic.module.css
+│       ├── DualInfographic.module.css
+│       └── TripleInfographic.module.css
 ├── hooks/
-│   ├── useConfig.ts             # Configuration management
-│   ├── useMediaUrl.ts           # Media URL management
-│   ├── useMonitoring.ts         # Real monitoring data
-│   └── useStorageSync.ts        # Cross-process sync
+│   ├── useConfig.ts                  # Configuration management
+│   ├── useMediaUrl.ts                # Media URL management
+│   ├── useMonitoring.ts              # Real/mock monitoring data
+│   └── useStorageSync.ts             # Cross-process sync
 ├── constants/
-│   ├── defaults.ts              # Default settings
-│   ├── nzxt.ts                 # NZXT API constants
-│   └── storage.ts              # Storage keys
+│   ├── defaults.ts                   # Default settings & metrics
+│   ├── nzxt.ts                      # NZXT API constants
+│   └── storage.ts                    # Storage keys
 ├── types/
-│   ├── overlay.ts              # Overlay type definitions
-│   └── nzxt.d.ts               # NZXT API types
+│   ├── overlay.ts                    # Overlay type definitions
+│   ├── nzxt.d.ts                    # NZXT API types
+│   └── css-modules.d.ts             # CSS modules types
 └── utils/
-    ├── monitoring.ts           # Data mapping utilities
-    ├── positioning.ts          # Position calculations
-    └── storage.ts              # Storage helpers
+    ├── monitoring.ts                 # Data mapping utilities
+    ├── positioning.ts                # Position calculations
+    ├── settings.ts                   # Settings merge/validation
+    ├── media.ts                      # Media type detection
+    └── storage.ts                    # Storage helpers (cookie fallback)
 ```
 
 ---
@@ -190,6 +198,9 @@ NZXT CAM automatically appends `?kraken=1` to the URL when running inside the ap
 - **Fallback Strategy** — Cookie fallback for robust storage in isolated processes
 - **Real-time Preview** — 200px circular preview with 1:1 scale mapping to 640px LCD
 - **Offset Scale Formula** — Critical formula: `previewSize / lcdResolution` (must be preserved)
+- **CSS Modules** — Scoped styling for better maintainability and performance
+- **Type Safety** — Full TypeScript coverage with strict mode enabled
+- **Modular Architecture** — Separated concerns: hooks, utils, constants, types
 
 ---
 
@@ -262,6 +273,11 @@ MIT © 2025 — Free for personal and non-commercial use.
 - Improved UI/UX with labeled dividers
 - Real-time monitoring data integration
 - Mock data support for browser testing
+- **Code Quality Improvements:**
+  - Refactored to modular architecture (hooks, utils, constants)
+  - Migrated inline styles to CSS modules
+  - Improved TypeScript type safety
+  - Enhanced code maintainability and documentation
 
 ---
 

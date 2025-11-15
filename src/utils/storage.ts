@@ -1,35 +1,13 @@
-// ============================================================================
-// NZXT Web Integration – Shared Storage Layer
-// ----------------------------------------------------------------------------
-// This module provides a robust shared storage mechanism for both the
-// Config page (settings UI) and the Display page (LCD renderer).
-//
-// Why this exists:
-// - NZXT CAM sometimes launches Config and Display in SEPARATE Chromium
-//   processes, causing localStorage isolation.
-// - To avoid desync, we mirror the URL into a cookie as a fallback layer.
-// - Cookies work across CAM’s embedded browser instances when secure attributes
-//   are applied (SameSite=None; Secure).
-//
-// Storage priority:
-//  1. localStorage   (best performance)
-//  2. cookie fallback (cross-process compatibility for CAM)
-//
-// This file also implements a small observer system so Display can react
-// instantly when Config updates the media URL.
-// ============================================================================
-
-// Primary storage key used in both localStorage and storage events.
-// NOTE: Must match STORAGE_KEYS.MEDIA_URL for backward compatibility.
-// (CAM will treat it as a brand-new storage namespace if changed.)
-const KEY = 'media_url'
-
-// Cookie key for cross-process fallback
-const COOKIE = 'media_url'
-
-// ============================================================================
-// Media URL – Read & Write
-// ============================================================================
+/**
+ * Shared Storage Layer for NZXT Web Integration
+ * 
+ * Provides robust storage mechanism for Config and Display pages.
+ * Uses localStorage with cookie fallback for cross-process compatibility in NZXT CAM.
+ * 
+ * Storage priority: localStorage (primary) → cookie (fallback)
+ */
+const KEY = 'media_url';
+const COOKIE = 'media_url';
 
 /**
  * Persist media URL (image/video) to both localStorage and cookie.
@@ -64,11 +42,12 @@ export function getMediaUrl(): string {
   return match ? decodeURIComponent(match[1]) : ''
 }
 
-// ============================================================================
-// Observer System – Sync Config → Display
-// ============================================================================
-// CAM sometimes does NOT trigger the normal "storage" event.
-// To avoid desync, we implement a polling fallback to detect changes.
+/**
+ * Observer System – Sync Config → Display
+ * 
+ * CAM sometimes does NOT trigger the normal "storage" event.
+ * To avoid desync, we implement a polling fallback to detect changes.
+ */
 
 type Listener = (value: string) => void
 const listeners = new Set<Listener>()
@@ -101,9 +80,9 @@ export function subscribe(fn: Listener) {
   return () => listeners.delete(fn)
 }
 
-// ============================================================================
-// Helpers
-// ============================================================================
+/**
+ * Helper Functions
+ */
 
 /**
  * Retrieve CAM LCD viewstate (expected resolution or scale factor).
