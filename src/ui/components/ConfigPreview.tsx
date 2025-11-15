@@ -155,10 +155,28 @@ export default function ConfigPreview({ activeTab }: { activeTab: 'media' | 'col
 
     // Save settings with URL for backward compatibility
     // Use settingsRef to avoid dependency on settings (prevents loop)
+    // Only save URL, don't merge with existing settings (prevents overwriting)
+    const currentSettings = settingsRef.current;
     const save: AppSettings & { url?: string } = {
-      ...settingsRef.current,
+      ...currentSettings,
       url: mediaUrl, // Include URL in config for backward compatibility
     };
+
+    // Only update if URL actually changed in the save object
+    // This prevents unnecessary updates
+    try {
+      const currentConfig = localStorage.getItem(STORAGE_KEYS.CONFIG) || 
+                           localStorage.getItem(STORAGE_KEYS.CONFIG_COMPAT);
+      if (currentConfig) {
+        const parsed = JSON.parse(currentConfig);
+        if (parsed.url === mediaUrl) {
+          // URL already matches, skip save to prevent loop
+          return;
+        }
+      }
+    } catch (e) {
+      // Ignore parse errors, continue with save
+    }
 
     setSettings(save);
   }, [mediaUrl, setSettings]); // Removed 'settings' from dependencies to prevent loop
