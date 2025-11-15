@@ -78,26 +78,25 @@ export default function Config() {
       // Ignore
     }
     
-    // Set default settings
     setSettings({
       ...DEFAULT_SETTINGS,
       backgroundColor: undefined,
     });
     
-    // 3. Tab'ı Media'ya döndür
+    // 4. Tab'ı Media'ya döndür
     setActiveTab('media');
     
-    // 4. Input focus durumunu sıfırla
+    // 5. Input focus durumunu sıfırla
     setIsInputFocused(false);
 
-    // Clear resetting flag after a short delay
+    // Clear resetting flag after a longer delay to ensure all operations complete
     setTimeout(() => {
       try {
         localStorage.removeItem('nzxtResetting');
       } catch (e) {
         // Ignore
       }
-    }, 500);
+    }, 1000);
   };
 
   const handleBackgroundColorChange = (color: string) => {
