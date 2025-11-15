@@ -148,8 +148,6 @@ export default function Config() {
             placeholder={t("urlPlaceholder", lang)}
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
-            onFocus={() => setIsInputFocused(true)}
-            onBlur={() => setIsInputFocused(false)}
           />
           <button onClick={handleSave} className="save-btn">
             {t("save", lang)}
