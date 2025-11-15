@@ -84,6 +84,8 @@ export default function TestColorPicker() {
         <h2>Test 1: Tüm Özellikler Açık (Test 6 Yapısı)</h2>
         <p className="test-description">
           Test 6 gibi gradient string ile başlıyor. hideAlpha=false, hideGradient=false
+          <br />
+          <strong>⚠️ Kontrol:</strong> Alpha slider, Gradient kontrolleri ve EyeDropper görünmeli. Eğer görünmüyorsa, paket prop'ları doğru okumuyor demektir.
         </p>
         <div className="test-row">
           <div className="test-controls">
@@ -97,7 +99,9 @@ export default function TestColorPicker() {
             </div>
             <div className="test-info">
               <p><strong>Mevcut değer:</strong> <code>{color1}</code></p>
+              <p><strong>Props:</strong> hideAlpha=false, hideGradient=false</p>
               <p className="test-note">✅ Gösterilmeli: Alpha slider, Gradient kontrolleri, EyeDropper</p>
+              <p className="test-warning">⚠️ Eğer Alpha slider veya Gradient kontrolleri görünmüyorsa, paket prop'ları doğru okumuyor demektir.</p>
             </div>
           </div>
           <div className="test-preview-area">
@@ -119,6 +123,8 @@ export default function TestColorPicker() {
         <p className="test-description">
           Test 6 gibi gradient string ile başlıyor. hideAlpha=false, hideGradient=true
           Alpha slider çalışmalı. Şeffaflığı görmek için üst üste 2 kutu kullanılıyor.
+          <br />
+          <strong>⚠️ Kontrol:</strong> Alpha slider görünmeli, Gradient kontrolleri gizlenmeli. Eğer Gradient kontrolleri görünüyorsa, hideGradient prop'u çalışmıyor demektir.
         </p>
         <div className="test-row">
           <div className="test-controls">
@@ -132,8 +138,10 @@ export default function TestColorPicker() {
             </div>
             <div className="test-info">
               <p><strong>Mevcut değer:</strong> <code>{color2}</code></p>
+              <p><strong>Props:</strong> hideAlpha=false, hideGradient=true</p>
               <p className="test-note">✅ Gösterilmeli: Alpha slider, EyeDropper | ❌ Gizlenmeli: Gradient</p>
               <p className="test-warning">⚠️ Şeffaflık testi: Alpha değerini değiştirin ve üst kutunun şeffaflaştığını görün.</p>
+              <p className="test-warning">⚠️ Eğer Gradient kontrolleri görünüyorsa, hideGradient prop'u çalışmıyor demektir.</p>
             </div>
           </div>
           <div className="test-preview-area">
@@ -159,6 +167,8 @@ export default function TestColorPicker() {
         <p className="test-description">
           Test 6 gibi gradient string ile başlıyor. hideAlpha=true, hideGradient=false
           Gradient kontrolleri çalışmalı.
+          <br />
+          <strong>⚠️ Kontrol:</strong> Gradient kontrolleri görünmeli, Alpha slider gizlenmeli. Eğer Alpha slider görünüyorsa, hideAlpha prop'u çalışmıyor demektir.
         </p>
         <div className="test-row">
           <div className="test-controls">
@@ -172,7 +182,9 @@ export default function TestColorPicker() {
             </div>
             <div className="test-info">
               <p><strong>Mevcut değer:</strong> <code>{color3}</code></p>
+              <p><strong>Props:</strong> hideAlpha=true, hideGradient=false</p>
               <p className="test-note">✅ Gösterilmeli: Gradient kontrolleri, EyeDropper | ❌ Gizlenmeli: Alpha slider</p>
+              <p className="test-warning">⚠️ Eğer Alpha slider görünüyorsa, hideAlpha prop'u çalışmıyor demektir.</p>
             </div>
           </div>
           <div className="test-preview-area">

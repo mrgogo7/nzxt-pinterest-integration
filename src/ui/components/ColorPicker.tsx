@@ -112,55 +112,70 @@ export default function ColorPicker({
 
   /**
    * Calculate popup position - positioned relative to trigger button.
-   * Uses same logic as old ColorPicker: relative to wrapper with calc() values.
+   * Fixed: Use pixel values relative to wrapper, not calc() values.
    */
   useEffect(() => {
-    if (isOpen && triggerRef.current) {
-      const triggerRect = triggerRef.current.getBoundingClientRect();
-      const popupWidth = 280; // Approximate width of GradientColorPicker
-      const popupHeight = 400; // Approximate height of GradientColorPicker
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const spacing = 8; // gap between trigger and popup
+    if (isOpen && triggerRef.current && pickerRef.current) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        if (!triggerRef.current || !pickerRef.current) return;
 
-      const position: { top?: string; bottom?: string; left?: string; right?: string } = {};
+        const triggerRect = triggerRef.current.getBoundingClientRect();
+        const wrapperRect = pickerRef.current.getBoundingClientRect();
+        const popupWidth = 280; // Approximate width of GradientColorPicker
+        const popupHeight = 400; // Approximate height of GradientColorPicker
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const spacing = 8; // gap between trigger and popup
 
-      // Horizontal positioning: prefer left (for NZXT CAM compatibility), fallback to right
-      if (triggerRect.left >= popupWidth + spacing) {
-        // Enough space on left, open to the left (wrapper's right side)
-        position.right = '0';
-      } else {
-        // Not enough space on left, try right
-        if (triggerRect.right + popupWidth + spacing <= viewportWidth) {
-          // Enough space on right, open to the right (wrapper's left side)
-          position.left = '0';
+        const position: { top?: string; bottom?: string; left?: string; right?: string } = {};
+
+        // Calculate trigger position relative to wrapper
+        const triggerLeftRelative = triggerRect.left - wrapperRect.left;
+        const triggerTopRelative = triggerRect.top - wrapperRect.top;
+        const triggerRightRelative = triggerRect.right - wrapperRect.left;
+        const triggerBottomRelative = triggerRect.bottom - wrapperRect.top;
+        const triggerWidth = triggerRect.width;
+        const triggerHeight = triggerRect.height;
+
+        // Horizontal positioning: prefer left (for NZXT CAM compatibility), fallback to right
+        if (triggerRect.left >= popupWidth + spacing) {
+          // Enough space on left, open to the left of trigger
+          position.right = `${wrapperRect.width - triggerLeftRelative + spacing}px`;
         } else {
-          // Not enough space on either side, open to the left anyway
-          position.right = '0';
+          // Not enough space on left, try right
+          if (triggerRect.right + popupWidth + spacing <= viewportWidth) {
+            // Enough space on right, open to the right of trigger
+            position.left = `${triggerRightRelative + spacing}px`;
+          } else {
+            // Not enough space on either side, open to the left anyway
+            position.right = `${wrapperRect.width - triggerLeftRelative + spacing}px`;
+          }
         }
-      }
 
-      // Vertical positioning: prefer top (for NZXT CAM compatibility), fallback to below
-      if (triggerRect.top >= popupHeight + spacing) {
-        // Enough space above, open above (wrapper's bottom)
-        position.bottom = 'calc(100% + 8px)';
-      } else {
-        // Not enough space above, try below
-        if (triggerRect.bottom + popupHeight + spacing <= viewportHeight) {
-          // Enough space below, open below (wrapper's top)
-          position.top = 'calc(100% + 8px)';
+        // Vertical positioning: prefer top (for NZXT CAM compatibility), fallback to below
+        if (triggerRect.top >= popupHeight + spacing) {
+          // Enough space above, open above trigger
+          position.bottom = `${wrapperRect.height - triggerTopRelative + spacing}px`;
         } else {
-          // Not enough space on either side, open above anyway
-          position.bottom = 'calc(100% + 8px)';
+          // Not enough space above, try below
+          if (triggerRect.bottom + popupHeight + spacing <= viewportHeight) {
+            // Enough space below, open below trigger
+            position.top = `${triggerBottomRelative + spacing}px`;
+          } else {
+            // Not enough space on either side, open above anyway
+            position.bottom = `${wrapperRect.height - triggerTopRelative + spacing}px`;
+          }
         }
-      }
 
-      console.log('[ColorPicker] Popup position calculated:', position, {
-        triggerRect: { left: triggerRect.left, top: triggerRect.top, right: triggerRect.right, bottom: triggerRect.bottom },
-        viewport: { width: viewportWidth, height: viewportHeight },
+        console.log('[ColorPicker] Popup position calculated:', position, {
+          triggerRect: { left: triggerRect.left, top: triggerRect.top, right: triggerRect.right, bottom: triggerRect.bottom },
+          wrapperRect: { left: wrapperRect.left, top: wrapperRect.top, width: wrapperRect.width, height: wrapperRect.height },
+          relative: { left: triggerLeftRelative, top: triggerTopRelative, right: triggerRightRelative, bottom: triggerBottomRelative },
+        });
+
+        setPopupPosition(position);
       });
-
-      setPopupPosition(position);
     }
   }, [isOpen]);
 
