@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import ColorPickerComponent from 'react-best-gradient-color-picker';
 import '../styles/ColorPicker.css';
 import { normalizeToRgba, normalizeToHex, parseColorToRgba, rgbaObjectToString } from '../../utils/color';
+
+// Import with fallback for different export styles
+import ColorPickerComponentDefault from 'react-best-gradient-color-picker';
+// Try to get the component (handle both default and named exports)
+const ColorPickerComponent: any = ColorPickerComponentDefault?.default || ColorPickerComponentDefault;
 
 interface ColorPickerProps {
   value: string; // RGBA or HEX color
@@ -155,6 +159,30 @@ export default function ColorPicker({
     };
   }, [isOpen]);
 
+  // If ColorPickerComponent is not available, show fallback
+  if (!ColorPickerComponent) {
+    return (
+      <div className="color-picker-wrapper">
+        <button
+          type="button"
+          className="color-picker-trigger"
+          disabled
+          style={{ opacity: 0.5, cursor: 'not-allowed' }}
+        >
+          <span 
+            className="color-picker-preview" 
+            style={{
+              backgroundColor: value || '#ffffff',
+            }}
+          />
+        </button>
+        <div style={{ fontSize: '10px', color: '#ff6b6b', marginTop: '4px' }}>
+          Color picker not available
+        </div>
+      </div>
+    );
+  }
+
   // If showInline is true, show picker directly without trigger button
   if (showInline) {
     return (
@@ -164,6 +192,11 @@ export default function ColorPicker({
           onChange={handleColorChange}
           hideAlpha={!allowAlpha}
           hideGradient={!allowGradient}
+          // Try alternative prop names
+          color={currentColor}
+          onColorChange={handleColorChange}
+          disableAlpha={!allowAlpha}
+          disableGradient={!allowGradient}
         />
       </div>
     );
@@ -196,6 +229,11 @@ export default function ColorPicker({
             onChange={handleColorChange}
             hideAlpha={!allowAlpha}
             hideGradient={!allowGradient}
+            // Try alternative prop names
+            color={currentColor}
+            onColorChange={handleColorChange}
+            disableAlpha={!allowAlpha}
+            disableGradient={!allowGradient}
           />
         </div>
       )}
