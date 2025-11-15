@@ -82,18 +82,7 @@
   border-left: 3px solid #4a9eff;
   border-radius: 4px;
   font-size: 11px;
-}
-
-.test-note:has-text("✅") {
-  color: #4ade80;
-}
-
-.test-note:has-text("❌") {
-  color: #f87171;
-}
-
-.test-note:has-text("⚠️") {
-  color: #fbbf24;
+  color: #a0a0a0;
 }
 
 .test-box {
