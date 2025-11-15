@@ -39,12 +39,16 @@ export default function KrakenOverlay() {
   const overlayOffsetX = (overlayConfig.mode === 'triple' || overlayConfig.mode === 'dual') ? 0 : (overlayConfig.x || 0);
   const overlayOffsetY = (overlayConfig.mode === 'triple' || overlayConfig.mode === 'dual') ? 0 : (overlayConfig.y || 0);
 
+  // Get background color from settings, default to #000000
+  const backgroundColor = settings.backgroundColor || '#000000';
+
   return (
     <div
       className={styles.krakenOverlay}
       style={{
         width: `${lcdSize}px`,
         height: `${lcdSize}px`,
+        background: backgroundColor,
       }}
     >
       <MediaRenderer url={mediaUrl} settings={settings} />

@@ -74,6 +74,14 @@
   font-size: 14px;
 }
 
+.url-label-inline {
+  color:#d8e0f5;
+  font-weight:600;
+  font-size: 14px;
+  white-space: nowrap;
+  margin-right: 8px;
+}
+
 .url-row { display:flex; gap:8px; align-items:center; }
 .url-input {
   flex:1;
@@ -94,7 +102,33 @@
   font-weight:600;
 }
 .save-btn:hover { background:#2e3a55; }
+.clear-btn {
+  background:#3a2424;
+  border:1px solid #5b3333;
+  color:#ffd6d6;
+  padding:8px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  white-space:nowrap;
+  font-weight:600;
+}
+.clear-btn:hover { background:#4a2f2f; }
 .hint { margin-top:6px; color:#9aa3ad; font-size:12px; }
+
+/* Background Color Section */
+.background-color-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #242734;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.background-color-label {
+  color:#d8e0f5;
+  font-weight:600;
+  font-size: 14px;
+}
 
 /* ==== Vertical layout with sections ==== */
 .config-wrapper-vertical {

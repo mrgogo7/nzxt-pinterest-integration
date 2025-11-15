@@ -2,6 +2,6 @@
   position: relative;
   overflow: hidden;
   border-radius: 50%;
-  background: #000;
+  /* background color is set inline via style prop */
 }
 
