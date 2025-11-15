@@ -35,7 +35,7 @@ import ColorPicker from './ColorPicker';
  * - Background Section: Main title + 2 columns (Preview | Settings)
  * - Overlay Section: Main title + 2 columns (Preview | Options)
  */
-export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'color' }) {
+export default function ConfigPreview({ activeTab = 'media' }: { activeTab?: 'media' | 'color' }) {
   const [lang, setLang] = useState<Lang>(getInitialLang());
   const { settings, setSettings } = useConfig();
   const { mediaUrl } = useMediaUrl();
@@ -399,7 +399,7 @@ export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'co
                 <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
 
                 {/* Show color background if Color tab is active */}
-                {activeTab === 'color' ? (
+                {(activeTab === 'color') ? (
                   <div
                     style={{
                       width: '100%',
