@@ -610,7 +610,7 @@ export default function ConfigPreview() {
                   )}
                 </div>
                 {/* Mock data warning */}
-                {!isRealDataReceived && overlayConfig.mode !== 'none' && (
+                {!isRealDataReceived && (
                   <div
                     style={{
                       marginTop: '12px',
