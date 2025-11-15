@@ -1,52 +1,80 @@
 import { useState, useRef, useEffect } from 'react';
-import { SketchPicker, ColorResult } from 'react-color';
+import ColorPickerComponent from 'react-best-gradient-color-picker';
 import '../styles/ColorPicker.css';
+import { normalizeToRgba, normalizeToHex, parseColorToRgba, rgbaObjectToString } from '../../utils/color';
 
 interface ColorPickerProps {
   value: string; // RGBA or HEX color
   onChange: (color: string) => void;
   showInline?: boolean; // If true, show picker inline without trigger button
+  allowAlpha?: boolean; // If true, allow alpha channel (default: false)
+  allowGradient?: boolean; // If true, allow gradient (default: false for text colors, true for background)
 }
 
 /**
- * ColorPicker component using react-color SketchPicker.
+ * ColorPicker component using react-best-gradient-color-picker.
  * Returns color in rgba() format for alpha support.
  * Positioned to avoid viewport overflow, prioritizing top-left for NZXT CAM compatibility.
  * Can be used inline (showInline=true) or as a popup (showInline=false).
  */
-export default function ColorPicker({ value, onChange, showInline = false }: ColorPickerProps) {
+export default function ColorPicker({ 
+  value, 
+  onChange, 
+  showInline = false,
+  allowAlpha = false,
+  allowGradient = false,
+}: ColorPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [popupPosition, setPopupPosition] = useState<{ top?: string; bottom?: string; left?: string; right?: string }>({});
 
-  // Parse color value to hex for react-color
-  const parseColor = (color: string): string => {
-    if (color.startsWith('rgba')) {
-      const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-      if (match) {
-        const r = parseInt(match[1]);
-        const g = parseInt(match[2]);
-        const b = parseInt(match[3]);
-        // Convert to hex (react-color uses hex, alpha is handled separately)
-        const hex = `#${[r, g, b].map(x => {
-          const hex = x.toString(16);
-          return hex.length === 1 ? '0' + hex : hex;
-        }).join('')}`;
-        return hex;
+  // Normalize color to HEX for the picker (picker likely uses HEX internally)
+  const currentColor = normalizeToHex(value);
+
+  // Handle color change from picker
+  const handleColorChange = (color: string | { r: number; g: number; b: number; a?: number }) => {
+    let rgbaString: string;
+    
+    // Check if color is an object (RGBA) or string (HEX/RGBA)
+    if (typeof color === 'object' && 'r' in color) {
+      // Color object with r, g, b, a
+      rgbaString = rgbaObjectToString({
+        r: color.r,
+        g: color.g,
+        b: color.b,
+        a: allowAlpha ? (color.a ?? 1) : 1,
+      });
+    } else if (typeof color === 'string') {
+      // Color string - normalize to RGBA
+      if (color.startsWith('rgba')) {
+        // Already RGBA, but ensure alpha is correct
+        const parsed = parseColorToRgba(color);
+        rgbaString = rgbaObjectToString({
+          r: parsed.r,
+          g: parsed.g,
+          b: parsed.b,
+          a: allowAlpha ? parsed.a : 1,
+        });
+      } else if (color.startsWith('#')) {
+        // HEX - convert to RGBA
+        const parsed = parseColorToRgba(color);
+        rgbaString = rgbaObjectToString({
+          r: parsed.r,
+          g: parsed.g,
+          b: parsed.b,
+          a: allowAlpha ? (parseColorToRgba(value).a || 1) : 1,
+        });
+      } else {
+        // Unknown format, normalize
+        rgbaString = normalizeToRgba(color);
       }
-    } else if (color.startsWith('#')) {
-      return color;
+    } else {
+      // Fallback
+      rgbaString = normalizeToRgba(value);
     }
-    return '#ffffff';
-  };
-
-  const currentColor = parseColor(value);
-
-  // Handle color change from react-color
-  const handleColorChange = (color: ColorResult) => {
-    const rgba = `rgba(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b}, ${color.rgb.a || 1})`;
-    onChange(rgba);
+    
+    onChange(rgbaString);
   };
 
   // Calculate popup position to avoid viewport overflow
@@ -54,8 +82,8 @@ export default function ColorPicker({ value, onChange, showInline = false }: Col
     if (isOpen && triggerRef.current && pickerRef.current) {
       const triggerRect = triggerRef.current.getBoundingClientRect();
       const wrapperRect = pickerRef.current.getBoundingClientRect();
-      const popupWidth = 220; // SketchPicker approximate width
-      const popupHeight = 320; // SketchPicker approximate height
+      const popupWidth = 280; // Approximate width for color picker
+      const popupHeight = 400; // Approximate height for color picker
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       const spacing = 8; // gap between trigger and popup
@@ -132,19 +160,11 @@ export default function ColorPicker({ value, onChange, showInline = false }: Col
   if (showInline) {
     return (
       <div className="color-picker-wrapper color-picker-inline" ref={pickerRef}>
-        <SketchPicker
-          color={currentColor}
+        <ColorPickerComponent
+          value={currentColor}
           onChange={handleColorChange}
-          onChangeComplete={handleColorChange}
-          disableAlpha={true}
-          presetColors={[
-            '#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff',
-            '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#800080',
-            '#ffc0cb', '#a52a2a', '#808080', '#c0c0c0', '#008000',
-            '#000080', '#800000', '#808000', '#008080', '#ff6347',
-            '#ff1493', '#00ced1', '#ffd700', '#da70d6', '#cd5c5c',
-            '#4169e1', '#32cd32', '#ff4500', '#9370db', '#20b2aa',
-          ]}
+          hideAlpha={!allowAlpha}
+          hideGradient={!allowGradient}
         />
       </div>
     );
@@ -172,18 +192,11 @@ export default function ColorPicker({ value, onChange, showInline = false }: Col
           className="color-picker-popup"
           style={popupPosition}
         >
-          <SketchPicker
-            color={currentColor}
-            onChangeComplete={handleColorChange}
-            disableAlpha={true}
-            presetColors={[
-              '#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff',
-              '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#800080',
-              '#ffc0cb', '#a52a2a', '#808080', '#c0c0c0', '#008000',
-              '#000080', '#800000', '#808000', '#008080', '#ff6347',
-              '#ff1493', '#00ced1', '#ffd700', '#da70d6', '#cd5c5c',
-              '#4169e1', '#32cd32', '#ff4500', '#9370db', '#20b2aa',
-            ]}
+          <ColorPickerComponent
+            value={currentColor}
+            onChange={handleColorChange}
+            hideAlpha={!allowAlpha}
+            hideGradient={!allowGradient}
           />
         </div>
       )}

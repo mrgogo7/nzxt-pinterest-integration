@@ -34,28 +34,23 @@
   z-index: 1000;
 }
 
-/* Override react-color styles to match dark theme */
-.color-picker-popup .sketch-picker {
+/* Override react-best-gradient-color-picker styles to match dark theme */
+.color-picker-popup > * {
   background: #121317 !important;
   border: 1px solid #242734 !important;
   border-radius: 8px !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
 }
 
-.color-picker-popup .sketch-picker input {
+.color-picker-popup input {
   background: #181a21 !important;
   border: 1px solid #2d3140 !important;
   color: #ffffff !important;
 }
 
-.color-picker-popup .sketch-picker .flexbox-fix {
-  border-top: 1px solid #242734 !important;
-}
-
-.color-picker-popup .sketch-picker .flexbox-fix input {
-  background: #181a21 !important;
-  border: 1px solid #2d3140 !important;
-  color: #ffffff !important;
+.color-picker-popup input:focus {
+  border-color: #4a5683 !important;
+  outline: none !important;
 }
 
 /* Inline color picker styles */
@@ -65,7 +60,7 @@
   max-width: 300px;
 }
 
-.color-picker-inline .sketch-picker {
+.color-picker-inline > * {
   background: #121317 !important;
   border: 1px solid #242734 !important;
   border-radius: 8px !important;
@@ -74,73 +69,14 @@
   padding: 10px !important;
 }
 
-.color-picker-inline .sketch-picker > div {
-  width: 100% !important;
-}
-
-.color-picker-inline .sketch-picker .saturation-white,
-.color-picker-inline .sketch-picker .saturation-black {
-  width: 100% !important;
-  padding-bottom: 55% !important;
-}
-
-.color-picker-inline .sketch-picker input {
+.color-picker-inline input {
   background: #181a21 !important;
   border: 1px solid #2d3140 !important;
   color: #ffffff !important;
 }
 
-.color-picker-inline .sketch-picker .flexbox-fix {
-  border-top: 1px solid #242734 !important;
-}
-
-.color-picker-inline .sketch-picker .flexbox-fix input {
-  background: #181a21 !important;
-  border: 1px solid #2d3140 !important;
-  color: #ffffff !important;
-}
-
-/* Ensure pointer/circle is visible in color picker */
-/* react-color SketchPicker uses nested divs for the pointer */
-/* The pointer is typically the direct child div of .saturation-white or .saturation-black */
-.color-picker-inline .sketch-picker .saturation-white > div,
-.color-picker-inline .sketch-picker .saturation-black > div {
-  box-shadow: 0 0 0 1.5px #fff, inset 0 0 1px 1px rgba(0,0,0,.15), 0 0 1px 2px rgba(0,0,0,.15) !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  width: 4px !important;
-  height: 4px !important;
-  transform: translate(-2px, -2px) !important;
-  border-radius: 50% !important;
-  position: absolute !important;
-}
-
-/* Also target nested divs (some versions use nested structure) */
-/* Only style the innermost div to avoid duplicate pointers */
-.color-picker-inline .sketch-picker .saturation-white > div > div,
-.color-picker-inline .sketch-picker .saturation-black > div > div {
-  /* Remove duplicate pointer styling - let parent handle it */
-  box-shadow: none !important;
-}
-
-/* Also for popup version */
-.color-picker-popup .sketch-picker .saturation-white > div,
-.color-picker-popup .sketch-picker .saturation-black > div {
-  box-shadow: 0 0 0 1.5px #fff, inset 0 0 1px 1px rgba(0,0,0,.15), 0 0 1px 2px rgba(0,0,0,.15) !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  width: 4px !important;
-  height: 4px !important;
-  transform: translate(-2px, -2px) !important;
-  border-radius: 50% !important;
-  position: absolute !important;
-}
-
-.color-picker-popup .sketch-picker .saturation-white > div > div,
-.color-picker-popup .sketch-picker .saturation-black > div > div {
-  /* Remove duplicate pointer styling - let parent handle it */
-  box-shadow: none !important;
+.color-picker-inline input:focus {
+  border-color: #4a5683 !important;
+  outline: none !important;
 }
 
