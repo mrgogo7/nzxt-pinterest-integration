@@ -3,6 +3,7 @@ import { LANG_KEY, Lang, t, getInitialLang, setLang } from '../i18n';
 import ConfigPreview from './components/ConfigPreview';
 import './styles/ConfigPreview.css';
 import { DEFAULT_SETTINGS } from '../constants/defaults';
+import { STORAGE_KEYS } from '../constants/storage';
 import { useMediaUrl } from '../hooks/useMediaUrl';
 import { useConfig } from '../hooks/useConfig';
 import ColorPicker from './components/ColorPicker';
@@ -56,11 +57,28 @@ export default function Config() {
   const handleReset = () => {
     if (!window.confirm(t('resetConfirm', lang))) return;
 
-    // 1. Media URL'i temizle
+    // Set resetting flag to prevent ConfigPreview throttled save from interfering
+    // This flag will be checked in ConfigPreview's useEffect
+    try {
+      localStorage.setItem('nzxtResetting', 'true');
+    } catch (e) {
+      // Ignore
+    }
+
+    // 1. Media URL'i temizle (storage.ts'den de temizle)
     setMediaUrl('');
     setUrlInput('');
     
     // 2. Tüm ayarları varsayılana döndür (backgroundColor'ı da temizle)
+    // Clear localStorage config keys completely
+    try {
+      localStorage.removeItem(STORAGE_KEYS.CONFIG);
+      localStorage.removeItem(STORAGE_KEYS.CONFIG_COMPAT);
+    } catch (e) {
+      // Ignore
+    }
+    
+    // Set default settings
     setSettings({
       ...DEFAULT_SETTINGS,
       backgroundColor: undefined,
@@ -71,6 +89,15 @@ export default function Config() {
     
     // 4. Input focus durumunu sıfırla
     setIsInputFocused(false);
+
+    // Clear resetting flag after a short delay
+    setTimeout(() => {
+      try {
+        localStorage.removeItem('nzxtResetting');
+      } catch (e) {
+        // Ignore
+      }
+    }, 500);
   };
 
   const handleBackgroundColorChange = (color: string) => {

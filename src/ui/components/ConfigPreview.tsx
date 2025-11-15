@@ -72,6 +72,8 @@ export default function ConfigPreview({ activeTab }: { activeTab: 'media' | 'col
   const hasInteractedRef = useRef(false);
   const lastSync = useRef(0);
   const settingsRef = useRef(settings);
+  const lastSavedUrlRef = useRef<string>(mediaUrl);
+  const isResettingRef = useRef(false);
 
   // CRITICAL: offsetScale formula - must be preserved
   const lcdResolution = window.nzxt?.v1?.width || NZXT_DEFAULTS.LCD_WIDTH;
@@ -121,22 +123,45 @@ export default function ConfigPreview({ activeTab }: { activeTab: 'media' | 'col
     hasLoadedRef.current = true;
   }, []);
 
+  // Check if reset is in progress
+  useEffect(() => {
+    const checkReset = () => {
+      try {
+        const resetting = localStorage.getItem('nzxtResetting');
+        isResettingRef.current = resetting === 'true';
+      } catch (e) {
+        // Ignore
+      }
+    };
+    
+    checkReset();
+    const interval = setInterval(checkReset, 100);
+    return () => clearInterval(interval);
+  }, []);
+
   // Throttled save (100ms) - CRITICAL for real-time sync
+  // ONLY save when mediaUrl changes, NOT when settings change (prevents infinite loop)
   useEffect(() => {
     if (!hasLoadedRef.current || !hasInteractedRef.current) return;
+    if (isResettingRef.current) return; // Skip during reset
+
+    // Only save if mediaUrl actually changed
+    if (mediaUrl === lastSavedUrlRef.current) return;
 
     const now = Date.now();
     if (now - lastSync.current < 100) return;
     lastSync.current = now;
+    lastSavedUrlRef.current = mediaUrl;
 
     // Save settings with URL for backward compatibility
+    // Use settingsRef to avoid dependency on settings (prevents loop)
     const save: AppSettings & { url?: string } = {
-      ...settings,
+      ...settingsRef.current,
       url: mediaUrl, // Include URL in config for backward compatibility
     };
 
     setSettings(save);
-  }, [mediaUrl, settings, setSettings]);
+  }, [mediaUrl, setSettings]); // Removed 'settings' from dependencies to prevent loop
 
   // Video detection
   const isVideo = isVideoUrl(mediaUrl);

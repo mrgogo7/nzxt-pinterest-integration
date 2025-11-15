@@ -58,14 +58,16 @@ export function useMediaUrl() {
   }, [mediaUrl]);
 
   // Also listen to direct localStorage 'media_url' key (for Config.tsx compatibility)
+  // BUT: Don't call setMediaUrl() here to avoid circular updates
+  // storage.ts is the source of truth, localStorage is just a mirror
   useStorageSync(STORAGE_KEYS.MEDIA_URL, (newValue) => {
     // Handle both empty and non-empty URLs (important for reset functionality)
     const urlValue = newValue || '';
-    if (urlValue !== mediaUrl) {
+    if (urlValue !== mediaUrl && urlValue !== lastCheckedUrlRef.current) {
       setMediaUrlState(urlValue);
       lastCheckedUrlRef.current = urlValue;
-      // Also sync to storage.ts
-      setMediaUrl(urlValue);
+      // DON'T call setMediaUrl() here - it would create a circular update
+      // storage.ts should be updated by updateMediaUrl() function only
     }
   }, true); // immediate = true to get initial value
 
