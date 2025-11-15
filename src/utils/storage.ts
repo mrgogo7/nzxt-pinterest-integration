@@ -14,6 +14,8 @@ const COOKIE = 'media_url';
  * This ensures maximum compatibility inside NZXT CAM.
  */
 export function setMediaUrl(url: string) {
+  const oldVal = lastVal
+  
   try {
     localStorage.setItem(KEY, url)
   } catch (e) {
@@ -35,7 +37,7 @@ export function setMediaUrl(url: string) {
     new StorageEvent('storage', {
       key: KEY,
       newValue: url,
-      oldValue: lastVal,
+      oldValue: oldVal,
     })
   )
 }
