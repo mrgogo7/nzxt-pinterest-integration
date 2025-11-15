@@ -2,10 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import '../styles/ColorPicker.css';
 import { normalizeToRgba, normalizeToHex, parseColorToRgba, rgbaObjectToString } from '../../utils/color';
 
-// Import with fallback for different export styles
-import ColorPickerComponentDefault from 'react-best-gradient-color-picker';
-// Try to get the component (handle both default and named exports)
-const ColorPickerComponent: any = ColorPickerComponentDefault?.default || ColorPickerComponentDefault;
+// Import ColorPicker component from react-best-gradient-color-picker
+import ColorPickerComponent from 'react-best-gradient-color-picker';
 
 interface ColorPickerProps {
   value: string; // RGBA or HEX color
@@ -37,48 +35,23 @@ export default function ColorPicker({
   const currentColor = normalizeToHex(value);
 
   // Handle color change from picker
-  const handleColorChange = (color: string | { r: number; g: number; b: number; a?: number }) => {
-    let rgbaString: string;
-    
-    // Check if color is an object (RGBA) or string (HEX/RGBA)
-    if (typeof color === 'object' && 'r' in color) {
-      // Color object with r, g, b, a
-      rgbaString = rgbaObjectToString({
-        r: color.r,
-        g: color.g,
-        b: color.b,
-        a: allowAlpha ? (color.a ?? 1) : 1,
+  // Package returns HEX string in onChange callback
+  const handleColorChange = (hexColor: string) => {
+    // Convert HEX to RGBA (project standard format)
+    const rgbaString = normalizeToRgba(hexColor);
+    // If alpha is not allowed, ensure alpha is 1
+    if (!allowAlpha) {
+      const parsed = parseColorToRgba(rgbaString);
+      const finalRgba = rgbaObjectToString({
+        r: parsed.r,
+        g: parsed.g,
+        b: parsed.b,
+        a: 1,
       });
-    } else if (typeof color === 'string') {
-      // Color string - normalize to RGBA
-      if (color.startsWith('rgba')) {
-        // Already RGBA, but ensure alpha is correct
-        const parsed = parseColorToRgba(color);
-        rgbaString = rgbaObjectToString({
-          r: parsed.r,
-          g: parsed.g,
-          b: parsed.b,
-          a: allowAlpha ? parsed.a : 1,
-        });
-      } else if (color.startsWith('#')) {
-        // HEX - convert to RGBA
-        const parsed = parseColorToRgba(color);
-        rgbaString = rgbaObjectToString({
-          r: parsed.r,
-          g: parsed.g,
-          b: parsed.b,
-          a: allowAlpha ? (parseColorToRgba(value).a || 1) : 1,
-        });
-      } else {
-        // Unknown format, normalize
-        rgbaString = normalizeToRgba(color);
-      }
+      onChange(finalRgba);
     } else {
-      // Fallback
-      rgbaString = normalizeToRgba(value);
+      onChange(rgbaString);
     }
-    
-    onChange(rgbaString);
   };
 
   // Calculate popup position to avoid viewport overflow
@@ -159,30 +132,6 @@ export default function ColorPicker({
     };
   }, [isOpen]);
 
-  // If ColorPickerComponent is not available, show fallback
-  if (!ColorPickerComponent) {
-    return (
-      <div className="color-picker-wrapper">
-        <button
-          type="button"
-          className="color-picker-trigger"
-          disabled
-          style={{ opacity: 0.5, cursor: 'not-allowed' }}
-        >
-          <span 
-            className="color-picker-preview" 
-            style={{
-              backgroundColor: value || '#ffffff',
-            }}
-          />
-        </button>
-        <div style={{ fontSize: '10px', color: '#ff6b6b', marginTop: '4px' }}>
-          Color picker not available
-        </div>
-      </div>
-    );
-  }
-
   // If showInline is true, show picker directly without trigger button
   if (showInline) {
     return (
@@ -192,11 +141,6 @@ export default function ColorPicker({
           onChange={handleColorChange}
           hideAlpha={!allowAlpha}
           hideGradient={!allowGradient}
-          // Try alternative prop names
-          color={currentColor}
-          onColorChange={handleColorChange}
-          disableAlpha={!allowAlpha}
-          disableGradient={!allowGradient}
         />
       </div>
     );
@@ -229,11 +173,6 @@ export default function ColorPicker({
             onChange={handleColorChange}
             hideAlpha={!allowAlpha}
             hideGradient={!allowGradient}
-            // Try alternative prop names
-            color={currentColor}
-            onColorChange={handleColorChange}
-            disableAlpha={!allowAlpha}
-            disableGradient={!allowGradient}
           />
         </div>
       )}
