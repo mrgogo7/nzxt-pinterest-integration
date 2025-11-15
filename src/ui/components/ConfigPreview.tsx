@@ -36,8 +36,8 @@ import ColorPicker from './ColorPicker';
  * - Overlay Section: Main title + 2 columns (Preview | Options)
  */
 export default function ConfigPreview({ activeTab = 'media' }: { activeTab?: 'media' | 'color' }) {
-  // Explicitly type to avoid TypeScript narrowing
-  const mode: 'media' | 'color' = activeTab;
+  // Explicitly type to avoid TypeScript narrowing - use type assertion
+  const mode = (activeTab === 'color' ? 'color' : 'media') as 'media' | 'color';
   const [lang, setLang] = useState<Lang>(getInitialLang());
   const { settings, setSettings } = useConfig();
   const { mediaUrl } = useMediaUrl();
