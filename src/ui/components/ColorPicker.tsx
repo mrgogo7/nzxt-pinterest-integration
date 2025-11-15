@@ -126,7 +126,6 @@ export default function ColorPicker({
       const triggerLeft = triggerRect.left - wrapperRect.left;
       const triggerTop = triggerRect.top - wrapperRect.top;
       const triggerRight = triggerRect.right - wrapperRect.left;
-      const triggerBottom = triggerRect.bottom - wrapperRect.top;
 
       // Horizontal: prefer right side of trigger
       if (triggerRect.right + popupWidth + spacing <= viewportWidth) {
