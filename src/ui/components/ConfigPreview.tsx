@@ -417,6 +417,7 @@ export default function ConfigPreview({ activeTab }: { activeTab: 'media' | 'col
                     {mediaUrl ? (
                       isVideo ? (
                         <video
+                          key={mediaUrl}
                           src={mediaUrl}
                           autoPlay
                           muted
@@ -433,6 +434,7 @@ export default function ConfigPreview({ activeTab }: { activeTab: 'media' | 'col
                         />
                       ) : (
                         <img
+                          key={mediaUrl}
                           src={mediaUrl}
                           alt="preview"
                           style={{

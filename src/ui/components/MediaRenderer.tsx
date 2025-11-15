@@ -85,6 +85,7 @@ export default function MediaRenderer({
   if (isVideo) {
     return (
       <video
+        key={url}
         src={url}
         autoPlay={settings.autoplay}
         loop={settings.loop}
@@ -98,6 +99,7 @@ export default function MediaRenderer({
 
   return (
     <img
+      key={url}
       src={url}
       alt="Media"
       className={className}
