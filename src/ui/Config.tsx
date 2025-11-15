@@ -12,6 +12,7 @@ export default function Config() {
   const { mediaUrl, setMediaUrl } = useMediaUrl();
   const { settings, setSettings } = useConfig();
   const [urlInput, setUrlInput] = useState<string>(mediaUrl);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const [activeTab, setActiveTab] = useState<'media' | 'color'>(() => {
     const saved = localStorage.getItem('nzxtActiveTab');
     return (saved === 'media' || saved === 'color') ? saved : 'media';
@@ -22,10 +23,13 @@ export default function Config() {
     localStorage.setItem('nzxtActiveTab', activeTab);
   }, [activeTab]);
 
-  // Sync urlInput with mediaUrl changes
+  // Sync urlInput with mediaUrl changes ONLY when input is not focused
+  // This prevents overwriting user input while typing
   useEffect(() => {
-    setUrlInput(mediaUrl);
-  }, [mediaUrl]);
+    if (!isInputFocused) {
+      setUrlInput(mediaUrl);
+    }
+  }, [mediaUrl, isInputFocused]);
 
   // language sync listener
   useEffect(() => {
@@ -64,6 +68,9 @@ export default function Config() {
     
     // 3. Tab'ı Media'ya döndür
     setActiveTab('media');
+    
+    // 4. Input focus durumunu sıfırla
+    setIsInputFocused(false);
   };
 
   const handleBackgroundColorChange = (color: string) => {
@@ -201,6 +208,8 @@ export default function Config() {
                 placeholder={t("urlPlaceholder", lang)}
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
+                onFocus={() => setIsInputFocused(true)}
+                onBlur={() => setIsInputFocused(false)}
               />
               <button onClick={handleSave} className="save-btn">
                 {t("save", lang)}
