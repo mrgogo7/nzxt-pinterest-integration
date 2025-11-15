@@ -36,8 +36,11 @@ import ColorPicker from './ColorPicker';
  * - Overlay Section: Main title + 2 columns (Preview | Options)
  */
 export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'color' }) {
-  // Default to 'media' if not provided
-  const currentTab: 'media' | 'color' = activeTab ?? 'media';
+  // Default to 'media' if not provided - use helper function to avoid type narrowing
+  const getCurrentTab = (): 'media' | 'color' => {
+    return activeTab === 'color' ? 'color' : 'media';
+  };
+  const currentTab = getCurrentTab();
   const [lang, setLang] = useState<Lang>(getInitialLang());
   const { settings, setSettings } = useConfig();
   const { mediaUrl } = useMediaUrl();
