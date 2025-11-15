@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { isVideoUrl } from '../../utils/media';
 import { getObjectPosition } from '../../utils/positioning';
 import type { AppSettings } from '../../constants/defaults';
@@ -83,8 +83,18 @@ export default function MediaRenderer({
   }
 
   if (isVideo) {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    
+    // Force video reload when URL changes
+    useEffect(() => {
+      if (videoRef.current && url) {
+        videoRef.current.load();
+      }
+    }, [url]);
+
     return (
       <video
+        ref={videoRef}
         key={url}
         src={url}
         autoPlay={settings.autoplay}

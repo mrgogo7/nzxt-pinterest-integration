@@ -26,6 +26,33 @@ import TripleInfographic from './TripleInfographic';
 import ColorPicker from './ColorPicker';
 
 /**
+ * VideoPreview component with forced reload on URL change
+ */
+function VideoPreview({ src, style }: { src: string; style: React.CSSProperties }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Force video reload when URL changes
+  useEffect(() => {
+    if (videoRef.current && src) {
+      videoRef.current.load();
+    }
+  }, [src]);
+
+  return (
+    <video
+      ref={videoRef}
+      key={src}
+      src={src}
+      autoPlay
+      muted
+      loop
+      playsInline
+      style={style}
+    />
+  );
+}
+
+/**
  * ConfigPreview component.
  * Provides interactive preview and settings panel for media configuration.
  * 
@@ -416,13 +443,9 @@ export default function ConfigPreview({ activeTab }: { activeTab: 'media' | 'col
                     {/* Show media if URL exists, otherwise show black */}
                     {mediaUrl ? (
                       isVideo ? (
-                        <video
+                        <VideoPreview
                           key={mediaUrl}
                           src={mediaUrl}
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
                           style={{
                             width: '100%',
                             height: '100%',
