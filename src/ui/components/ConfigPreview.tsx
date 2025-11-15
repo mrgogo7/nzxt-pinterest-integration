@@ -37,7 +37,7 @@ import ColorPicker from './ColorPicker';
  */
 export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'color' }) {
   // Default to 'media' if not provided
-  const currentTab = activeTab ?? 'media';
+  const currentTab: 'media' | 'color' = activeTab ?? 'media';
   const [lang, setLang] = useState<Lang>(getInitialLang());
   const { settings, setSettings } = useConfig();
   const { mediaUrl } = useMediaUrl();
