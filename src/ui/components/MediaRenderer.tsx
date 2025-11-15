@@ -34,6 +34,21 @@ export default function MediaRenderer({
     ...style,
   };
 
+  // If no URL but backgroundColor exists, show color background
+  if (!url && settings.backgroundColor) {
+    return (
+      <div
+        className={className}
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: settings.backgroundColor,
+          ...style,
+        }}
+      />
+    );
+  }
+
   if (!url) return null;
 
   if (isVideo) {

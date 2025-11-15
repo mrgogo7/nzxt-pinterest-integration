@@ -132,12 +132,14 @@ export default function ColorPicker({ value, onChange }: ColorPickerProps) {
           <SketchPicker
             color={currentColor}
             onChange={handleColorChange}
-            disableAlpha={false}
+            disableAlpha={true}
             presetColors={[
               '#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff',
               '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#800080',
               '#ffc0cb', '#a52a2a', '#808080', '#c0c0c0', '#008000',
               '#000080', '#800000', '#808000', '#008080', '#ff6347',
+              '#ff1493', '#00ced1', '#ffd700', '#da70d6', '#cd5c5c',
+              '#4169e1', '#32cd32', '#ff4500', '#9370db', '#20b2aa',
             ]}
           />
         </div>

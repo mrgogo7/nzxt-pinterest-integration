@@ -35,7 +35,7 @@ import ColorPicker from './ColorPicker';
  * - Background Section: Main title + 2 columns (Preview | Settings)
  * - Overlay Section: Main title + 2 columns (Preview | Options)
  */
-export default function ConfigPreview() {
+export default function ConfigPreview({ activeTab }: { activeTab?: 'media' | 'color' }) {
   const [lang, setLang] = useState<Lang>(getInitialLang());
   const { settings, setSettings } = useConfig();
   const { mediaUrl } = useMediaUrl();
@@ -397,38 +397,49 @@ export default function ConfigPreview() {
             >
               <div className="scale-label">Scale: {settings.scale.toFixed(2)}×</div>
 
-              {isVideo ? (
-                <video
-                  src={mediaUrl}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
+              {/* Show color background if no media URL but backgroundColor exists */}
+              {!mediaUrl && settings.backgroundColor ? (
+                <div
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: settings.fit,
-                    objectPosition,
-                    transform: `scale(${settings.scale})`,
-                    transformOrigin: 'center center',
+                    backgroundColor: settings.backgroundColor,
                   }}
                 />
               ) : (
-                mediaUrl && (
-                  <img
-                    src={mediaUrl}
-                    alt="preview"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: settings.fit,
-                      objectPosition,
-                      transform: `scale(${settings.scale})`,
-                      transformOrigin: 'center center',
-                    }}
-                  />
-                )
-              )}
+                <>
+                  {isVideo ? (
+                    <video
+                      src={mediaUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: settings.fit,
+                        objectPosition,
+                        transform: `scale(${settings.scale})`,
+                        transformOrigin: 'center center',
+                      }}
+                    />
+                  ) : (
+                    mediaUrl && (
+                      <img
+                        src={mediaUrl}
+                        alt="preview"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: settings.fit,
+                          objectPosition,
+                          transform: `scale(${settings.scale})`,
+                          transformOrigin: 'center center',
+                        }}
+                      />
+                    )
+                  )}
 
               {/* Overlay guide - only for alignment reference */}
               {settings.showGuide && (
@@ -451,31 +462,32 @@ export default function ConfigPreview() {
             </div>
           </div>
 
-          {/* Background Settings */}
-          <div className="settings-column">
-            <div className="panel">
-              <div className="panel-header">
-                <h3>{t('settingsTitle', lang)}</h3>
+          {/* Media Settings - Only show when Media tab is active (or activeTab is undefined for backward compatibility) */}
+          {(activeTab === undefined || activeTab !== 'color') && (
+            <div className="settings-column">
+              <div className="panel">
+                <div className="panel-header">
+                  <h3>{t('mediaOptionsTitle', lang)}</h3>
 
-                <div className="overlay-toggle-compact">
-                  <span>{t('overlayGuide', lang)}</span>
-                  <label className="switch">
-                    <input
-                      type="checkbox"
-                      checked={!!settings.showGuide}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          showGuide: e.target.checked,
-                        })
-                      }
-                    />
-                    <span className="slider" />
-                  </label>
+                  <div className="overlay-toggle-compact">
+                    <span>{t('overlayGuide', lang)}</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={!!settings.showGuide}
+                        onChange={(e) =>
+                          setSettings({
+                            ...settings,
+                            showGuide: e.target.checked,
+                          })
+                        }
+                      />
+                      <span className="slider" />
+                    </label>
+                  </div>
                 </div>
-              </div>
 
-              <div className="settings-grid-modern">
+                <div className="settings-grid-modern">
                 {/* SCALE / X / Y */}
                 {([
                   { field: 'scale' as const, label: t('scale', lang), step: 0.1 },
@@ -574,6 +586,7 @@ export default function ConfigPreview() {
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
 

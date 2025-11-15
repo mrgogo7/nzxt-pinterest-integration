@@ -18,6 +18,8 @@ export interface AppSettings {
   overlay?: OverlaySettings;
   // Optional: url can be included in saved config for backward compatibility
   url?: string;
+  // Optional: backgroundColor for color tab (solid color background)
+  backgroundColor?: string;
 }
 
 /**

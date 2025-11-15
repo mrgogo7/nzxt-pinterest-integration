@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { LANG_KEY, Lang, t, getInitialLang, setLang } from '../i18n';
 import ConfigPreview from './components/ConfigPreview';
 import './styles/ConfigPreview.css';
-import { DEFAULT_MEDIA_URL, DEFAULT_SETTINGS } from '../constants/defaults';
+import { DEFAULT_SETTINGS } from '../constants/defaults';
 import { useMediaUrl } from '../hooks/useMediaUrl';
 import { useConfig } from '../hooks/useConfig';
+import ColorPicker from './components/ColorPicker';
 
 export default function Config() {
   const [lang, setLangState] = useState<Lang>(getInitialLang());
   const { mediaUrl, setMediaUrl } = useMediaUrl();
-  const { setSettings } = useConfig();
+  const { settings, setSettings } = useConfig();
   const [urlInput, setUrlInput] = useState<string>(mediaUrl);
+  const [activeTab, setActiveTab] = useState<'media' | 'color'>('media');
 
   // Sync urlInput with mediaUrl changes
   useEffect(() => {
@@ -42,13 +44,32 @@ export default function Config() {
   const handleReset = () => {
     if (!window.confirm(t('resetConfirm', lang))) return;
 
-    // Reset to defaults
-    setMediaUrl(DEFAULT_MEDIA_URL);
-    setUrlInput(DEFAULT_MEDIA_URL);
+    // 1. Media URL'i temizle
+    setMediaUrl('');
+    setUrlInput('');
     
-    // Reset settings to defaults (including overlay)
-    // Note: url is stored separately via useMediaUrl, not in settings
+    // 2. Tüm ayarları varsayılana döndür
     setSettings(DEFAULT_SETTINGS);
+    
+    // 3. Tab'ı Media'ya döndür
+    setActiveTab('media');
+  };
+
+  const handleBackgroundColorChange = (color: string) => {
+    // Remove alpha channel (convert rgba to rgb)
+    const rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (rgbMatch) {
+      const rgb = `rgb(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]})`;
+      setSettings({
+        ...settings,
+        backgroundColor: rgb,
+      });
+    } else {
+      setSettings({
+        ...settings,
+        backgroundColor: color,
+      });
+    }
   };
 
   return (
@@ -106,48 +127,86 @@ export default function Config() {
         </div>
 
         <div className="header-actions">
-          <button className="reset-btn" onClick={handleReset}>
-            {t("reset", lang)}
-          </button>
+          {/* Language - En üst sağ köşe */}
+          <div className="header-actions-top">
+            <label className="lang-label" htmlFor="lang-select">
+              {t("language", lang)}
+            </label>
+            <select
+              id="lang-select"
+              className="lang-select"
+              value={lang}
+              onChange={handleLangChange}
+            >
+              <option value="en">English</option>
+              <option value="tr">Türkçe</option>
+            </select>
+          </div>
 
-          <label className="lang-label" htmlFor="lang-select">
-            {t("language", lang)}
-          </label>
-          <select
-            id="lang-select"
-            className="lang-select"
-            value={lang}
-            onChange={handleLangChange}
-          >
-            <option value="en">English</option>
-            <option value="tr">Türkçe</option>
-          </select>
+          {/* Quick Presets ve Reset - Altında */}
+          <div className="header-actions-bottom">
+            <button className="quick-presets-btn" disabled title={t("quickPresets", lang)}>
+              {t("quickPresets", lang)}
+            </button>
+            <button className="reset-btn" onClick={handleReset}>
+              {t("reset", lang)}
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* URL + Save */}
+      {/* Background Section with Tabs */}
       <section className="url-section">
-        <label className="url-label" htmlFor="mediaUrl">
-          {t("urlLabel", lang)}
+        <label className="url-label">
+          {t("background", lang)}
         </label>
-        <div className="url-row">
-          <input
-            id="mediaUrl"
-            type="text"
-            className="url-input"
-            placeholder={t("urlPlaceholder", lang)}
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-          />
-          <button onClick={handleSave} className="save-btn">
-            {t("save", lang)}
+        
+        {/* Tabs */}
+        <div className="background-tabs">
+          <button
+            className={`background-tab ${activeTab === 'media' ? 'active' : ''}`}
+            onClick={() => setActiveTab('media')}
+          >
+            {t("mediaTab", lang)}
+          </button>
+          <button
+            className={`background-tab ${activeTab === 'color' ? 'active' : ''}`}
+            onClick={() => setActiveTab('color')}
+          >
+            {t("colorTab", lang)}
           </button>
         </div>
-        <p className="hint">{t("note", lang)}</p>
+
+        {/* Tab Content */}
+        {activeTab === 'media' ? (
+          <>
+            <div className="url-row">
+              <input
+                id="mediaUrl"
+                type="text"
+                className="url-input"
+                placeholder={t("urlPlaceholder", lang)}
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+              />
+              <button onClick={handleSave} className="save-btn">
+                {t("save", lang)}
+              </button>
+            </div>
+            <p className="hint">{t("note", lang)}</p>
+          </>
+        ) : (
+          <div className="color-picker-section">
+            <ColorPicker
+              value={settings.backgroundColor || '#000000'}
+              onChange={handleBackgroundColorChange}
+            />
+          </div>
+        )}
       </section>
 
       {/* Preview + Settings */}
-      <ConfigPreview />
+      <ConfigPreview activeTab={activeTab} />
     </div>
   );
 }
