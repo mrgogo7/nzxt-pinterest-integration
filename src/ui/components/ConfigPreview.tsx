@@ -895,69 +895,88 @@ export default function ConfigPreview() {
                   {t('overlayOptionsDescription', lang)}
                 </p>
                 {(overlayConfig.mode === 'single' || overlayConfig.mode === 'dual' || overlayConfig.mode === 'triple' || overlayConfig.mode === 'custom') && (
-                  <button
+                  <span
                     onClick={() => {
                       const mode = overlayConfig.mode;
-                      const defaults = { ...DEFAULT_OVERLAY };
                       
-                      // Set mode-specific defaults
-                      if (mode === 'dual') {
-                        defaults.numberSize = 120;
-                        defaults.textSize = 35;
-                        defaults.secondaryNumberSize = 120;
-                        defaults.secondaryTextSize = 35;
-                        defaults.dividerGap = 32;
-                        defaults.x = 0;
-                        defaults.y = 0;
-                        defaults.secondaryOffsetX = 50;
-                        defaults.secondaryOffsetY = 0;
-                      } else if (mode === 'triple') {
-                        defaults.numberSize = 155;
-                        defaults.textSize = 35;
-                        defaults.secondaryNumberSize = 80;
-                        defaults.secondaryTextSize = 20;
-                        defaults.tertiaryNumberSize = 80;
-                        defaults.tertiaryTextSize = 20;
-                        defaults.gapSecondaryTertiary = 20;
-                        defaults.dividerGap = 27;
-                        defaults.x = 18;
-                        defaults.y = 0;
-                        defaults.dualReadersOffsetX = 60;
-                        defaults.dualReadersOffsetY = 0;
+                      if (mode === 'custom') {
+                        // Custom mode: only reset reading options, keep readings
+                        const currentReadings = overlayConfig.customReadings || [];
+                        const resetReadings = currentReadings.map(reading => ({
+                          ...reading,
+                          metric: 'cpuTemp' as OverlayMetricKey,
+                          numberColor: DEFAULT_OVERLAY.numberColor,
+                          numberSize: 180,
+                          x: 0,
+                          y: 0,
+                        }));
+                        setSettings({
+                          ...settings,
+                          overlay: {
+                            ...overlayConfig,
+                            customReadings: resetReadings,
+                          },
+                        });
+                      } else {
+                        // Other modes: full reset
+                        const defaults = { ...DEFAULT_OVERLAY };
+                        
+                        // Set mode-specific defaults
+                        if (mode === 'dual') {
+                          defaults.numberSize = 120;
+                          defaults.textSize = 35;
+                          defaults.secondaryNumberSize = 120;
+                          defaults.secondaryTextSize = 35;
+                          defaults.dividerGap = 32;
+                          defaults.x = 0;
+                          defaults.y = 0;
+                          defaults.secondaryOffsetX = 50;
+                          defaults.secondaryOffsetY = 0;
+                        } else if (mode === 'triple') {
+                          defaults.numberSize = 155;
+                          defaults.textSize = 35;
+                          defaults.secondaryNumberSize = 80;
+                          defaults.secondaryTextSize = 20;
+                          defaults.tertiaryNumberSize = 80;
+                          defaults.tertiaryTextSize = 20;
+                          defaults.gapSecondaryTertiary = 20;
+                          defaults.dividerGap = 27;
+                          defaults.x = 18;
+                          defaults.y = 0;
+                          defaults.dualReadersOffsetX = 60;
+                          defaults.dualReadersOffsetY = 0;
+                        }
+                        
+                        setSettings({
+                          ...settings,
+                          overlay: {
+                            ...defaults,
+                            mode: overlayConfig.mode,
+                            primaryMetric: overlayConfig.primaryMetric,
+                            secondaryMetric: overlayConfig.secondaryMetric || defaults.secondaryMetric,
+                            tertiaryMetric: overlayConfig.tertiaryMetric || defaults.tertiaryMetric,
+                          },
+                        });
                       }
-                      
-                      setSettings({
-                        ...settings,
-                        overlay: {
-                          ...defaults,
-                          mode: overlayConfig.mode,
-                          primaryMetric: overlayConfig.primaryMetric,
-                          secondaryMetric: overlayConfig.secondaryMetric || defaults.secondaryMetric,
-                          tertiaryMetric: overlayConfig.tertiaryMetric || defaults.tertiaryMetric,
-                        },
-                      });
                     }}
                     style={{
                       alignSelf: 'flex-start',
-                      background: '#263146',
-                      border: '1px solid #3b5a9a',
-                      color: '#d9e6ff',
-                      padding: '6px 12px',
-                      borderRadius: '8px',
+                      color: '#5a9aff',
                       cursor: 'pointer',
                       fontSize: '12px',
                       fontWeight: 500,
+                      textDecoration: 'underline',
                       transition: 'all 0.15s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#2e3a55';
+                      e.currentTarget.style.color = '#7ab3ff';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = '#263146';
+                      e.currentTarget.style.color = '#5a9aff';
                     }}
                   >
                     {t('revertToDefaults', lang)}
-                  </button>
+                  </span>
                 )}
               </div>
 
@@ -2711,7 +2730,7 @@ export default function ConfigPreview() {
                       <button
                         onClick={() => {
                           const currentReadings = overlayConfig.customReadings || [];
-                          if (currentReadings.length < 4) {
+                          if (currentReadings.length < 8) {
                             const newReading: CustomReading = {
                               id: `reading-${Date.now()}-${Math.random()}`,
                               metric: 'cpuTemp',
@@ -2729,14 +2748,14 @@ export default function ConfigPreview() {
                             });
                           }
                         }}
-                        disabled={(overlayConfig.customReadings || []).length >= 4}
+                        disabled={(overlayConfig.customReadings || []).length >= 8}
                         style={{
-                          background: (overlayConfig.customReadings || []).length >= 4 ? '#1a1f2e' : '#263146',
+                          background: (overlayConfig.customReadings || []).length >= 8 ? '#1a1f2e' : '#263146',
                           border: '1px solid #3b5a9a',
-                          color: (overlayConfig.customReadings || []).length >= 4 ? '#5a6b7d' : '#d9e6ff',
+                          color: (overlayConfig.customReadings || []).length >= 8 ? '#5a6b7d' : '#d9e6ff',
                           padding: '8px 16px',
                           borderRadius: '8px',
-                          cursor: (overlayConfig.customReadings || []).length >= 4 ? 'not-allowed' : 'pointer',
+                          cursor: (overlayConfig.customReadings || []).length >= 8 ? 'not-allowed' : 'pointer',
                           fontSize: '13px',
                           fontWeight: 500,
                           display: 'flex',
@@ -2745,12 +2764,12 @@ export default function ConfigPreview() {
                           transition: 'all 0.15s ease',
                         }}
                         onMouseEnter={(e) => {
-                          if ((overlayConfig.customReadings || []).length < 4) {
+                          if ((overlayConfig.customReadings || []).length < 8) {
                             e.currentTarget.style.background = '#2e3a55';
                           }
                         }}
                         onMouseLeave={(e) => {
-                          if ((overlayConfig.customReadings || []).length < 4) {
+                          if ((overlayConfig.customReadings || []).length < 8) {
                             e.currentTarget.style.background = '#263146';
                           }
                         }}
@@ -2767,6 +2786,10 @@ export default function ConfigPreview() {
                         t('secondReading', lang),
                         t('thirdReading', lang),
                         t('fourthReading', lang),
+                        t('fifthReading', lang),
+                        t('sixthReading', lang),
+                        t('seventhReading', lang),
+                        t('eighthReading', lang),
                       ];
                       
                       return (
@@ -2904,7 +2927,7 @@ export default function ConfigPreview() {
                           <div className="settings-grid-modern">
                             {/* Metric Selection */}
                             <div className="setting-row">
-                              <label>{t('primaryReading', lang)}</label>
+                              <label>{t('reading', lang)}</label>
                               <select
                                 className="url-input select-narrow"
                                 value={reading.metric}
@@ -2935,7 +2958,7 @@ export default function ConfigPreview() {
 
                             {/* Number Color */}
                             <div className="setting-row">
-                              <label>{t('numberColor', lang)}</label>
+                              <label>{t('color', lang)}</label>
                               <ColorPicker
                                 value={reading.numberColor}
                                 onChange={(color) => {
@@ -2981,7 +3004,7 @@ export default function ConfigPreview() {
 
                             {/* Number Size */}
                             <div className="setting-row">
-                              <label>{t('numberSize', lang)}</label>
+                              <label>{t('size', lang)}</label>
                               <input
                                 type="number"
                                 value={reading.numberSize}
@@ -3029,7 +3052,7 @@ export default function ConfigPreview() {
 
                             {/* X Offset */}
                             <div className="setting-row">
-                              <label>{t('overlayXOffset', lang)}</label>
+                              <label>{t('customXOffset', lang)}</label>
                               <input
                                 type="number"
                                 value={reading.x}
@@ -3077,7 +3100,7 @@ export default function ConfigPreview() {
 
                             {/* Y Offset */}
                             <div className="setting-row">
-                              <label>{t('overlayYOffset', lang)}</label>
+                              <label>{t('customYOffset', lang)}</label>
                               <input
                                 type="number"
                                 value={reading.y}

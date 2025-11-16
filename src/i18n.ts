@@ -185,8 +185,18 @@ const dict: Record<Lang, Record<string, string>> = {
     secondReading: "2nd Reading",
     thirdReading: "3rd Reading",
     fourthReading: "4th Reading",
+    fifthReading: "5th Reading",
+    sixthReading: "6th Reading",
+    seventhReading: "7th Reading",
+    eighthReading: "8th Reading",
     moveReadingUp: "Move Up",
     moveReadingDown: "Move Down",
+    // Custom mode simplified labels
+    reading: "Reading",
+    color: "Color",
+    size: "Size",
+    customXOffset: "X Offset",
+    customYOffset: "Y Offset",
   },
   tr: {
     appTitle: "NZXT Elite Screen Customizer",
@@ -286,8 +296,18 @@ const dict: Record<Lang, Record<string, string>> = {
     secondReading: "2. Reading",
     thirdReading: "3. Reading",
     fourthReading: "4. Reading",
+    fifthReading: "5. Reading",
+    sixthReading: "6. Reading",
+    seventhReading: "7. Reading",
+    eighthReading: "8. Reading",
     moveReadingUp: "Yukarı Taşı",
     moveReadingDown: "Aşağı Taşı",
+    // Custom mode simplified labels
+    reading: "Reading",
+    color: "Renk",
+    size: "Boyut",
+    customXOffset: "X Ofset",
+    customYOffset: "Y Ofset",
   },
 };
 
