@@ -39,10 +39,12 @@
   border: 1px solid #242734;
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  padding: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  min-width: 250px;
+  width: 250px;
 }
 
 /* react-colorful styles */
@@ -53,48 +55,67 @@
 
 .color-picker-container .react-colorful__saturation {
   border-radius: 6px 6px 0 0;
+  cursor: crosshair;
 }
 
 .color-picker-container .react-colorful__hue {
   height: 20px;
   border-radius: 0;
+  cursor: pointer;
 }
 
 .color-picker-container .react-colorful__alpha {
   height: 20px;
   border-radius: 0 0 6px 6px;
+  cursor: pointer;
 }
 
 .color-picker-container .react-colorful__pointer {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.color-picker-container .react-colorful__saturation-pointer {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Preset colors */
 .color-picker-presets {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 6px;
-  padding-top: 8px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  padding-top: 12px;
   border-top: 1px solid #242734;
 }
 
 .color-picker-preset {
   width: 100%;
+  min-width: 32px;
+  min-height: 32px;
   aspect-ratio: 1;
-  border: 1px solid #2d3140;
-  border-radius: 4px;
+  border: 2px solid #2d3140;
+  border-radius: 6px;
   cursor: pointer;
   padding: 0;
   background: none;
   transition: all 0.15s ease;
+  position: relative;
 }
 
 .color-picker-preset:hover {
   border-color: #4a5683;
   transform: scale(1.1);
   z-index: 1;
-  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.color-picker-preset:active {
+  transform: scale(1.05);
 }
 
 /* Inline color picker styles */
@@ -107,4 +128,6 @@
 .color-picker-inline .color-picker-container {
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
   width: 100%;
+  min-width: 250px;
+  max-width: 300px;
 }

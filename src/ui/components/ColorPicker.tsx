@@ -122,8 +122,8 @@ export default function ColorPicker({
   useEffect(() => {
     if (isOpen && triggerRef.current) {
       const triggerRect = triggerRef.current.getBoundingClientRect();
-      const popupWidth = 220; // Color picker approximate width
-      const popupHeight = enableAlpha ? 320 : 280; // Color picker approximate height (with alpha slider)
+      const popupWidth = 282; // Color picker width (250px + padding)
+      const popupHeight = enableAlpha ? 380 : 360; // Color picker approximate height (with alpha slider and presets)
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       const spacing = 8; // gap between trigger and popup
