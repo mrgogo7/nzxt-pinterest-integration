@@ -258,6 +258,8 @@ export default function ColorPicker({
     };
 
     const handleMouseDown = (e: React.MouseEvent<HTMLInputElement>) => {
+      // Prevent popup from closing when clicking on input
+      e.stopPropagation();
       // Don't select if user is clicking to position cursor
       if (e.detail === 1) {
         setIsSelecting(true);
@@ -265,8 +267,13 @@ export default function ColorPicker({
       }
     };
 
+    const handleWrapperMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+      // Prevent popup from closing when clicking on input wrapper
+      e.stopPropagation();
+    };
+
     return (
-      <div className="color-picker-input-wrapper">
+      <div className="color-picker-input-wrapper" onMouseDown={handleWrapperMouseDown}>
         <div className="color-picker-input-group">
           <HexColorInput
             color={colorInput}
