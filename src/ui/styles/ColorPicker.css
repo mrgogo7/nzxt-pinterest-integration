@@ -57,6 +57,11 @@
 
 .color-picker-container .react-colorful__hue {
   height: 20px;
+  border-radius: 0;
+}
+
+.color-picker-container .react-colorful__alpha {
+  height: 20px;
   border-radius: 0 0 6px 6px;
 }
 

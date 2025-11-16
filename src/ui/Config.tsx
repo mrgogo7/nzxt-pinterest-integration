@@ -170,6 +170,7 @@ export default function Config() {
             value={settings.backgroundColor || '#000000'}
             onChange={handleBackgroundColorChange}
             showInline={false}
+            enableAlpha={false}
           />
         </div>
       </section>
