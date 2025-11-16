@@ -127,18 +127,39 @@ export function extractMediaFromHtml(html: string): string | null {
     }
     
     // Method 3: Try to find JSON in script tags
+    // Collect all video URLs and pick the highest quality
     const scriptTags = html.match(/<script[^>]*>(.*?)<\/script>/gs);
     if (scriptTags) {
+      const videoUrls: string[] = [];
+      const imageUrls: string[] = [];
+      
       for (const script of scriptTags) {
-        // Look for JSON-like structures with video/image URLs
-        const videoMatch = script.match(/https?:\/\/[^"'\s]+\.(mp4|webm)/i);
-        if (videoMatch) {
-          return videoMatch[0];
+        // Collect all video URLs
+        const videoMatches = script.matchAll(/https?:\/\/[^"'\s]+\.(mp4|webm)/gi);
+        for (const match of videoMatches) {
+          if (match[0] && !videoUrls.includes(match[0])) {
+            videoUrls.push(match[0]);
+          }
         }
-        const imageMatch = script.match(/https?:\/\/[^"'\s]+\.(jpg|jpeg|png|gif|webp)/i);
-        if (imageMatch) {
-          return imageMatch[0];
+        
+        // Collect all image URLs
+        const imageMatches = script.matchAll(/https?:\/\/[^"'\s]+\.(jpg|jpeg|png|gif|webp)/gi);
+        for (const match of imageMatches) {
+          if (match[0] && !imageUrls.includes(match[0])) {
+            imageUrls.push(match[0]);
+          }
         }
+      }
+      
+      // If we found video URLs, pick the highest quality one
+      if (videoUrls.length > 0) {
+        videoUrls.sort((a, b) => getVideoQualityPriority(b) - getVideoQualityPriority(a));
+        return videoUrls[0];
+      }
+      
+      // If no videos, return first image
+      if (imageUrls.length > 0) {
+        return imageUrls[0];
       }
     }
     
@@ -174,7 +195,71 @@ export function extractMediaFromHtml(html: string): string | null {
 }
 
 /**
+ * Gets quality priority for video URLs.
+ * Higher number = higher priority.
+ */
+function getVideoQualityPriority(url: string): number {
+  if (!url || typeof url !== 'string') return 0;
+  const lowerUrl = url.toLowerCase();
+  
+  // Priority order: 720p > 480p > 360p > expMp4 > hevcMp4V3 > others
+  if (lowerUrl.includes('/720p/')) return 100;
+  if (lowerUrl.includes('/480p/')) return 80;
+  if (lowerUrl.includes('/360p/')) return 60;
+  if (lowerUrl.includes('/expmp4/')) return 40;
+  if (lowerUrl.includes('/hevcmp4v3')) return 20;
+  if (lowerUrl.includes('.mp4') || lowerUrl.includes('.webm')) return 10;
+  return 0;
+}
+
+/**
+ * Collects all video URLs from an object and returns the highest quality one.
+ */
+function collectVideoUrls(obj: any, depth = 0, urls: string[] = []): string[] {
+  if (depth > 10) return urls; // Prevent infinite recursion
+  if (!obj || typeof obj !== 'object') return urls;
+  
+  if (typeof obj === 'object' && obj !== null) {
+    // Check for video URLs in common structures
+    if (obj.url && typeof obj.url === 'string') {
+      if (obj.url.match(/\.(mp4|webm)/i) && !urls.includes(obj.url)) {
+        urls.push(obj.url);
+      }
+    }
+    
+    if (obj.src && typeof obj.src === 'string') {
+      if (obj.src.match(/\.(mp4|webm)/i) && !urls.includes(obj.src)) {
+        urls.push(obj.src);
+      }
+    }
+    
+    // Common Pinterest JSON structures
+    if (obj.videos && obj.videos.video_list) {
+      const videoList = obj.videos.video_list;
+      for (const key in videoList) {
+        const video = videoList[key];
+        if (video && video.url && typeof video.url === 'string') {
+          if (!urls.includes(video.url)) {
+            urls.push(video.url);
+          }
+        }
+      }
+    }
+  }
+  
+  // Recursively search in nested objects and arrays
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      collectVideoUrls(obj[key], depth + 1, urls);
+    }
+  }
+  
+  return urls;
+}
+
+/**
  * Recursively searches JSON object for media URLs.
+ * For videos, collects all URLs and returns the highest quality one.
  */
 function findMediaInJson(obj: any, depth = 0): string | null {
   if (depth > 10) return null; // Prevent infinite recursion
@@ -182,18 +267,15 @@ function findMediaInJson(obj: any, depth = 0): string | null {
   
   // Check if this object has a direct URL property
   if (typeof obj === 'object' && obj !== null) {
-    // Common Pinterest JSON structures
-    if (obj.videos && obj.videos.video_list) {
-      // Try to get highest quality video
-      const videoList = obj.videos.video_list;
-      if (videoList.V_720P) return videoList.V_720P.url;
-      if (videoList.V_480P) return videoList.V_480P.url;
-      if (videoList.V_360P) return videoList.V_360P.url;
-      // Get first available video
-      const firstVideo = Object.values(videoList)[0] as any;
-      if (firstVideo && firstVideo.url) return firstVideo.url;
+    // For videos, collect all URLs and pick the highest quality
+    const videoUrls = collectVideoUrls(obj, 0, []);
+    if (videoUrls.length > 0) {
+      // Sort by quality priority (highest first)
+      videoUrls.sort((a, b) => getVideoQualityPriority(b) - getVideoQualityPriority(a));
+      return videoUrls[0];
     }
     
+    // For images, use existing logic
     if (obj.images) {
       // Try to get highest quality image
       if (obj.images.orig) return obj.images.orig.url;
@@ -204,15 +286,15 @@ function findMediaInJson(obj: any, depth = 0): string | null {
       if (firstImage && firstImage.url) return firstImage.url;
     }
     
-    // Direct URL properties
+    // Direct URL properties (non-video)
     if (obj.url && typeof obj.url === 'string') {
-      if (obj.url.match(/\.(mp4|webm|jpg|jpeg|png|gif|webp)/i)) {
+      if (obj.url.match(/\.(jpg|jpeg|png|gif|webp)/i)) {
         return obj.url;
       }
     }
     
     if (obj.src && typeof obj.src === 'string') {
-      if (obj.src.match(/\.(mp4|webm|jpg|jpeg|png|gif|webp)/i)) {
+      if (obj.src.match(/\.(jpg|jpeg|png|gif|webp)/i)) {
         return obj.src;
       }
     }
