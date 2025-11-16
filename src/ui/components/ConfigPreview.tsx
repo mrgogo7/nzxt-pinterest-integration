@@ -836,24 +836,27 @@ export default function ConfigPreview() {
                               paddingBottom: `${scaledNumberSize * 0.02}px`, // Minimal bottom padding
                             }}
                           >
-                            {/* Label in top-left corner */}
-                            <div
-                              style={{
-                                position: 'absolute',
-                                top: '2px',
-                                left: '2px',
-                                fontSize: '8px',
-                                color: 'rgba(255, 255, 255, 0.5)',
-                                fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
-                                fontWeight: 500,
-                                pointerEvents: 'none',
-                                userSelect: 'none',
-                                zIndex: zIndex + 1,
-                                textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)',
-                              }}
-                            >
-                              {readingLabel}
-                            </div>
+                            {/* Label outside bounding box - only visible when dragging */}
+                            {isDraggingThis && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: '-18px',
+                                  left: '0px',
+                                  fontSize: '8px',
+                                  color: 'rgba(255, 255, 255, 0.7)',
+                                  fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
+                                  fontWeight: 500,
+                                  pointerEvents: 'none',
+                                  userSelect: 'none',
+                                  zIndex: zIndex + 1,
+                                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {readingLabel}
+                              </div>
+                            )}
                             <SingleInfographic
                               overlay={{
                                 ...overlayConfig,
@@ -930,24 +933,27 @@ export default function ConfigPreview() {
                               justifyContent: 'center',
                             }}
                           >
-                            {/* Label in top-left corner */}
-                            <div
-                              style={{
-                                position: 'absolute',
-                                top: '2px',
-                                left: '2px',
-                                fontSize: '8px',
-                                color: 'rgba(255, 255, 255, 0.5)',
-                                fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
-                                fontWeight: 500,
-                                pointerEvents: 'none',
-                                userSelect: 'none',
-                                zIndex: zIndex + 1,
-                                textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)',
-                              }}
-                            >
-                              {textLabel}
-                            </div>
+                            {/* Label outside bounding box - only visible when dragging */}
+                            {isDraggingThis && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: '-18px',
+                                  left: '0px',
+                                  fontSize: '8px',
+                                  color: 'rgba(255, 255, 255, 0.7)',
+                                  fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
+                                  fontWeight: 500,
+                                  pointerEvents: 'none',
+                                  userSelect: 'none',
+                                  zIndex: zIndex + 1,
+                                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {textLabel}
+                              </div>
+                            )}
                             <div
                               style={{
                                 fontSize: `${scaledTextSize}px`,
