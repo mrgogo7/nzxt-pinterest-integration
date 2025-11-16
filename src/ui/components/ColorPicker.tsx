@@ -33,6 +33,7 @@ export default function ColorPicker({
   const [popupStyle, setPopupStyle] = useState<{ top?: string; bottom?: string; left?: string; right?: string }>({});
   const [colorInput, setColorInput] = useState<string>('');
   const [isSelecting, setIsSelecting] = useState(false);
+  const [isUserTyping, setIsUserTyping] = useState(false);
   const lang = getInitialLang();
 
   // Parse color value to RGBA object or hex string
@@ -114,7 +115,7 @@ export default function ColorPicker({
 
   // Update color input when value changes (but not when user is typing/selecting)
   useEffect(() => {
-    if (!isSelecting) {
+    if (!isSelecting && !isUserTyping) {
       if (enableAlpha && typeof currentColor === 'object') {
         const newInput = rgbaToHex(currentColor, true);
         // Only update if different to avoid disrupting user input
@@ -123,7 +124,7 @@ export default function ColorPicker({
         setColorInput(prev => prev !== currentColor ? currentColor : prev);
       }
     }
-  }, [value, enableAlpha, isSelecting]);
+  }, [value, enableAlpha, isSelecting, isUserTyping]);
 
   // Handle color change from react-colorful
   const handleColorChange = (color: RgbaColor | string) => {
@@ -136,6 +137,7 @@ export default function ColorPicker({
 
   // Handle color input change
   const handleInputChange = (inputValue: string) => {
+    setIsUserTyping(true);
     setColorInput(inputValue);
     
     // Validate and convert input - only call onChange for valid colors
@@ -156,6 +158,9 @@ export default function ColorPicker({
     } else if (inputValue.startsWith('rgba')) {
       onChange(inputValue);
     }
+    
+    // Reset typing flag after a delay
+    setTimeout(() => setIsUserTyping(false), 500);
   };
 
 
@@ -231,11 +236,16 @@ export default function ColorPicker({
   const ColorInput = () => {
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       setIsSelecting(true);
+      setIsUserTyping(true);
       // Select all text on focus for easy editing
       requestAnimationFrame(() => {
         e.target.select();
-        // Reset selecting flag after selection
-        setTimeout(() => setIsSelecting(false), 150);
+        // Reset flags after selection is complete
+        setTimeout(() => {
+          setIsSelecting(false);
+          // Keep userTyping true to prevent selection loss during editing
+          setTimeout(() => setIsUserTyping(false), 1000);
+        }, 200);
       });
     };
 
@@ -244,8 +254,13 @@ export default function ColorPicker({
       e.stopPropagation();
       // Allow normal text selection behavior
       setIsSelecting(true);
-      // Reset flag after a delay to allow selection
-      setTimeout(() => setIsSelecting(false), 300);
+      setIsUserTyping(true);
+      // Reset flags after a delay to allow selection
+      setTimeout(() => {
+        setIsSelecting(false);
+        // Keep userTyping true longer to prevent selection loss
+        setTimeout(() => setIsUserTyping(false), 1000);
+      }, 500);
     };
 
     const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
