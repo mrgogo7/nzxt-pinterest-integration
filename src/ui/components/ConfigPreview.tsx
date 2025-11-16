@@ -727,7 +727,7 @@ export default function ConfigPreview() {
                         // Note: Custom mode doesn't show text labels, so we don't need extra space for that
                         const scaledNumberSize = reading.numberSize * overlayPreviewScale;
                         const hitAreaWidth = scaledNumberSize * 1.5; // 1.5x multiplier for width (narrower)
-                        const hitAreaHeight = scaledNumberSize * 1.1; // 1.1x multiplier for height (less vertical space since no text)
+                        const hitAreaHeight = scaledNumberSize * 0.85; // 0.85x multiplier for height (minimal vertical space, no text labels)
                         
                         return (
                           <div
@@ -764,6 +764,9 @@ export default function ConfigPreview() {
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
+                              // Asymmetric padding: less space at bottom (no text), slightly less at top
+                              paddingTop: `${scaledNumberSize * 0.05}px`, // Small top padding
+                              paddingBottom: `${scaledNumberSize * 0.02}px`, // Minimal bottom padding
                             }}
                           >
                             <SingleInfographic
