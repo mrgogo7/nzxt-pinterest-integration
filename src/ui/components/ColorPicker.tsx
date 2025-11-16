@@ -112,16 +112,18 @@ export default function ColorPicker({
 
   const currentColor = parseColor(value);
 
-  // Update color input when value changes (but not when user is selecting)
+  // Update color input when value changes (but not when user is typing/selecting)
   useEffect(() => {
     if (!isSelecting) {
       if (enableAlpha && typeof currentColor === 'object') {
-        setColorInput(rgbaToHex(currentColor, true));
+        const newInput = rgbaToHex(currentColor, true);
+        // Only update if different to avoid disrupting user input
+        setColorInput(prev => prev !== newInput ? newInput : prev);
       } else if (typeof currentColor === 'string') {
-        setColorInput(currentColor);
+        setColorInput(prev => prev !== currentColor ? currentColor : prev);
       }
     }
-  }, [value, enableAlpha, currentColor, isSelecting]);
+  }, [value, enableAlpha, isSelecting]);
 
   // Handle color change from react-colorful
   const handleColorChange = (color: RgbaColor | string) => {
@@ -156,26 +158,6 @@ export default function ColorPicker({
     }
   };
 
-  // Handle copy
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(colorInput);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
-
-  // Handle paste
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (text) {
-        handleInputChange(text);
-      }
-    } catch (err) {
-      console.error('Failed to paste:', err);
-    }
-  };
 
   // Calculate popup position to avoid viewport overflow
   useEffect(() => {
@@ -250,26 +232,56 @@ export default function ColorPicker({
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       setIsSelecting(true);
       // Select all text on focus for easy editing
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         e.target.select();
-        // Reset selecting flag after a short delay
-        setTimeout(() => setIsSelecting(false), 100);
-      }, 0);
+        // Reset selecting flag after selection
+        setTimeout(() => setIsSelecting(false), 150);
+      });
     };
 
     const handleMouseDown = (e: React.MouseEvent<HTMLInputElement>) => {
       // Prevent popup from closing when clicking on input
       e.stopPropagation();
-      // Don't select if user is clicking to position cursor
-      if (e.detail === 1) {
-        setIsSelecting(true);
-        setTimeout(() => setIsSelecting(false), 200);
-      }
+      // Allow normal text selection behavior
+      setIsSelecting(true);
+      // Reset flag after a delay to allow selection
+      setTimeout(() => setIsSelecting(false), 300);
+    };
+
+    const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
+      // Prevent popup from closing
+      e.stopPropagation();
     };
 
     const handleWrapperMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
       // Prevent popup from closing when clicking on input wrapper
+      // But allow drag operations from other parts of the page
+      if (e.target === e.currentTarget || (e.target as HTMLElement).closest('.color-picker-input-group')) {
+        e.stopPropagation();
+      }
+    };
+
+    const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
+      e.preventDefault();
+      try {
+        await navigator.clipboard.writeText(colorInput);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    };
+
+    const handlePaste = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      e.preventDefault();
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          handleInputChange(text);
+        }
+      } catch (err) {
+        console.error('Failed to paste:', err);
+      }
     };
 
     return (
@@ -283,12 +295,14 @@ export default function ColorPicker({
             className="color-picker-input"
             onFocus={handleFocus}
             onMouseDown={handleMouseDown}
+            onClick={handleClick}
           />
           <div className="color-picker-input-actions">
             <button
               type="button"
               className="color-picker-action-btn"
               onClick={handleCopy}
+              onMouseDown={(e) => e.stopPropagation()}
               title={t('copy', lang)}
             >
               <Copy size={14} />
@@ -297,6 +311,7 @@ export default function ColorPicker({
               type="button"
               className="color-picker-action-btn"
               onClick={handlePaste}
+              onMouseDown={(e) => e.stopPropagation()}
               title={t('paste', lang)}
             >
               <ClipboardPaste size={14} />

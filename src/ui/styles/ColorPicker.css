@@ -110,6 +110,10 @@
   font-size: 13px;
   transition: all 0.15s ease;
   box-sizing: border-box;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
 .color-picker-input:focus {
