@@ -44,6 +44,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   resolution: '640x640',
   showGuide: true,
   overlay: DEFAULT_OVERLAY,
+  backgroundColor: '#000000',
 };
 
 /**
