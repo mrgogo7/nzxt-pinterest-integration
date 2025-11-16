@@ -1,0 +1,147 @@
+.pinterest-test {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.pinterest-test-container {
+  max-width: 800px;
+  width: 100%;
+}
+
+.pinterest-test h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.pinterest-test-description {
+  margin: 0 0 2rem 0;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.pinterest-test-form {
+  margin-bottom: 2rem;
+}
+
+.pinterest-test-input-group {
+  margin-bottom: 1rem;
+}
+
+.pinterest-test-input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.pinterest-test-input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #333;
+  background: #111;
+  color: #fff;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.pinterest-test-input:focus {
+  outline: none;
+  border-color: #555;
+}
+
+.pinterest-test-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pinterest-test-button {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #0066cc;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pinterest-test-button:hover:not(:disabled) {
+  background: #0052a3;
+}
+
+.pinterest-test-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pinterest-test-error {
+  padding: 1rem;
+  background: #330000;
+  border: 1px solid #660000;
+  border-radius: 4px;
+  color: #ff6666;
+  margin-bottom: 1rem;
+}
+
+.pinterest-test-result {
+  margin-top: 2rem;
+}
+
+.pinterest-test-url-display {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #111;
+  border-radius: 4px;
+}
+
+.pinterest-test-url-display strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #aaa;
+}
+
+.pinterest-test-url-link {
+  color: #0066cc;
+  word-break: break-all;
+  text-decoration: none;
+}
+
+.pinterest-test-url-link:hover {
+  text-decoration: underline;
+}
+
+.pinterest-test-media-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  background: #111;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.pinterest-test-video {
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 4px;
+}
+
+.pinterest-test-image {
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.pinterest-test-unknown {
+  color: #aaa;
+  text-align: center;
+}
+
