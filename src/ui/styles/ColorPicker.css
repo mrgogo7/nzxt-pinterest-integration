@@ -84,20 +84,54 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Preset colors */
-.color-picker-presets {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 6px;
+/* Bottom section: input and presets side by side */
+.color-picker-bottom-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding-top: 12px;
   border-top: 1px solid #242734;
 }
 
-.color-picker-preset {
+/* Color input */
+.color-picker-input-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.color-picker-input {
   width: 100%;
-  min-width: 16px;
-  min-height: 16px;
-  aspect-ratio: 1;
+  padding: 8px 12px;
+  background: #181a21;
+  border: 1px solid #2d3140;
+  border-radius: 6px;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+
+.color-picker-input:focus {
+  outline: none;
+  border-color: #4a5683;
+  box-shadow: 0 0 0 2px rgba(74, 86, 131, 0.2);
+}
+
+.color-picker-input::placeholder {
+  color: #6b7280;
+}
+
+/* Preset colors */
+.color-picker-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.color-picker-preset {
+  width: 24px;
+  height: 24px;
   border: 1px solid #2d3140;
   border-radius: 4px;
   cursor: pointer;
@@ -109,13 +143,13 @@
 
 .color-picker-preset:hover {
   border-color: #4a5683;
-  transform: scale(1.1);
+  transform: scale(1.15);
   z-index: 1;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .color-picker-preset:active {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 /* Inline color picker styles */

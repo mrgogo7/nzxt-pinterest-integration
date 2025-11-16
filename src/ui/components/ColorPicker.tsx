@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { HexColorPicker, RgbaColorPicker } from 'react-colorful';
+import { HexColorPicker, RgbaColorPicker, HexColorInput } from 'react-colorful';
 import type { RgbaColor } from 'react-colorful';
 import '../styles/ColorPicker.css';
 
@@ -10,7 +10,7 @@ interface ColorPickerProps {
   enableAlpha?: boolean; // If true, show alpha slider (default: true)
 }
 
-// Preset colors - 16 carefully selected colors
+// Preset colors - 8 carefully selected colors for NZXT overlay (distinct, vibrant colors)
 const PRESET_COLORS = [
   '#ffffff', // White
   '#000000', // Black
@@ -20,14 +20,6 @@ const PRESET_COLORS = [
   '#ffff00', // Yellow
   '#ff00ff', // Magenta
   '#00ffff', // Cyan
-  '#ffa500', // Orange
-  '#800080', // Purple
-  '#ff6347', // Tomato
-  '#4169e1', // Royal Blue
-  '#32cd32', // Lime Green
-  '#ffd700', // Gold
-  '#9370db', // Medium Purple
-  '#20b2aa', // Light Sea Green
 ];
 
 /**
@@ -47,6 +39,7 @@ export default function ColorPicker({
   const pickerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [popupPosition, setPopupPosition] = useState<{ top?: string; bottom?: string; left?: string; right?: string }>({});
+  const [colorInput, setColorInput] = useState<string>('');
 
   // Parse color value to RGBA object or hex string
   const parseColor = (color: string): RgbaColor | string => {
@@ -73,10 +66,19 @@ export default function ColorPicker({
       if (enableAlpha) {
         // Convert hex to RGBA
         const cleanHex = color.replace('#', '');
-        const r = parseInt(cleanHex.substring(0, 2), 16);
-        const g = parseInt(cleanHex.substring(2, 4), 16);
-        const b = parseInt(cleanHex.substring(4, 6), 16);
-        return { r, g, b, a: 1 };
+        if (cleanHex.length === 6) {
+          const r = parseInt(cleanHex.substring(0, 2), 16);
+          const g = parseInt(cleanHex.substring(2, 4), 16);
+          const b = parseInt(cleanHex.substring(4, 6), 16);
+          return { r, g, b, a: 1 };
+        } else if (cleanHex.length === 8) {
+          // #rrggbbaa format
+          const r = parseInt(cleanHex.substring(0, 2), 16);
+          const g = parseInt(cleanHex.substring(2, 4), 16);
+          const b = parseInt(cleanHex.substring(4, 6), 16);
+          const a = parseInt(cleanHex.substring(6, 8), 16) / 255;
+          return { r, g, b, a };
+        }
       }
       return color;
     }
@@ -93,6 +95,18 @@ export default function ColorPicker({
     return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
   };
 
+  // Convert RGBA to hex string (with or without alpha)
+  const rgbaToHex = (rgba: RgbaColor, includeAlpha: boolean): string => {
+    const r = rgba.r.toString(16).padStart(2, '0');
+    const g = rgba.g.toString(16).padStart(2, '0');
+    const b = rgba.b.toString(16).padStart(2, '0');
+    if (includeAlpha && rgba.a < 1) {
+      const a = Math.round(rgba.a * 255).toString(16).padStart(2, '0');
+      return `#${r}${g}${b}${a}`;
+    }
+    return `#${r}${g}${b}`;
+  };
+
   // Convert hex to rgba string
   const hexToRgba = (hex: string): string => {
     const cleanHex = hex.replace('#', '');
@@ -104,12 +118,45 @@ export default function ColorPicker({
 
   const currentColor = parseColor(value);
 
+  // Update color input when value changes
+  useEffect(() => {
+    if (enableAlpha && typeof currentColor === 'object') {
+      setColorInput(rgbaToHex(currentColor, true));
+    } else if (typeof currentColor === 'string') {
+      setColorInput(currentColor);
+    }
+  }, [value, enableAlpha, currentColor]);
+
   // Handle color change from react-colorful
   const handleColorChange = (color: RgbaColor | string) => {
     if (enableAlpha && typeof color === 'object') {
       onChange(rgbaToString(color));
     } else if (typeof color === 'string') {
       onChange(hexToRgba(color));
+    }
+  };
+
+  // Handle color input change
+  const handleInputChange = (inputValue: string) => {
+    setColorInput(inputValue);
+    
+    // Validate and convert input
+    if (inputValue.startsWith('#')) {
+      const cleanHex = inputValue.replace('#', '');
+      if (cleanHex.length === 6 || cleanHex.length === 8) {
+        if (enableAlpha) {
+          // Convert to RGBA
+          const r = parseInt(cleanHex.substring(0, 2), 16);
+          const g = parseInt(cleanHex.substring(2, 4), 16);
+          const b = parseInt(cleanHex.substring(4, 6), 16);
+          const a = cleanHex.length === 8 ? parseInt(cleanHex.substring(6, 8), 16) / 255 : 1;
+          onChange(`rgba(${r}, ${g}, ${b}, ${a})`);
+        } else {
+          onChange(hexToRgba(inputValue));
+        }
+      }
+    } else if (inputValue.startsWith('rgba')) {
+      onChange(inputValue);
     }
   };
 
@@ -205,6 +252,19 @@ export default function ColorPicker({
     </div>
   );
 
+  // Color input component
+  const ColorInput = () => (
+    <div className="color-picker-input-wrapper">
+      <HexColorInput
+        color={colorInput}
+        onChange={handleInputChange}
+        alpha={enableAlpha}
+        prefixed
+        className="color-picker-input"
+      />
+    </div>
+  );
+
   // If showInline is true, show picker directly without trigger button
   if (showInline) {
     return (
@@ -221,7 +281,10 @@ export default function ColorPicker({
               onChange={handleColorChange as (color: string) => void}
             />
           )}
-          <PresetColors onSelect={handlePresetSelect} />
+          <div className="color-picker-bottom-section">
+            <ColorInput />
+            <PresetColors onSelect={handlePresetSelect} />
+          </div>
         </div>
       </div>
     );
@@ -261,7 +324,10 @@ export default function ColorPicker({
                 onChange={handleColorChange as (color: string) => void}
               />
             )}
-            <PresetColors onSelect={handlePresetSelect} />
+            <div className="color-picker-bottom-section">
+              <ColorInput />
+              <PresetColors onSelect={handlePresetSelect} />
+            </div>
           </div>
         </div>
       )}
