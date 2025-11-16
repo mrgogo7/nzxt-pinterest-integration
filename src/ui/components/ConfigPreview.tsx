@@ -724,9 +724,10 @@ export default function ConfigPreview() {
                         
                         // Calculate hit area size based on numberSize
                         // Hit area should be slightly larger than content for easier interaction
+                        // Note: Custom mode doesn't show text labels, so we don't need extra space for that
                         const scaledNumberSize = reading.numberSize * overlayPreviewScale;
-                        const hitAreaWidth = scaledNumberSize * 1.8; // 1.8x multiplier for comfortable hit area
-                        const hitAreaHeight = scaledNumberSize * 1.5; // 1.5x multiplier for height
+                        const hitAreaWidth = scaledNumberSize * 1.5; // 1.5x multiplier for width (narrower)
+                        const hitAreaHeight = scaledNumberSize * 1.1; // 1.1x multiplier for height (less vertical space since no text)
                         
                         return (
                           <div
