@@ -3,7 +3,7 @@ import {
   OverlayMetrics,
   getOverlayLabelAndValue,
 } from "../../types/overlay";
-import { motion } from "framer-motion";
+import AnimateNumber from "./AnimateNumber";
 import styles from "../styles/DualInfographic.module.css";
 
 /**
@@ -47,6 +47,7 @@ export default function DualInfographic({
   // Helper function to render a single metric value
   const renderMetric = (
     info: typeof primaryInfo,
+    rawValue: number,
     isClock: boolean,
     unitSize: number,
     numSize: number,
@@ -56,19 +57,14 @@ export default function DualInfographic({
       return (
         <div className={styles.numberContainer}>
           {/* Main numeric value */}
-          <motion.span
-            key={info.valueNumber}
+          <AnimateNumber
+            value={rawValue}
             className={styles.number}
             style={{
               fontSize: `${numSize}px`,
               color: numColor,
             }}
-            initial={{ scale: 1.2, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          >
-            {info.valueNumber}
-          </motion.span>
+          />
 
           {/* Temperature unit (°) with manual visual offset */}
           {info.valueUnit && info.valueUnitType === "temp" && (
@@ -103,19 +99,15 @@ export default function DualInfographic({
       return (
         <>
           {/* Clock number */}
-          <motion.div
-            key={info.valueNumber}
+          <AnimateNumber
+            value={rawValue}
             className={styles.clockNumber}
             style={{
               fontSize: `${numSize}px`,
               color: numColor,
             }}
-            initial={{ scale: 1.2, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          >
-            {info.valueNumber}
-          </motion.div>
+            as="div"
+          />
 
           {/* MHz label below */}
           <div
@@ -185,7 +177,7 @@ export default function DualInfographic({
           transform: `translate(calc(-100% - ${dividerGap}px + ${primaryOffsetX}px), calc(-50% + ${primaryOffsetY}px))`,
         }}
       >
-        {renderMetric(primaryInfo, primaryIsClock, primaryUnitSize, primaryNumberSize, primaryNumberColor)}
+        {renderMetric(primaryInfo, primaryValue, primaryIsClock, primaryUnitSize, primaryNumberSize, primaryNumberColor)}
 
         {/* Label */}
         <div
@@ -207,7 +199,7 @@ export default function DualInfographic({
           transform: `translate(${secondaryOffsetX}px, calc(-50% + ${secondaryOffsetY}px))`,
         }}
       >
-        {renderMetric(secondaryInfo, secondaryIsClock, secondaryUnitSize, secondaryNumberSize, secondaryNumberColor)}
+        {renderMetric(secondaryInfo, secondaryValue, secondaryIsClock, secondaryUnitSize, secondaryNumberSize, secondaryNumberColor)}
 
         {/* Label */}
         <div

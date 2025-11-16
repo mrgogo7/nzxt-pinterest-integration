@@ -3,7 +3,7 @@ import {
   OverlayMetrics,
   getOverlayLabelAndValue,
 } from "../../types/overlay";
-import { motion } from "framer-motion";
+import AnimateNumber from "./AnimateNumber";
 import styles from "../styles/TripleInfographic.module.css";
 
 /**
@@ -57,6 +57,7 @@ export default function TripleInfographic({
   // Helper function to render a single metric value
   const renderMetric = (
     info: typeof primaryInfo,
+    rawValue: number,
     isClock: boolean,
     unitSize: number,
     numSize: number,
@@ -66,19 +67,14 @@ export default function TripleInfographic({
       return (
         <div className={styles.numberContainer}>
           {/* Main numeric value */}
-          <motion.span
-            key={info.valueNumber}
+          <AnimateNumber
+            value={rawValue}
             className={styles.number}
             style={{
               fontSize: `${numSize}px`,
               color: numColor,
             }}
-            initial={{ scale: 1.2, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          >
-            {info.valueNumber}
-          </motion.span>
+          />
 
           {/* Temperature unit (°) with manual visual offset */}
           {info.valueUnit && info.valueUnitType === "temp" && (
@@ -113,19 +109,15 @@ export default function TripleInfographic({
       return (
         <>
           {/* Clock number */}
-          <motion.div
-            key={info.valueNumber}
+          <AnimateNumber
+            value={rawValue}
             className={styles.clockNumber}
             style={{
               fontSize: `${numSize}px`,
               color: numColor,
             }}
-            initial={{ scale: 1.2, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          >
-            {info.valueNumber}
-          </motion.div>
+            as="div"
+          />
 
           {/* MHz label below */}
           <div
@@ -205,6 +197,7 @@ export default function TripleInfographic({
       >
         {renderMetric(
           primaryInfo,
+          primaryValue,
           primaryIsClock,
           primaryUnitSize,
           primaryNumberSize,
@@ -236,6 +229,7 @@ export default function TripleInfographic({
         <div className={styles.metricContainer}>
           {renderMetric(
             secondaryInfo,
+            secondaryValue,
             secondaryIsClock,
             secondaryUnitSize,
             secondaryNumberSize,
@@ -259,6 +253,7 @@ export default function TripleInfographic({
         <div className={styles.metricContainer}>
           {renderMetric(
             tertiaryInfo,
+            tertiaryValue,
             tertiaryIsClock,
             tertiaryUnitSize,
             tertiaryNumberSize,
