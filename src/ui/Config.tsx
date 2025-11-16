@@ -6,7 +6,7 @@ import { DEFAULT_MEDIA_URL, DEFAULT_SETTINGS } from '../constants/defaults';
 import { useMediaUrl } from '../hooks/useMediaUrl';
 import { useConfig } from '../hooks/useConfig';
 import ColorPicker from './components/ColorPicker';
-import { Save, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export default function Config() {
   const [lang, setLangState] = useState<Lang>(getInitialLang());
@@ -145,28 +145,30 @@ export default function Config() {
           <label className="url-label-inline" htmlFor="mediaUrl">
             {t("backgroundMediaUrlLabel", lang)}
           </label>
-          <input
-            id="mediaUrl"
-            type="text"
-            className="url-input"
-            placeholder={t("urlPlaceholder", lang)}
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            onFocus={(e) => e.target.select()}
-          />
+          <div className="url-input-wrapper">
+            <input
+              id="mediaUrl"
+              type="text"
+              className="url-input"
+              placeholder={t("urlPlaceholder", lang)}
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              onFocus={(e) => e.target.select()}
+            />
+            <button 
+              onClick={handleClear} 
+              className="clear-btn-inline"
+              title={t("clear", lang)}
+              type="button"
+            >
+              <X size={16} />
+            </button>
+          </div>
           <button 
             onClick={handleSave} 
-            className="save-btn icon-btn"
-            title={t("save", lang)}
+            className="save-btn"
           >
-            <Save size={18} />
-          </button>
-          <button 
-            onClick={handleClear} 
-            className="clear-btn icon-btn"
-            title={t("clear", lang)}
-          >
-            <X size={18} />
+            {t("save", lang)}
           </button>
         </div>
         
