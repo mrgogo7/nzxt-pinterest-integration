@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import legacy from '@vitejs/plugin-legacy';
 import { resolve } from 'node:path';
 
 /**
@@ -13,10 +12,6 @@ export default defineConfig({
     react({
       // React Fast Refresh
       fastRefresh: true,
-    }),
-    legacy({
-      targets: ['defaults', 'ie 11'],
-      modernPolyfills: true,
     }),
   ],
   build: {
