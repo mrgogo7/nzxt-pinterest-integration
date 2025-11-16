@@ -8,6 +8,7 @@ import { useConfig } from '../hooks/useConfig';
 import ColorPicker from './components/ColorPicker';
 import { X } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
+import { motion } from 'framer-motion';
 import 'react-tooltip/dist/react-tooltip.css';
 import './styles/tooltip.css';
 
@@ -123,9 +124,15 @@ export default function Config() {
         </div>
 
         <div className="header-actions">
-          <button className="reset-btn" onClick={handleReset}>
+          <motion.button 
+            className="reset-btn" 
+            onClick={handleReset}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
             {t("reset", lang)}
-          </button>
+          </motion.button>
 
           <label className="lang-label" htmlFor="lang-select">
             {t("language", lang)}
@@ -158,7 +165,7 @@ export default function Config() {
               onChange={(e) => setUrlInput(e.target.value)}
               onFocus={(e) => e.target.select()}
             />
-            <button 
+            <motion.button 
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -172,17 +179,23 @@ export default function Config() {
               data-tooltip-id="clear-btn-tooltip"
               data-tooltip-content={t("clear", lang)}
               type="button"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
               <X size={16} />
-            </button>
+            </motion.button>
             <Tooltip id="clear-btn-tooltip" />
           </div>
-          <button 
+          <motion.button 
             onClick={handleSave} 
             className="save-btn"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             {t("save", lang)}
-          </button>
+          </motion.button>
         </div>
         
         {/* Background Color Picker */}

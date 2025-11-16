@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import '../styles/ConfigPreview.css';
 import { LANG_KEY, Lang, t, getInitialLang } from '../../i18n';
 import { Tooltip } from 'react-tooltip';
+import { motion } from 'framer-motion';
 import {
   RefreshCw,
   Move,
@@ -449,8 +450,18 @@ export default function ConfigPreview() {
               )}
 
               <div className="zoom-buttons-bottom">
-                <button onClick={() => adjustScale(-0.1)}>−</button>
-                <button onClick={() => adjustScale(0.1)}>＋</button>
+                <motion.button 
+                  onClick={() => adjustScale(-0.1)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >−</motion.button>
+                <motion.button 
+                  onClick={() => adjustScale(0.1)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >＋</motion.button>
               </div>
             </div>
           </div>
@@ -501,14 +512,17 @@ export default function ConfigPreview() {
                       }
                     />
 
-                    <button
+                    <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
                       onClick={() => resetField(field as keyof AppSettings)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                     >
                       <RefreshCw size={14} />
-                    </button>
+                    </motion.button>
                   </div>
                 ))}
 
@@ -517,7 +531,7 @@ export default function ConfigPreview() {
                   <label>{t('align', lang)}</label>
                   <div className="icon-group">
                     {alignIcons.map(({ key, icon }) => (
-                      <button
+                      <motion.button
                         key={key}
                         className={`icon-btn ${settings.align === key ? 'active' : ''}`}
                         data-tooltip-id={`align-${key}-tooltip`}
@@ -528,20 +542,26 @@ export default function ConfigPreview() {
                             align: key as AppSettings['align'],
                           })
                         }
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
                       >
                         {icon}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
 
-                  <button
+                  <motion.button
                     className="reset-icon"
                     data-tooltip-id="reset-tooltip"
                     data-tooltip-content={t('reset', lang)}
                     onClick={() => resetField('align')}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
                     <RefreshCw size={14} />
-                  </button>
+                  </motion.button>
                 </div>
 
                 {/* FIT */}
@@ -549,7 +569,7 @@ export default function ConfigPreview() {
                   <label>{t('fit', lang)}</label>
                   <div className="icon-group">
                     {fitIcons.map(({ key, icon }) => (
-                      <button
+                      <motion.button
                         key={key}
                         className={`icon-btn ${settings.fit === key ? 'active' : ''}`}
                         data-tooltip-id={`fit-${key}-tooltip`}
@@ -560,20 +580,26 @@ export default function ConfigPreview() {
                             fit: key as AppSettings['fit'],
                           })
                         }
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
                       >
                         {icon}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
 
-                  <button
+                  <motion.button
                     className="reset-icon"
                     data-tooltip-id="reset-tooltip"
                     data-tooltip-content={t('reset', lang)}
                     onClick={() => resetField('fit')}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
                     <RefreshCw size={14} />
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             </div>
@@ -900,10 +926,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -915,7 +944,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -934,10 +963,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -949,7 +981,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* PRIMARY SETTINGS */}
@@ -967,10 +999,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -982,7 +1017,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -999,10 +1034,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1014,7 +1052,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1033,14 +1071,17 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => resetOverlayField('numberSize')}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1059,14 +1100,17 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => resetOverlayField('textSize')}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Divider Gap - Space between primary and divider */}
@@ -1086,10 +1130,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1101,7 +1148,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Divider Width */}
@@ -1121,10 +1168,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1136,7 +1186,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Divider Thickness */}
@@ -1156,10 +1206,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1171,7 +1224,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Divider Color */}
@@ -1189,10 +1242,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1204,7 +1260,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Horizontal divider with label */}
@@ -1230,10 +1286,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1245,7 +1304,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1264,10 +1323,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1279,7 +1341,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* SECONDARY SETTINGS */}
@@ -1297,10 +1359,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1312,7 +1377,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1329,10 +1394,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1344,7 +1412,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1363,10 +1431,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1378,7 +1449,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1397,10 +1468,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1412,7 +1486,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
                       </>
                     ) : overlayConfig.mode === 'triple' ? (
@@ -1440,10 +1514,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1455,7 +1532,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1474,10 +1551,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1489,7 +1569,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* PRIMARY SETTINGS */}
@@ -1507,10 +1587,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1522,7 +1605,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1539,10 +1622,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1554,7 +1640,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1573,14 +1659,17 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => resetOverlayField('numberSize')}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1599,14 +1688,17 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => resetOverlayField('textSize')}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Divider Gap - Space between primary and divider */}
@@ -1626,10 +1718,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1641,7 +1736,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Divider Width */}
@@ -1661,10 +1756,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1676,7 +1774,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Divider Thickness */}
@@ -1696,10 +1794,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1711,7 +1812,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Divider Color */}
@@ -1729,10 +1830,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1744,7 +1848,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Horizontal divider with label */}
@@ -1770,10 +1874,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1785,7 +1892,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1804,10 +1911,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1819,7 +1929,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* SECONDARY SETTINGS */}
@@ -1837,10 +1947,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1852,7 +1965,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1869,10 +1982,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1884,7 +2000,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1903,10 +2019,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1918,7 +2037,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -1937,10 +2056,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1952,7 +2074,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* TERTIARY SETTINGS */}
@@ -1970,10 +2092,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1985,7 +2110,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -2002,10 +2127,13 @@ export default function ConfigPreview() {
                               })
                             }
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2017,7 +2145,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -2036,10 +2164,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2051,7 +2182,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -2070,10 +2201,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2085,7 +2219,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Gap (Secondary-Tertiary) */}
@@ -2105,10 +2239,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2120,7 +2257,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         {/* Dual Readers X/Y Offset */}
@@ -2140,10 +2277,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2155,7 +2295,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
 
                         <div className="setting-row">
@@ -2174,10 +2314,13 @@ export default function ConfigPreview() {
                             }
                             className="input-narrow"
                           />
-                          <button
+                          <motion.button
                       className="reset-icon"
                       data-tooltip-id="reset-tooltip"
                       data-tooltip-content={t('reset', lang)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2189,7 +2332,7 @@ export default function ConfigPreview() {
                             }}
                           >
                             <RefreshCw size={14} />
-                          </button>
+                          </motion.button>
                         </div>
                       </>
                     ) : null}

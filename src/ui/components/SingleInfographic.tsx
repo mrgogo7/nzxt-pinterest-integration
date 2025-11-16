@@ -3,6 +3,7 @@ import {
   OverlayMetrics,
   getOverlayLabelAndValue,
 } from "../../types/overlay";
+import { motion } from "framer-motion";
 import styles from "../styles/SingleInfographic.module.css";
 
 /**
@@ -50,15 +51,19 @@ export default function SingleInfographic({
       {!isClock ? (
         <div className={styles.numberContainer}>
           {/* Main numeric value */}
-          <span
+          <motion.span
+            key={valueNumber}
             className={styles.number}
             style={{
               fontSize: `${numberSize}px`,
               color: numberColor,
             }}
+            initial={{ scale: 1.2, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
           >
             {valueNumber}
-          </span>
+          </motion.span>
 
           {/* Temperature unit (°) with manual visual offset */}
           {valueUnit && valueUnitType === "temp" && (
@@ -91,15 +96,19 @@ export default function SingleInfographic({
       ) : (
         <>
           {/* Clock number */}
-          <div
+          <motion.div
+            key={valueNumber}
             className={styles.clockNumber}
             style={{
               fontSize: `${numberSize}px`,
               color: numberColor,
             }}
+            initial={{ scale: 1.2, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
           >
             {valueNumber}
-          </div>
+          </motion.div>
 
           {/* MHz label below */}
           <div

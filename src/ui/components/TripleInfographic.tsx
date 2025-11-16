@@ -3,6 +3,7 @@ import {
   OverlayMetrics,
   getOverlayLabelAndValue,
 } from "../../types/overlay";
+import { motion } from "framer-motion";
 import styles from "../styles/TripleInfographic.module.css";
 
 /**
@@ -65,15 +66,19 @@ export default function TripleInfographic({
       return (
         <div className={styles.numberContainer}>
           {/* Main numeric value */}
-          <span
+          <motion.span
+            key={info.valueNumber}
             className={styles.number}
             style={{
               fontSize: `${numSize}px`,
               color: numColor,
             }}
+            initial={{ scale: 1.2, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
           >
             {info.valueNumber}
-          </span>
+          </motion.span>
 
           {/* Temperature unit (°) with manual visual offset */}
           {info.valueUnit && info.valueUnitType === "temp" && (
@@ -108,15 +113,19 @@ export default function TripleInfographic({
       return (
         <>
           {/* Clock number */}
-          <div
+          <motion.div
+            key={info.valueNumber}
             className={styles.clockNumber}
             style={{
               fontSize: `${numSize}px`,
               color: numColor,
             }}
+            initial={{ scale: 1.2, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
           >
             {info.valueNumber}
-          </div>
+          </motion.div>
 
           {/* MHz label below */}
           <div

@@ -4,6 +4,7 @@ import type { RgbaColor } from 'react-colorful';
 import { Copy, ClipboardPaste } from 'lucide-react';
 import { t, getInitialLang } from '../../i18n';
 import { Tooltip } from 'react-tooltip';
+import { motion, AnimatePresence } from 'framer-motion';
 import 'react-tooltip/dist/react-tooltip.css';
 import '../styles/ColorPicker.css';
 import '../styles/tooltip.css';
@@ -389,27 +390,33 @@ export default function ColorPicker({
         />
       </button>
 
-      {isOpen && (
-        <div 
-          className="color-picker-popup"
-          style={popupStyle}
-        >
-          <div className="color-picker-container">
-            {enableAlpha ? (
-              <RgbaColorPicker
-                color={currentColor as RgbaColor}
-                onChange={handleColorChange as (color: RgbaColor) => void}
-              />
-            ) : (
-              <HexColorPicker
-                color={currentColor as string}
-                onChange={handleColorChange as (color: string) => void}
-              />
-            )}
-            <ColorInput />
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            className="color-picker-popup"
+            style={popupStyle}
+            initial={{ opacity: 0, scale: 0.9, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: -10 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            <div className="color-picker-container">
+              {enableAlpha ? (
+                <RgbaColorPicker
+                  color={currentColor as RgbaColor}
+                  onChange={handleColorChange as (color: RgbaColor) => void}
+                />
+              ) : (
+                <HexColorPicker
+                  color={currentColor as string}
+                  onChange={handleColorChange as (color: string) => void}
+                />
+              )}
+              <ColorInput />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
