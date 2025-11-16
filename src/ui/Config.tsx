@@ -7,6 +7,9 @@ import { useMediaUrl } from '../hooks/useMediaUrl';
 import { useConfig } from '../hooks/useConfig';
 import ColorPicker from './components/ColorPicker';
 import { X } from 'lucide-react';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
+import './styles/tooltip.css';
 
 export default function Config() {
   const [lang, setLangState] = useState<Lang>(getInitialLang());
@@ -156,13 +159,23 @@ export default function Config() {
               onFocus={(e) => e.target.select()}
             />
             <button 
-              onClick={handleClear} 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleClear();
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
               className="clear-btn-inline"
-              title={t("clear", lang)}
+              data-tooltip-id="clear-btn-tooltip"
+              data-tooltip-content={t("clear", lang)}
               type="button"
             >
               <X size={16} />
             </button>
+            <Tooltip id="clear-btn-tooltip" />
           </div>
           <button 
             onClick={handleSave} 

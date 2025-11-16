@@ -1,0 +1,19 @@
+/* React Tooltip custom styles */
+.react-tooltip {
+  background: rgba(20, 20, 20, 0.95) !important;
+  border: 1px solid #3b5a9a !important;
+  border-radius: 6px !important;
+  color: #d9e6ff !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding: 6px 10px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  z-index: 10000 !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.react-tooltip-arrow {
+  display: none !important;
+}
+

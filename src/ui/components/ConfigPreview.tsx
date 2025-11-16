@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import '../styles/ConfigPreview.css';
 import { LANG_KEY, Lang, t, getInitialLang } from '../../i18n';
+import { Tooltip } from 'react-tooltip';
 import {
   RefreshCw,
   Move,
@@ -502,7 +503,8 @@ export default function ConfigPreview() {
 
                     <button
                       className="reset-icon"
-                      title="Reset"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                       onClick={() => resetField(field as keyof AppSettings)}
                     >
                       <RefreshCw size={14} />
@@ -518,7 +520,8 @@ export default function ConfigPreview() {
                       <button
                         key={key}
                         className={`icon-btn ${settings.align === key ? 'active' : ''}`}
-                        title={t(`align${key[0].toUpperCase() + key.slice(1)}`, lang)}
+                        data-tooltip-id={`align-${key}-tooltip`}
+                        data-tooltip-content={t(`align${key[0].toUpperCase() + key.slice(1)}`, lang)}
                         onClick={() =>
                           setSettings({
                             ...settings,
@@ -533,7 +536,8 @@ export default function ConfigPreview() {
 
                   <button
                     className="reset-icon"
-                    title="Reset"
+                    data-tooltip-id="reset-tooltip"
+                    data-tooltip-content={t('reset', lang)}
                     onClick={() => resetField('align')}
                   >
                     <RefreshCw size={14} />
@@ -548,7 +552,8 @@ export default function ConfigPreview() {
                       <button
                         key={key}
                         className={`icon-btn ${settings.fit === key ? 'active' : ''}`}
-                        title={t(`fit${key[0].toUpperCase() + key.slice(1)}`, lang)}
+                        data-tooltip-id={`fit-${key}-tooltip`}
+                        data-tooltip-content={t(`fit${key[0].toUpperCase() + key.slice(1)}`, lang)}
                         onClick={() =>
                           setSettings({
                             ...settings,
@@ -563,7 +568,8 @@ export default function ConfigPreview() {
 
                   <button
                     className="reset-icon"
-                    title="Reset"
+                    data-tooltip-id="reset-tooltip"
+                    data-tooltip-content={t('reset', lang)}
                     onClick={() => resetField('fit')}
                   >
                     <RefreshCw size={14} />
@@ -895,8 +901,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -928,8 +935,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -960,8 +968,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -991,8 +1000,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1024,8 +1034,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => resetOverlayField('numberSize')}
                           >
                             <RefreshCw size={14} />
@@ -1049,8 +1060,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => resetOverlayField('textSize')}
                           >
                             <RefreshCw size={14} />
@@ -1075,8 +1087,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1109,8 +1122,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1143,8 +1157,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1175,8 +1190,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1215,8 +1231,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1248,8 +1265,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1280,8 +1298,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1311,8 +1330,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1344,8 +1364,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1377,8 +1398,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1419,8 +1441,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1452,8 +1475,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1484,8 +1508,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1515,8 +1540,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1548,8 +1574,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => resetOverlayField('numberSize')}
                           >
                             <RefreshCw size={14} />
@@ -1573,8 +1600,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => resetOverlayField('textSize')}
                           >
                             <RefreshCw size={14} />
@@ -1599,8 +1627,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1633,8 +1662,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1667,8 +1697,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1699,8 +1730,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1739,8 +1771,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1772,8 +1805,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1804,8 +1838,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1835,8 +1870,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1868,8 +1904,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1901,8 +1938,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1933,8 +1971,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1964,8 +2003,9 @@ export default function ConfigPreview() {
                             }
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -1997,8 +2037,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2030,8 +2071,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2064,8 +2106,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2098,8 +2141,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2131,8 +2175,9 @@ export default function ConfigPreview() {
                             className="input-narrow"
                           />
                           <button
-                            className="reset-icon"
-                            title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                             onClick={() => {
                               setSettings({
                                 ...settings,
@@ -2175,8 +2220,9 @@ export default function ConfigPreview() {
                         className="input-narrow"
                       />
                       <button
-                        className="reset-icon"
-                        title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                         onClick={() => resetOverlayField('x')}
                       >
                         <RefreshCw size={14} />
@@ -2200,8 +2246,9 @@ export default function ConfigPreview() {
                         className="input-narrow"
                       />
                       <button
-                        className="reset-icon"
-                        title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                         onClick={() => resetOverlayField('y')}
                       >
                         <RefreshCw size={14} />
@@ -2223,8 +2270,9 @@ export default function ConfigPreview() {
                         }
                       />
                       <button
-                        className="reset-icon"
-                        title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                         onClick={() => resetOverlayField('numberColor')}
                       >
                         <RefreshCw size={14} />
@@ -2246,8 +2294,9 @@ export default function ConfigPreview() {
                         }
                       />
                       <button
-                        className="reset-icon"
-                        title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                         onClick={() => resetOverlayField('textColor')}
                       >
                         <RefreshCw size={14} />
@@ -2271,8 +2320,9 @@ export default function ConfigPreview() {
                         className="input-narrow"
                       />
                       <button
-                        className="reset-icon"
-                        title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                         onClick={() => resetOverlayField('numberSize')}
                       >
                         <RefreshCw size={14} />
@@ -2296,8 +2346,9 @@ export default function ConfigPreview() {
                         className="input-narrow"
                       />
                       <button
-                        className="reset-icon"
-                        title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                         onClick={() => resetOverlayField('textSize')}
                       >
                         <RefreshCw size={14} />
@@ -2322,8 +2373,9 @@ export default function ConfigPreview() {
                         className="input-narrow"
                       />
                       <button
-                        className="reset-icon"
-                        title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                         onClick={() => resetOverlayField('x')}
                       >
                         <RefreshCw size={14} />
@@ -2347,8 +2399,9 @@ export default function ConfigPreview() {
                         className="input-narrow"
                       />
                       <button
-                        className="reset-icon"
-                        title="Reset"
+                      className="reset-icon"
+                      data-tooltip-id="reset-tooltip"
+                      data-tooltip-content={t('reset', lang)}
                         onClick={() => resetOverlayField('y')}
                       >
                         <RefreshCw size={14} />
@@ -2361,6 +2414,15 @@ export default function ConfigPreview() {
           </div>
         </div>
       </div>
+      <Tooltip id="reset-tooltip" />
+      <Tooltip id="align-center-tooltip" />
+      <Tooltip id="align-top-tooltip" />
+      <Tooltip id="align-bottom-tooltip" />
+      <Tooltip id="align-left-tooltip" />
+      <Tooltip id="align-right-tooltip" />
+      <Tooltip id="fit-cover-tooltip" />
+      <Tooltip id="fit-contain-tooltip" />
+      <Tooltip id="fit-fill-tooltip" />
     </div>
   );
 }

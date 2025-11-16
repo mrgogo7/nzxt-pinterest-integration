@@ -3,7 +3,10 @@ import { HexColorPicker, RgbaColorPicker, HexColorInput } from 'react-colorful';
 import type { RgbaColor } from 'react-colorful';
 import { Copy, ClipboardPaste } from 'lucide-react';
 import { t, getInitialLang } from '../../i18n';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 import '../styles/ColorPicker.css';
+import '../styles/tooltip.css';
 
 interface ColorPickerProps {
   value: string; // RGBA or HEX color
@@ -324,19 +327,23 @@ export default function ColorPicker({
               className="color-picker-action-btn"
               onClick={handleCopy}
               onMouseDown={(e) => e.stopPropagation()}
-              title={t('copy', lang)}
+              data-tooltip-id="color-picker-copy-tooltip"
+              data-tooltip-content={t('copy', lang)}
             >
               <Copy size={14} />
             </button>
+            <Tooltip id="color-picker-copy-tooltip" />
             <button
               type="button"
               className="color-picker-action-btn"
               onClick={handlePaste}
               onMouseDown={(e) => e.stopPropagation()}
-              title={t('paste', lang)}
+              data-tooltip-id="color-picker-paste-tooltip"
+              data-tooltip-content={t('paste', lang)}
             >
               <ClipboardPaste size={14} />
             </button>
+            <Tooltip id="color-picker-paste-tooltip" />
           </div>
         </div>
       </div>
