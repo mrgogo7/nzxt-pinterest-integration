@@ -722,40 +722,47 @@ export default function ConfigPreview() {
                         const isDraggingThis = draggingReadingId === reading.id;
                         const zIndex = 10 + originalIndex; // Higher z-index for later readings
                         
+                        // Calculate hit area size based on numberSize
+                        // Hit area should be slightly larger than content for easier interaction
+                        const scaledNumberSize = reading.numberSize * overlayPreviewScale;
+                        const hitAreaWidth = scaledNumberSize * 1.8; // 1.8x multiplier for comfortable hit area
+                        const hitAreaHeight = scaledNumberSize * 1.5; // 1.5x multiplier for height
+                        
                         return (
                           <div
                             key={reading.id}
                             onMouseDown={(e) => {
                               // Only handle if clicking on this specific reading's content area
-                              // Check if click is within a reasonable hit area around the content
                               const rect = e.currentTarget.getBoundingClientRect();
                               const clickX = e.clientX - rect.left;
                               const clickY = e.clientY - rect.top;
                               const centerX = rect.width / 2;
                               const centerY = rect.height / 2;
                               
-                              // Calculate approximate content size based on numberSize
-                              const contentWidth = (reading.numberSize * overlayPreviewScale) * 1.5;
-                              const contentHeight = (reading.numberSize * overlayPreviewScale) * 1.2;
-                              
-                              // Only handle if click is within content area
+                              // Check if click is within hit area
                               const distanceX = Math.abs(clickX - centerX);
                               const distanceY = Math.abs(clickY - centerY);
                               
-                              if (distanceX < contentWidth / 2 && distanceY < contentHeight / 2) {
+                              if (distanceX < hitAreaWidth / 2 && distanceY < hitAreaHeight / 2) {
                                 handleCustomReadingMouseDown(e, reading.id);
                               }
                             }}
                             style={{
                               position: 'absolute',
-                              inset: 0,
-                              transform: `translate(${readingX}px, ${readingY}px)`,
+                              left: '50%',
+                              top: '50%',
+                              width: `${hitAreaWidth}px`,
+                              height: `${hitAreaHeight}px`,
+                              transform: `translate(calc(-50% + ${readingX}px), calc(-50% + ${readingY}px))`,
                               cursor: isDraggingThis ? 'grabbing' : 'grab',
                               pointerEvents: 'auto',
                               zIndex: zIndex,
                               // Visual feedback: show outline when dragging
                               outline: isDraggingThis ? '2px dashed rgba(255, 255, 255, 0.5)' : 'none',
                               outlineOffset: isDraggingThis ? '4px' : '0',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
                             }}
                           >
                             <SingleInfographic
