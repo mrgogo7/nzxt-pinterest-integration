@@ -8,6 +8,7 @@ interface ColorPickerProps {
   onChange: (color: string) => void;
   showInline?: boolean; // If true, show picker inline without trigger button
   enableAlpha?: boolean; // If true, show alpha slider (default: true)
+  popupPosition?: 'auto' | 'bottom-right'; // Popup position preference
 }
 
 /**
@@ -21,12 +22,13 @@ export default function ColorPicker({
   value, 
   onChange, 
   showInline = false,
-  enableAlpha = true 
+  enableAlpha = true,
+  popupPosition = 'auto'
 }: ColorPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const [popupPosition, setPopupPosition] = useState<{ top?: string; bottom?: string; left?: string; right?: string }>({});
+  const [popupStyle, setPopupStyle] = useState<{ top?: string; bottom?: string; left?: string; right?: string }>({});
   const [colorInput, setColorInput] = useState<string>('');
 
   // Parse color value to RGBA object or hex string
@@ -160,37 +162,44 @@ export default function ColorPicker({
 
       const position: { top?: string; bottom?: string; left?: string; right?: string } = {};
 
-      // Horizontal positioning: prefer left (for NZXT CAM compatibility)
-      if (triggerRect.left >= popupWidth + spacing) {
-        // Enough space on left, open to the left
-        position.right = '0';
+      // Special positioning for background color picker
+      if (popupPosition === 'bottom-right') {
+        position.top = 'calc(100% + 8px)';
+        position.left = '0';
       } else {
-        // Not enough space on left, try right
-        if (triggerRect.right + popupWidth + spacing <= viewportWidth) {
-          position.left = '0';
-        } else {
-          // Not enough space on either side, open to the left anyway
+        // Default positioning: prefer left and top (for NZXT CAM compatibility)
+        // Horizontal positioning: prefer left
+        if (triggerRect.left >= popupWidth + spacing) {
+          // Enough space on left, open to the left
           position.right = '0';
-        }
-      }
-
-      // Vertical positioning: prefer top (for NZXT CAM compatibility)
-      if (triggerRect.top >= popupHeight + spacing) {
-        // Enough space above, open above
-        position.bottom = 'calc(100% + 8px)';
-      } else {
-        // Not enough space above, try below
-        if (triggerRect.bottom + popupHeight + spacing <= viewportHeight) {
-          position.top = 'calc(100% + 8px)';
         } else {
-          // Not enough space on either side, open above anyway
+          // Not enough space on left, try right
+          if (triggerRect.right + popupWidth + spacing <= viewportWidth) {
+            position.left = '0';
+          } else {
+            // Not enough space on either side, open to the left anyway
+            position.right = '0';
+          }
+        }
+
+        // Vertical positioning: prefer top
+        if (triggerRect.top >= popupHeight + spacing) {
+          // Enough space above, open above
           position.bottom = 'calc(100% + 8px)';
+        } else {
+          // Not enough space above, try below
+          if (triggerRect.bottom + popupHeight + spacing <= viewportHeight) {
+            position.top = 'calc(100% + 8px)';
+          } else {
+            // Not enough space on either side, open above anyway
+            position.bottom = 'calc(100% + 8px)';
+          }
         }
       }
 
-      setPopupPosition(position);
+      setPopupStyle(position);
     }
-  }, [isOpen, enableAlpha]);
+  }, [isOpen, enableAlpha, popupPosition]);
 
   // Close picker when clicking outside
   useEffect(() => {
@@ -210,17 +219,28 @@ export default function ColorPicker({
   }, [isOpen]);
 
   // Color input component
-  const ColorInput = () => (
-    <div className="color-picker-input-wrapper">
-      <HexColorInput
-        color={colorInput}
-        onChange={handleInputChange}
-        alpha={enableAlpha}
-        prefixed
-        className="color-picker-input"
-      />
-    </div>
-  );
+  const ColorInput = () => {
+    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+      // Select all text on focus for easy editing
+      // Use setTimeout to ensure the input is fully focused
+      setTimeout(() => {
+        e.target.select();
+      }, 0);
+    };
+
+    return (
+      <div className="color-picker-input-wrapper">
+        <HexColorInput
+          color={colorInput}
+          onChange={handleInputChange}
+          alpha={enableAlpha}
+          prefixed
+          className="color-picker-input"
+          onFocus={handleFocus}
+        />
+      </div>
+    );
+  };
 
   // If showInline is true, show picker directly without trigger button
   if (showInline) {
@@ -264,7 +284,7 @@ export default function ColorPicker({
       {isOpen && (
         <div 
           className="color-picker-popup"
-          style={popupPosition}
+          style={popupStyle}
         >
           <div className="color-picker-container">
             {enableAlpha ? (

@@ -42,7 +42,7 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   min-width: 200px;
   width: 200px;
   box-sizing: border-box;
@@ -87,8 +87,7 @@
 
 /* Color input */
 .color-picker-input-wrapper {
-  padding-top: 12px;
-  border-top: 1px solid #242734;
+  padding-top: 8px;
   width: 100%;
   box-sizing: border-box;
 }

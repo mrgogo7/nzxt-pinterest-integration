@@ -171,6 +171,7 @@ export default function Config() {
             onChange={handleBackgroundColorChange}
             showInline={false}
             enableAlpha={false}
+            popupPosition="bottom-right"
           />
         </div>
       </section>
