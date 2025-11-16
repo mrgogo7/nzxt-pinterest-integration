@@ -459,29 +459,42 @@ export default function ConfigPreview() {
     }
   }, [draggingTextId, handleCustomTextMouseMove, handleCustomTextMouseUp]);
 
-  // Handle click outside to deselect
+  // Handle click outside to deselect and stop drag
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      // Only deselect if clicking on preview area but not on a reading/text
       const target = e.target as HTMLElement;
-      const previewCircle = target.closest('.preview-circle');
+      
+      // Check if click is inside Overlay Options area
+      const overlayOptionsArea = target.closest('.overlay-options-area');
       const isReading = target.closest('[data-reading-id]');
       const isText = target.closest('[data-text-id]');
       
-      if (previewCircle && !isReading && !isText) {
+      // If clicking outside Overlay Options area (and not on a reading/text), deselect and stop drag
+      if (!overlayOptionsArea && !isReading && !isText) {
+        // Stop any active drag
+        if (draggingReadingId) {
+          setDraggingReadingId(null);
+          customReadingDragStart.current = null;
+        }
+        if (draggingTextId) {
+          setDraggingTextId(null);
+          customTextDragStart.current = null;
+        }
+        
+        // Deselect
         setSelectedReadingId(null);
         setSelectedTextId(null);
         selectedItemMousePos.current = null;
       }
     };
 
-    if (selectedReadingId || selectedTextId) {
+    if (selectedReadingId || selectedTextId || draggingReadingId || draggingTextId) {
       window.addEventListener('mousedown', handleClickOutside);
       return () => {
         window.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [selectedReadingId, selectedTextId]);
+  }, [selectedReadingId, selectedTextId, draggingReadingId, draggingTextId]);
 
   // Zoom handler for background
   useEffect(() => {
@@ -1052,7 +1065,7 @@ export default function ConfigPreview() {
           </div>
 
           {/* Overlay Options */}
-          <div className="settings-column">
+          <div className="settings-column overlay-options-area">
             <div className="panel">
               <div className="panel-header">
                 <h3>{t('overlaySettingsTitle', lang)}</h3>
