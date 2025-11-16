@@ -115,16 +115,18 @@ export default function SingleInfographic({
         </>
       )}
 
-      {/* Label (CPU / GPU / Liquid) */}
-      <div
-        className={styles.label}
-        style={{
-          fontSize: `${overlay.textSize * scale}px`,
-          color: textColor,
-        }}
-      >
-        {label}
-      </div>
+      {/* Label (CPU / GPU / Liquid) - Hide if textSize is 0 or textColor is transparent */}
+      {(overlay.textSize > 0 && textColor !== 'transparent') && (
+        <div
+          className={styles.label}
+          style={{
+            fontSize: `${overlay.textSize * scale}px`,
+            color: textColor,
+          }}
+        >
+          {label}
+        </div>
+      )}
     </div>
   );
 }
