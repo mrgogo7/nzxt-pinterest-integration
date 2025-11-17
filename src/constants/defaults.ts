@@ -1,4 +1,4 @@
-import { DEFAULT_OVERLAY, type OverlaySettings } from '../types/overlay';
+import { DEFAULT_OVERLAY, type Overlay, type OverlaySettings } from '../types/overlay';
 
 /**
  * Application settings interface.
@@ -15,7 +15,7 @@ export interface AppSettings {
   mute: boolean;
   resolution: string;
   showGuide?: boolean;
-  overlay?: OverlaySettings;
+  overlay?: Overlay | OverlaySettings; // Can be new Overlay or legacy OverlaySettings (for migration)
   // Optional: url can be included in saved config for backward compatibility
   url?: string;
   // Optional: backgroundColor for color tab (solid color background)
@@ -43,7 +43,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   mute: true,
   resolution: '640x640',
   showGuide: true,
-  overlay: DEFAULT_OVERLAY,
+  overlay: DEFAULT_OVERLAY, // New Overlay model
   backgroundColor: '#000000',
 };
 

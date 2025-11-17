@@ -1,0 +1,70 @@
+/**
+ * UnifiedOverlay CSS Module
+ * Styles for unified overlay element rendering.
+ * 
+ * FAZ1: Simple styles - visual accuracy is NOT critical.
+ */
+
+.elementContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: nzxt-extrabold;
+}
+
+.numberContainer {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  line-height: 0.9;
+}
+
+.number {
+  font-weight: 700;
+}
+
+.unitContainer {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-left: 4px;
+  transform: translateY(-65%);
+}
+
+.unit {
+  font-weight: 700;
+  line-height: 1;
+}
+
+.unitPercent {
+  font-weight: 700;
+  padding-left: 4px;
+  line-height: 1;
+}
+
+.clockNumber {
+  font-weight: 700;
+  line-height: 0.9;
+}
+
+.clockLabel {
+  /* Styles set inline */
+}
+
+.label {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.textElement {
+  font-family: nzxt-extrabold;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.dividerElement {
+  /* Simple divider - styles set inline */
+}
+

@@ -1,10 +1,21 @@
 /**
  * Shared overlay types and helpers for Kraken LCD overlays.
  * This file intentionally does not contain any JSX.
+ * 
+ * FAZ1: Element-based overlay architecture.
+ * - New unified Overlay model with OverlayElement array
+ * - Legacy OverlaySettings kept for migration compatibility
  */
 
 import { getMetricDisplayInfo, type MetricDisplayInfo, type MetricUnitType } from '../domain/metrics';
 
+// ============================================================================
+// LEGACY TYPES (Deprecated - kept for migration compatibility)
+// ============================================================================
+
+/**
+ * @deprecated Use new Overlay type instead. Kept for migration compatibility.
+ */
 export type OverlayMode = "none" | "single" | "dual" | "triple" | "custom";
 
 export type OverlayMetricKey =
@@ -16,6 +27,9 @@ export type OverlayMetricKey =
   | "gpuLoad"
   | "gpuClock";
 
+/**
+ * @deprecated Use new OverlayElement type instead. Kept for migration compatibility.
+ */
 export interface CustomReading {
   id: string; // Unique identifier for the reading
   metric: OverlayMetricKey;
@@ -27,6 +41,9 @@ export interface CustomReading {
   labelIndex: number; // Fixed label index based on creation order (0 = 1st, 1 = 2nd, etc.)
 }
 
+/**
+ * @deprecated Use new OverlayElement type instead. Kept for migration compatibility.
+ */
 export interface CustomText {
   id: string; // Unique identifier for the text
   text: string; // Plain text content (max 120 characters, sanitized)
@@ -38,6 +55,10 @@ export interface CustomText {
   labelIndex: number; // Fixed label index based on creation order (0 = 1st, 1 = 2nd, etc.)
 }
 
+/**
+ * @deprecated Use new Overlay type instead. Kept for migration compatibility.
+ * This type will be removed in a future version after migration is complete.
+ */
 export interface OverlaySettings {
   mode: OverlayMode;
   primaryMetric: OverlayMetricKey;
@@ -89,11 +110,89 @@ export type OverlayMetrics = {
   gpuClock: number;
 };
 
+// ============================================================================
+// NEW ELEMENT-BASED TYPES (FAZ1)
+// ============================================================================
+
 /**
- * Default overlay configuration when none is stored yet.
- * Must stay in sync with ConfigPreview default overlay block.
+ * Overlay element types.
+ * FAZ1: Only metric, text, and divider are supported.
+ * Icon and weather types reserved for future use (FAZ2+).
  */
-export const DEFAULT_OVERLAY: OverlaySettings = {
+export type OverlayElementType = "metric" | "text" | "divider";
+
+/**
+ * Metric element data.
+ */
+export interface MetricElementData {
+  metric: OverlayMetricKey;
+  numberColor: string;
+  numberSize: number;
+  textColor: string;
+  textSize: number;
+  showLabel?: boolean; // Default: true
+}
+
+/**
+ * Text element data.
+ */
+export interface TextElementData {
+  text: string; // Plain text content (max 120 characters, sanitized)
+  textColor: string;
+  textSize: number; // Minimum 6
+}
+
+/**
+ * Divider element data.
+ * FAZ1: Only vertical orientation is supported.
+ */
+export interface DividerElementData {
+  width: number; // Percentage of height
+  thickness: number; // Pixels
+  color: string;
+  orientation: "vertical"; // FAZ1: Only vertical, horizontal reserved for future
+}
+
+/**
+ * Overlay element.
+ * FAZ1: Simple model - only id, type, x, y, zIndex, and data.
+ * Rotation and opacity fields are NOT included (reserved for future).
+ */
+export interface OverlayElement {
+  id: string;
+  type: OverlayElementType;
+  x: number; // X position in LCD coordinates
+  y: number; // Y position in LCD coordinates
+  zIndex?: number; // Render order (default: element index in array)
+  data: MetricElementData | TextElementData | DividerElementData; // Discriminated union based on type
+}
+
+/**
+ * New unified overlay model.
+ * FAZ1: mode is "none" | "custom". "preset" will be added in FAZ2.
+ */
+export interface Overlay {
+  mode: "none" | "custom"; // FAZ2: "preset" will be added
+  elements: OverlayElement[];
+}
+
+/**
+ * Default overlay configuration (new model).
+ * Used when no overlay is stored yet.
+ */
+export const DEFAULT_OVERLAY: Overlay = {
+  mode: "none",
+  elements: [],
+};
+
+// ============================================================================
+// LEGACY DEFAULT (Deprecated - kept for migration compatibility)
+// ============================================================================
+
+/**
+ * @deprecated Use new DEFAULT_OVERLAY constant instead. Kept for migration compatibility.
+ */
+export const DEFAULT_OVERLAY_LEGACY: OverlaySettings = {
   mode: "none",
   primaryMetric: "cpuTemp",
   secondaryMetric: "gpuTemp", // Default for dual/triple modes
@@ -131,6 +230,28 @@ export const DEFAULT_OVERLAY: OverlaySettings = {
   customReadings: [], // Empty array by default, readings will be added by user
   customTexts: [], // Empty array by default, texts will be added by user
 };
+
+// ============================================================================
+// TYPE GUARDS AND HELPERS
+// ============================================================================
+
+/**
+ * Type guard to check if an object is a legacy OverlaySettings.
+ */
+export function isLegacyOverlaySettings(obj: any): obj is OverlaySettings {
+  return obj && typeof obj === 'object' && 'mode' in obj && 
+    (obj.mode === 'single' || obj.mode === 'dual' || obj.mode === 'triple' || 
+     (obj.mode === 'custom' && ('customReadings' in obj || 'customTexts' in obj)));
+}
+
+/**
+ * Type guard to check if an object is the new Overlay type.
+ */
+export function isOverlay(obj: any): obj is Overlay {
+  return obj && typeof obj === 'object' && 'mode' in obj && 'elements' in obj &&
+    Array.isArray(obj.elements) &&
+    (obj.mode === 'none' || obj.mode === 'custom');
+}
 
 // Re-export types from metrics domain for backward compatibility
 export type OverlayValueUnitType = MetricUnitType;
