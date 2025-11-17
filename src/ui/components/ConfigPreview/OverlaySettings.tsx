@@ -1,4 +1,4 @@
-﻿import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { RefreshCw, ChevronUp, ChevronDown, Plus, X } from 'lucide-react';
 import type { AppSettings } from '../../../constants/defaults';
 import { DEFAULT_OVERLAY, type OverlayMode, type OverlayMetricKey, type OverlaySettings, type CustomReading, type CustomText } from '../../../types/overlay';
