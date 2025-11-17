@@ -139,7 +139,7 @@ export const MODE_TRANSITIONS: ModeTransitionDefaults = {
  * @returns Default values to apply for the target mode
  */
 export function getModeTransitionDefaults(
-  fromMode: OverlayMode,
+  _fromMode: OverlayMode,
   toMode: OverlayMode,
   current: Partial<OverlaySettings>
 ): Partial<OverlaySettings> {
@@ -189,7 +189,7 @@ export function validateModeSettings(
       return !!(
         settings.primaryMetric &&
         settings.secondaryMetric &&
-        typeof settings.primaryNumberSize === "number" &&
+        typeof settings.numberSize === "number" &&
         typeof settings.secondaryNumberSize === "number"
       );
     
@@ -198,7 +198,7 @@ export function validateModeSettings(
         settings.primaryMetric &&
         settings.secondaryMetric &&
         settings.tertiaryMetric &&
-        typeof settings.primaryNumberSize === "number" &&
+        typeof settings.numberSize === "number" &&
         typeof settings.secondaryNumberSize === "number" &&
         typeof settings.tertiaryNumberSize === "number"
       );
@@ -210,4 +210,6 @@ export function validateModeSettings(
       return false;
   }
 }
+
+
 
