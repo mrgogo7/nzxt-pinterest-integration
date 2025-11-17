@@ -7,6 +7,7 @@ import ColorPicker from '../ColorPicker';
 import { updateOverlayField, resetOverlayFieldValue, updateCustomReading, updateCustomText } from '../../../utils/overlaySettingsHelpers';
 import OverlayField from './OverlayField';
 import ResetButton from './ResetButton';
+import { getModeTransitionDefaults } from '../../../domain/overlayModes';
 
 interface OverlaySettingsProps {
   overlayConfig: OverlaySettings;
@@ -40,51 +41,21 @@ export default function OverlaySettingsComponent({
                   value={overlayConfig.mode}
                     onChange={(e) => {
                       const newMode = e.target.value as OverlayMode;
-                      const updates: Partial<OverlaySettings> = { mode: newMode };
+                      const currentMode = overlayConfig.mode;
                       
-                      // Set default values when switching to dual mode
-                      if (newMode === 'dual') {
-                        updates.numberSize = 120;
-                        updates.textSize = 35;
-                        updates.secondaryNumberSize = 120;
-                        updates.secondaryTextSize = 35;
-                        updates.dividerGap = 32;
-                        updates.x = 0; // Primary X Offset
-                        updates.y = 0; // Primary Y Offset
-                        updates.secondaryOffsetX = 50; // Secondary X Offset
-                        updates.secondaryOffsetY = 0; // Secondary Y Offset
-                        updates.primaryNumberColor = overlayConfig.primaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
-                        updates.primaryTextColor = overlayConfig.primaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                        updates.secondaryNumberColor = overlayConfig.secondaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
-                        updates.secondaryTextColor = overlayConfig.secondaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                      }
+                      // Use centralized mode transition logic
+                      // This ensures consistent defaults across the application
+                      const modeDefaults = getModeTransitionDefaults(
+                        currentMode,
+                        newMode,
+                        overlayConfig
+                      );
                       
-                      // Set default values when switching to triple mode
-                      if (newMode === 'triple') {
-                        updates.numberSize = 155; // Primary Number Size
-                        updates.textSize = 35; // Primary Text Size
-                        updates.secondaryNumberSize = 80;
-                        updates.secondaryTextSize = 20;
-                        updates.tertiaryNumberSize = 80;
-                        updates.tertiaryTextSize = 20;
-                        updates.gapSecondaryTertiary = 20;
-                        updates.dividerGap = 27;
-                        updates.x = 18; // Primary X Offset
-                        updates.y = 0; // Primary Y Offset
-                        updates.dualReadersOffsetX = 60; // Dual Readers X Offset
-                        updates.dualReadersOffsetY = 0; // Dual Readers Y Offset
-                        updates.primaryNumberColor = overlayConfig.primaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
-                        updates.primaryTextColor = overlayConfig.primaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                        updates.secondaryNumberColor = overlayConfig.secondaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
-                        updates.secondaryTextColor = overlayConfig.secondaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                        updates.tertiaryNumberColor = overlayConfig.tertiaryNumberColor || overlayConfig.numberColor || DEFAULT_OVERLAY.numberColor;
-                        updates.tertiaryTextColor = overlayConfig.tertiaryTextColor || overlayConfig.textColor || DEFAULT_OVERLAY.textColor;
-                      }
-                      
-                      // Set default values when switching to custom mode
-                      if (newMode === 'custom') {
-                        updates.customReadings = overlayConfig.customReadings || [];
-                      }
+                      // Merge mode change with defaults
+                      const updates: Partial<OverlaySettings> = {
+                        mode: newMode,
+                        ...modeDefaults,
+                      };
                       
                       setSettings({
                         ...settings,

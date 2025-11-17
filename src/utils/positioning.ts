@@ -51,11 +51,24 @@ export function getObjectPosition(
 
 /**
  * Calculates offset scale between preview and LCD resolution.
- * CRITICAL: This formula solved scale/offset issues in the past.
  * 
- * @param previewSize - Preview circle size (default: 200px)
- * @param lcdResolution - LCD resolution (default: 640px)
- * @returns Offset scale factor
+ * CRITICAL FORMULA: offsetScale = previewSize / lcdResolution
+ * 
+ * This formula converts coordinates between the 200px preview circle and the 640px LCD.
+ * Example: 200 / 640 = 0.3125 means 1 LCD pixel = 0.3125 preview pixels.
+ * 
+ * WHY THIS FORMULA IS CRITICAL:
+ * - This formula solved persistent drag positioning issues in the past
+ * - Any change to this formula will break drag positioning accuracy
+ * - Both ConfigPreview and KrakenOverlay depend on this exact calculation
+ * - The preview uses 200px circle, LCD uses 640px circle, scale MUST match
+ * 
+ * AI CONTRIBUTORS: DO NOT modify this formula without extensive testing.
+ * Test drag positioning in both preview and actual LCD display.
+ * 
+ * @param previewSize - Preview circle size (default: 200px, MUST match ConfigPreview preview size)
+ * @param lcdResolution - LCD resolution (default: 640px, MUST match NZXT Kraken Elite LCD)
+ * @returns Offset scale factor (typically 0.3125 for 200/640)
  */
 export function calculateOffsetScale(
   previewSize: number = 200,

@@ -1,8 +1,8 @@
 import { DEFAULT_OVERLAY, type OverlaySettings } from '../../types/overlay';
-import { NZXT_DEFAULTS } from '../../constants/nzxt';
 import { useConfig } from '../../hooks/useConfig';
 import { useMediaUrl } from '../../hooks/useMediaUrl';
 import { useMonitoring } from '../../hooks/useMonitoring';
+import { getLCDDimensions } from '../../environment';
 import MediaRenderer from './MediaRenderer';
 import SingleInfographic from './SingleInfographic';
 import DualInfographic from './DualInfographic';
@@ -24,8 +24,8 @@ export default function KrakenOverlay() {
   const { mediaUrl } = useMediaUrl();
   const metrics = useMonitoring();
 
-  // Get LCD resolution from NZXT API or use default
-  const lcdResolution = window.nzxt?.v1?.width || NZXT_DEFAULTS.LCD_WIDTH;
+  // Get LCD resolution using centralized environment detection
+  const { width: lcdResolution } = getLCDDimensions();
   const lcdSize = lcdResolution;
 
   // Merge overlay settings with defaults

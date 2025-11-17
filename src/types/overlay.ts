@@ -3,6 +3,8 @@
  * This file intentionally does not contain any JSX.
  */
 
+import { getMetricDisplayInfo, type MetricDisplayInfo, type MetricUnitType } from '../domain/metrics';
+
 export type OverlayMode = "none" | "single" | "dual" | "triple" | "custom";
 
 export type OverlayMetricKey =
@@ -130,53 +132,22 @@ export const DEFAULT_OVERLAY: OverlaySettings = {
   customTexts: [], // Empty array by default, texts will be added by user
 };
 
-export type OverlayValueUnitType = "temp" | "percent" | "clock" | "none";
-
-export interface OverlayValueInfo {
-  label: string;
-  valueNumber: string;
-  valueUnit: string;
-  valueUnitType: OverlayValueUnitType;
-}
+// Re-export types from metrics domain for backward compatibility
+export type OverlayValueUnitType = MetricUnitType;
+export type OverlayValueInfo = MetricDisplayInfo;
 
 /**
  * Derive label + value + unit for a given metric key.
+ * 
+ * DEPRECATED: Use getMetricDisplayInfo from domain/metrics.ts instead.
+ * This function is kept for backward compatibility and delegates to the centralized implementation.
+ * 
  * The goal is to keep a stable display model independent of the raw data shape.
  */
 export function getOverlayLabelAndValue(
   key: OverlayMetricKey,
   rawValue: number
 ): OverlayValueInfo {
-  let label: string;
-  let unit = "";
-  let unitType: OverlayValueUnitType = "none";
-
-  if (key.startsWith("cpu")) label = "CPU";
-  else if (key.startsWith("gpu")) label = "GPU";
-  else if (key === "liquidTemp") label = "Liquid";
-  else label = key.toUpperCase();
-
-  if (key === "cpuTemp" || key === "gpuTemp" || key === "liquidTemp") {
-    unit = "°";
-    unitType = "temp";
-  } else if (key === "cpuLoad" || key === "gpuLoad") {
-    unit = "%";
-    unitType = "percent";
-  } else if (key === "cpuClock" || key === "gpuClock") {
-    unit = "MHz";
-    unitType = "clock";
-  }
-
-  const rounded = Math.round(rawValue);
-  const valueNumber =
-    typeof rounded === "number" && !Number.isNaN(rounded)
-      ? `${rounded}`
-      : "-";
-
-  return {
-    label,
-    valueNumber,
-    valueUnit: unit,
-    valueUnitType: unitType,
-  };
+  // Delegate to centralized metrics domain
+  return getMetricDisplayInfo(key, rawValue);
 }

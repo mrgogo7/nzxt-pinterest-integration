@@ -11,6 +11,7 @@ import { usePreviewScaling } from '../../hooks/usePreviewScaling';
 import { useSettingsSync } from '../../hooks/useSettingsSync';
 import { useDragHandlers } from '../../hooks/useDragHandlers';
 import { useOverlayConfig } from '../../hooks/useOverlayConfig';
+import { hasRealMonitoring } from '../../environment';
 import { lcdToPreview, getBaseAlign } from '../../utils/positioning';
 import { isVideoUrl } from '../../utils/media';
 import BackgroundPreview from './ConfigPreview/BackgroundPreview';
@@ -32,17 +33,16 @@ export default function ConfigPreview() {
   const [lang, setLang] = useState<Lang>(getInitialLang());
   const { settings, setSettings } = useConfig();
   const { mediaUrl } = useMediaUrl();
-  // Use real monitoring data if NZXT API is available, otherwise use mock data
-  // Check if NZXT API exists and has monitoring capability
-  const hasNzxtApi = typeof window !== 'undefined' && 
-    window.nzxt?.v1 && 
-    typeof window.nzxt.v1.onMonitoringDataUpdate === 'function';
+  
+  // Use centralized environment detection to determine if real monitoring is available
+  const hasRealMonitoringAPI = hasRealMonitoring();
   
   const realMetrics = useMonitoring();
   const mockMetrics = useMonitoringMock();
   
-  // Use mock data if API is not available or if real metrics are still at defaults (no data received)
-  const isRealDataReceived = !!(hasNzxtApi && (
+  // Use real data if API is available and metrics have been received (non-zero values)
+  // Use mock data otherwise (for browser testing)
+  const isRealDataReceived = !!(hasRealMonitoringAPI && (
     realMetrics.cpuTemp > 0 || 
     realMetrics.gpuTemp > 0 || 
     realMetrics.cpuLoad > 0 || 
