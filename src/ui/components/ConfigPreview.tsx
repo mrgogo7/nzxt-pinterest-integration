@@ -64,16 +64,10 @@ export default function ConfigPreview() {
   const {
     isDragging,
     handleBackgroundMouseDown,
-    isDraggingOverlay,
-    isDraggingSecondaryTertiary,
-    handleOverlayMouseDown,
-    draggingReadingId,
-    selectedReadingId,
-    handleCustomReadingMouseDown,
-    draggingTextId,
-    selectedTextId,
-    handleCustomTextMouseDown,
-  } = useDragHandlers(offsetScale, settingsRef, setSettings, overlayConfig);
+    draggingElementId,
+    selectedElementId,
+    handleElementMouseDown,
+  } = useDragHandlers(offsetScale, settingsRef, setSettings);
 
   // Language sync
   useEffect(() => {
@@ -151,10 +145,9 @@ export default function ConfigPreview() {
 
 
   // Overlay positioning for preview
-  // Overlay offset for preview (only for single mode)
-  // Dual and triple modes handle offsets internally
-  const overlayAdjX = (overlayConfig.mode === 'triple' || overlayConfig.mode === 'dual' || overlayConfig.mode === 'custom') ? 0 : lcdToPreview(overlayConfig.x || 0, offsetScale);
-  const overlayAdjY = (overlayConfig.mode === 'triple' || overlayConfig.mode === 'dual' || overlayConfig.mode === 'custom') ? 0 : lcdToPreview(overlayConfig.y || 0, offsetScale);
+  // Element-based overlay: no global offset needed (elements have their own positions)
+  const overlayAdjX = 0;
+  const overlayAdjY = 0;
 
   return (
     <div className="config-wrapper-vertical">
@@ -199,15 +192,9 @@ export default function ConfigPreview() {
             offsetScale={offsetScale}
             overlayAdjX={overlayAdjX}
             overlayAdjY={overlayAdjY}
-            isDraggingOverlay={isDraggingOverlay}
-            isDraggingSecondaryTertiary={isDraggingSecondaryTertiary}
-            draggingReadingId={draggingReadingId}
-            draggingTextId={draggingTextId}
-            selectedReadingId={selectedReadingId}
-            selectedTextId={selectedTextId}
-            onOverlayMouseDown={handleOverlayMouseDown}
-            onCustomReadingMouseDown={handleCustomReadingMouseDown}
-            onCustomTextMouseDown={handleCustomTextMouseDown}
+            draggingElementId={draggingElementId}
+            selectedElementId={selectedElementId}
+            onElementMouseDown={handleElementMouseDown}
             isRealDataReceived={isRealDataReceived}
             lang={lang}
             t={t}

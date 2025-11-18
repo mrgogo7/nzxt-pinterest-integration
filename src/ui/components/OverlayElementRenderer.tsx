@@ -21,7 +21,7 @@ interface OverlayElementRendererProps {
  * Render a metric element.
  */
 function renderMetricElement(
-  element: OverlayElement,
+  _element: OverlayElement,
   data: MetricElementData,
   metrics: OverlayMetrics,
   scale: number
@@ -128,7 +128,7 @@ function renderMetricElement(
  * Render a text element.
  */
 function renderTextElement(
-  element: OverlayElement,
+  _element: OverlayElement,
   data: TextElementData,
   scale: number
 ) {
@@ -153,9 +153,9 @@ function renderTextElement(
  * FAZ1: Minimalist - divider is not used in FAZ1 but renderer exists for completeness.
  */
 function renderDividerElement(
-  element: OverlayElement,
+  _element: OverlayElement,
   data: DividerElementData,
-  scale: number
+  _scale: number
 ) {
   // FAZ1: Simple vertical divider
   return (
