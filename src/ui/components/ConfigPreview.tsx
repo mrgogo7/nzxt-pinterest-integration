@@ -3,7 +3,6 @@ import '../styles/ConfigPreview.css';
 import { LANG_KEY, Lang, t, getInitialLang } from '../../i18n';
 import { Tooltip } from 'react-tooltip';
 import { DEFAULT_SETTINGS, type AppSettings } from '../../constants/defaults';
-import { DEFAULT_OVERLAY } from '../../types/overlay';
 import { useConfig } from '../../hooks/useConfig';
 import { useMediaUrl } from '../../hooks/useMediaUrl';
 import { useMonitoring, useMonitoringMock } from '../../hooks/useMonitoring';
@@ -132,17 +131,6 @@ export default function ConfigPreview() {
     });
   };
 
-  const resetOverlayField = (field: keyof typeof DEFAULT_OVERLAY) => {
-    const defaultValue = DEFAULT_OVERLAY[field];
-    setSettings({
-      ...settings,
-      overlay: {
-        ...overlayConfig,
-        [field]: defaultValue,
-      },
-    });
-  };
-
 
   // Overlay positioning for preview
   // Element-based overlay: no global offset needed (elements have their own positions)
@@ -207,7 +195,6 @@ export default function ConfigPreview() {
             setSettings={setSettings}
             lang={lang}
             t={t}
-            resetOverlayField={resetOverlayField}
           />
         </div>
       </div>
