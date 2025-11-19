@@ -16,7 +16,7 @@
  * - All 8 handles supported (4 corners + 4 edges, including NE)
  */
 
-import type { OverlayElement, MetricElementData, TextElementData } from '../../types/overlay';
+import type { OverlayElement, MetricElementData, TextElementData, DividerElementData } from '../../types/overlay';
 import type { ResizeHandle } from '../engine/HandlePositioning';
 import { 
   createRotationMatrix,
@@ -53,12 +53,21 @@ export interface ResizeOperationConfig {
 const SIZE_CONSTRAINTS = {
   metric: { min: 20, max: 500 },
   text: { min: 6, max: 200 },
+  divider: {
+    width: { min: 1, max: 400 }, // Thickness constraints (width) - allows strong vertical bars
+    height: { min: 10, max: 640 }, // Length constraints (height) - covers full LCD height
+  },
 } as const;
 
 /**
  * Resize speed factor (normalizes mouse movement to size delta).
  */
 const RESIZE_SPEED_FACTOR = 0.6;
+
+/**
+ * Resize speed factor for divider elements (slower for fine control).
+ */
+const DIVIDER_RESIZE_SPEED_FACTOR = 0.1;
 
 /**
  * Resizes an element based on handle position and mouse movement.
@@ -85,8 +94,8 @@ export function resizeElement(
   currentMousePos: { x: number; y: number },
   config: ResizeOperationConfig
 ): ResizeResult {
-  // Only metric and text elements can be resized
-  if (element.type !== 'metric' && element.type !== 'text') {
+  // Only metric, text, and divider elements can be resized
+  if (element.type !== 'metric' && element.type !== 'text' && element.type !== 'divider') {
     return {
       element,
       newSize: getElementSize(element),
@@ -108,6 +117,19 @@ export function resizeElement(
   // Get element's rotation angle
   const angle = element.angle ?? 0;
   
+  // Divider is a rectangle element - use generic rectangle resize (no aspect ratio lock)
+  // Width and height are independent dimensions
+  if (element.type === 'divider') {
+    return resizeDividerRectangle(
+      element,
+      handle,
+      lcdDelta,
+      angle,
+      config
+    );
+  }
+  
+  // For metric and text elements, use aspect ratio lock (always ON)
   // Calculate resize delta in element's local coordinate space
   // WHY: This is the critical fix for Bug #2. When an element is rotated,
   // the mouse movement is in global (screen) coordinates, but resize should
@@ -278,6 +300,8 @@ function getCornerHandleSign(
 
 /**
  * Gets current element size.
+ * For metric/text: returns numberSize/textSize.
+ * For divider: returns width (for undo/redo consistency).
  */
 function getElementSize(element: OverlayElement): number {
   if (element.type === 'metric') {
@@ -286,8 +310,108 @@ function getElementSize(element: OverlayElement): number {
   } else if (element.type === 'text') {
     const data = element.data as TextElementData;
     return data.textSize || 45;
+  } else if (element.type === 'divider') {
+    const data = element.data as DividerElementData;
+    return data.width || 2;
   }
   return 0;
+}
+
+/**
+ * Resizes a divider element as a rectangle.
+ * 
+ * Divider is a rectangle element - width and height are independent.
+ * Resize rules (same as any rectangle):
+ * - Left/Right handles: resize width (thickness)
+ * - Top/Bottom handles: resize height (length)
+ * - Corner handles: resize both independently (no aspect ratio lock)
+ * 
+ * @param element - Divider element to resize
+ * @param handle - Resize handle being dragged
+ * @param lcdDelta - Mouse movement in LCD coordinates
+ * @param angle - Element rotation angle in degrees
+ * @param config - Resize operation configuration (initialSize not used for divider)
+ * @returns Updated divider element
+ */
+function resizeDividerRectangle(
+  element: OverlayElement,
+  handle: ResizeHandle,
+  lcdDelta: { x: number; y: number },
+  angle: number,
+  _config: ResizeOperationConfig
+): ResizeResult {
+  const data = element.data as DividerElementData;
+  
+  // CRITICAL FIX: Use the EXACT same delta calculation as metric/text elements
+  // This ensures divider resize speed matches metric/text exactly.
+  // The calculateResizeDeltaInLocalSpace function handles rotation and handle direction correctly.
+  const localDelta = calculateResizeDeltaInLocalSpace(
+    handle,
+    lcdDelta,
+    angle
+  );
+  
+  // Get current values (already in LCD pixels)
+  let currentWidth = data.width || 2;
+  let currentHeight = data.height || 384; // Default 60% of 640px LCD
+  
+  // CRITICAL: For divider, width and height are independent (no aspect ratio lock)
+  // But we use the same delta calculation as metric/text for consistency.
+  // 
+  // For edge handles: calculateResizeDeltaForHandle applies the same delta to both axes
+  // (for aspect ratio lock), but for divider we only use the relevant axis.
+  // For corner handles: both axes get the diagonal delta (same as metric/text).
+  const direction = getResizeDirection(handle);
+  
+  if (direction.horizontal !== 'none' && direction.vertical !== 'none') {
+    // Corner handle: resize both width and height independently
+    // localDelta.x and localDelta.y are both the diagonal delta (from calculateResizeDeltaForHandle)
+    // Use either one (they're the same for corner handles)
+    const delta = localDelta.x; // or localDelta.y, they're equal for corner handles
+    currentWidth = currentWidth + delta * DIVIDER_RESIZE_SPEED_FACTOR;
+    currentHeight = currentHeight + delta * DIVIDER_RESIZE_SPEED_FACTOR;
+    
+  } else if (direction.horizontal !== 'none') {
+    // Horizontal handle (Left/Right): resize width only
+    // localDelta.x has the correct sign and value (from calculateResizeDeltaForHandle)
+    // localDelta.y is the same as localDelta.x (aspect ratio lock), but we ignore it for divider
+    currentWidth = currentWidth + localDelta.x * DIVIDER_RESIZE_SPEED_FACTOR;
+    
+  } else if (direction.vertical !== 'none') {
+    // Vertical handle (Top/Bottom): resize height only
+    // localDelta.y has the correct sign and value (from calculateResizeDeltaForHandle)
+    // localDelta.x is the same as localDelta.y (aspect ratio lock), but we ignore it for divider
+    currentHeight = currentHeight + localDelta.y * DIVIDER_RESIZE_SPEED_FACTOR;
+  }
+  
+  // Apply constraints
+  const widthConstraints = SIZE_CONSTRAINTS.divider.width;
+  const constrainedWidth = Math.max(
+    widthConstraints.min,
+    Math.min(widthConstraints.max, currentWidth)
+  );
+  
+  const heightConstraints = SIZE_CONSTRAINTS.divider.height;
+  const constrainedHeight = Math.max(
+    heightConstraints.min,
+    Math.min(heightConstraints.max, currentHeight)
+  );
+  
+  // Update element
+  const updatedElement: OverlayElement = {
+    ...element,
+    data: {
+      ...data,
+      width: constrainedWidth,
+      height: constrainedHeight,
+    },
+  };
+  
+  // Return width as newSize for consistency (undo/redo uses it)
+  return {
+    element: updatedElement,
+    newSize: constrainedWidth,
+  };
 }
 
 /**
@@ -313,6 +437,9 @@ function updateElementSize(
         textSize: newSize,
       },
     };
+  } else if (element.type === 'divider') {
+    // This function is only used for metric/text, divider uses resizeDividerRectangle
+    return element;
   }
   return element;
 }

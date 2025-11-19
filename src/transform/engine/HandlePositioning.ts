@@ -95,8 +95,11 @@ export function calculateHandlePositions(
 /**
  * Calculates resize handle positions.
  * 
- * Handles are positioned at AABB corners and edges.
- * For rotated elements, handles are positioned at the rotated corners/edges.
+ * Handles are positioned at AABB corners and edges (axis-aligned bounding box).
+ * This ensures consistent handle placement for all element types, including rotated elements.
+ * 
+ * CRITICAL: Handles must be at AABB corners, not rotated corners, for consistent UX.
+ * This matches the visual bounding box shown to users (Figma-style).
  * 
  * @param element - Overlay element
  * @param aabb - Axis-aligned bounding box (relative to element center)
@@ -106,43 +109,54 @@ export function calculateHandlePositions(
  */
 function calculateResizeHandlePositions(
   element: OverlayElement,
-  _aabb: BoundingBox,
+  aabb: BoundingBox,
   angle: number,
   config: HandlePositioningConfig
 ): Map<ResizeHandle, HandlePosition> {
   const handles = new Map<ResizeHandle, HandlePosition>();
   
-  // Get rotated bounding box corners (in global coordinates)
-  const rBox = calculateRotatedBoundingBoxAtPosition(element);
+  // CRITICAL FIX: Use AABB corners, not rotated corners
+  // This ensures handles appear at the visual bounding box corners (Figma-style)
+  // which matches user expectations and is consistent across all element types.
+  // 
+  // AABB corners in global coordinates (relative to element center, then translated)
+  const aabbCorners = {
+    topLeft: { x: element.x + aabb.left, y: element.y + aabb.top },
+    topRight: { x: element.x + aabb.right, y: element.y + aabb.top },
+    bottomRight: { x: element.x + aabb.right, y: element.y + aabb.bottom },
+    bottomLeft: { x: element.x + aabb.left, y: element.y + aabb.bottom },
+  };
   
-  // Corner handles
-  handles.set('nw', calculateCornerHandlePosition(rBox.topLeft, angle, config));
-  handles.set('ne', calculateCornerHandlePosition(rBox.topRight, angle, config));
-  handles.set('sw', calculateCornerHandlePosition(rBox.bottomLeft, angle, config));
-  handles.set('se', calculateCornerHandlePosition(rBox.bottomRight, angle, config));
+  // Corner handles at AABB corners
+  handles.set('nw', calculateCornerHandlePosition(aabbCorners.topLeft, angle, config));
+  handles.set('ne', calculateCornerHandlePosition(aabbCorners.topRight, angle, config));
+  handles.set('sw', calculateCornerHandlePosition(aabbCorners.bottomLeft, angle, config));
+  handles.set('se', calculateCornerHandlePosition(aabbCorners.bottomRight, angle, config));
   
-  // Edge handles (midpoints of rotated edges)
+  // Edge handles at AABB edge midpoints
   const topMid = {
-    x: (rBox.topLeft.x + rBox.topRight.x) / 2,
-    y: (rBox.topLeft.y + rBox.topRight.y) / 2,
+    x: (aabbCorners.topLeft.x + aabbCorners.topRight.x) / 2,
+    y: (aabbCorners.topLeft.y + aabbCorners.topRight.y) / 2,
   };
   const rightMid = {
-    x: (rBox.topRight.x + rBox.bottomRight.x) / 2,
-    y: (rBox.topRight.y + rBox.bottomRight.y) / 2,
+    x: (aabbCorners.topRight.x + aabbCorners.bottomRight.x) / 2,
+    y: (aabbCorners.topRight.y + aabbCorners.bottomRight.y) / 2,
   };
   const bottomMid = {
-    x: (rBox.bottomLeft.x + rBox.bottomRight.x) / 2,
-    y: (rBox.bottomLeft.y + rBox.bottomRight.y) / 2,
+    x: (aabbCorners.bottomLeft.x + aabbCorners.bottomRight.x) / 2,
+    y: (aabbCorners.bottomLeft.y + aabbCorners.bottomRight.y) / 2,
   };
   const leftMid = {
-    x: (rBox.topLeft.x + rBox.bottomLeft.x) / 2,
-    y: (rBox.topLeft.y + rBox.bottomLeft.y) / 2,
+    x: (aabbCorners.topLeft.x + aabbCorners.bottomLeft.x) / 2,
+    y: (aabbCorners.topLeft.y + aabbCorners.bottomLeft.y) / 2,
   };
   
-  handles.set('n', calculateEdgeHandlePosition(topMid, rBox.topLeft, rBox.topRight, angle, config));
-  handles.set('e', calculateEdgeHandlePosition(rightMid, rBox.topRight, rBox.bottomRight, angle, config));
-  handles.set('s', calculateEdgeHandlePosition(bottomMid, rBox.bottomLeft, rBox.bottomRight, angle, config));
-  handles.set('w', calculateEdgeHandlePosition(leftMid, rBox.topLeft, rBox.bottomLeft, angle, config));
+  // For edge handles, we need edge direction vectors for perpendicular offset
+  // Since AABB edges are axis-aligned, we can use simple perpendicular directions
+  handles.set('n', calculateEdgeHandlePosition(topMid, aabbCorners.topLeft, aabbCorners.topRight, angle, config));
+  handles.set('e', calculateEdgeHandlePosition(rightMid, aabbCorners.topRight, aabbCorners.bottomRight, angle, config));
+  handles.set('s', calculateEdgeHandlePosition(bottomMid, aabbCorners.bottomLeft, aabbCorners.bottomRight, angle, config));
+  handles.set('w', calculateEdgeHandlePosition(leftMid, aabbCorners.topLeft, aabbCorners.bottomLeft, angle, config));
   
   return handles;
 }
