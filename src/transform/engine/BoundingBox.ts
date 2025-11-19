@@ -13,7 +13,6 @@
  */
 
 import type { OverlayElement, MetricElementData, TextElementData, DividerElementData } from '../../types/overlay';
-import { NZXT_DEFAULTS } from '../../constants/nzxt';
 
 /**
  * Element dimensions in LCD coordinates.
