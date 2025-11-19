@@ -1,7 +1,7 @@
 /**
  * Overlay migration utilities.
  * 
- * FAZ1: Simple migration from legacy OverlaySettings to new Overlay model.
+ * Simple migration from legacy OverlaySettings to new Overlay model.
  * Migration is minimal - visual accuracy, position accuracy, and color accuracy are NOT important.
  * The goal is only to make the new element-based overlay structure work.
  */
@@ -40,11 +40,11 @@ function createSimpleMetricElement(metric: OverlayMetricKey, x: number = 0, y: n
 /**
  * Migrate legacy OverlaySettings to new Overlay model.
  * 
- * FAZ1: Minimal migration - visual accuracy is NOT important.
+ * Minimal migration - visual accuracy is NOT important.
  * - Single/Dual/Triple: Simple metric elements with basic positions
  * - Custom: Convert readings/texts to elements (order/labelIndex may be lost)
  * - Invalid data: Return DEFAULT_OVERLAY
- * - Divider elements are NOT created (FAZ1)
+ * - Divider elements are NOT created
  */
 export function migrateOverlaySettingsToOverlay(oldSettings: OverlaySettings | null | undefined): Overlay {
   // Handle null/undefined
@@ -99,7 +99,7 @@ export function migrateOverlaySettingsToOverlay(oldSettings: OverlaySettings | n
 
       case 'custom':
         // Custom mode: Convert readings and texts to elements
-        // Order and labelIndex may be lost - that's acceptable for FAZ1
+        // Order and labelIndex may be lost - that's acceptable
         
         // Convert custom readings to metric elements
         if (Array.isArray(oldSettings.customReadings)) {

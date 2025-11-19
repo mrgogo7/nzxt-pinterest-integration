@@ -75,7 +75,7 @@ export function calculateElementDimensions(element: OverlayElement): ElementDime
     };
   } else if (element.type === 'divider') {
     const data = element.data as DividerElementData;
-    // Divider is vertical by default (FAZ1)
+    // Divider is vertical by default
     return {
       width: data.thickness || 2,
       height: NZXT_DEFAULTS.LCD_HEIGHT, // Full height for vertical divider

@@ -2,10 +2,10 @@
  * OverlayElementRenderer
  * Renders individual overlay elements based on their type.
  * 
- * FAZ1: Simple rendering - visual accuracy is NOT critical.
+ * Simple rendering - visual accuracy is NOT critical.
  * The goal is to display elements on screen with basic features.
  * 
- * Phase 4.2: Performance optimization with memoization.
+ * Performance optimization with memoization.
  */
 
 import { memo } from 'react';
@@ -153,14 +153,14 @@ function renderTextElement(
 
 /**
  * Render a divider element.
- * FAZ1: Minimalist - divider is not used in FAZ1 but renderer exists for completeness.
+ * Minimalist - divider renderer exists for completeness.
  */
 function renderDividerElement(
   _element: OverlayElement,
   data: DividerElementData,
   _scale: number
 ) {
-  // FAZ1: Simple vertical divider
+  // Simple vertical divider
   return (
     <div
       className={styles.dividerElement}
@@ -197,6 +197,6 @@ function OverlayElementRenderer({
   }
 }
 
-// Phase 4.2: Memoize to prevent unnecessary re-renders
+// Memoize to prevent unnecessary re-renders
 export default memo(OverlayElementRenderer);
 

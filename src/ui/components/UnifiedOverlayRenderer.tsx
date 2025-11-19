@@ -11,7 +11,7 @@
  * - Correct order: translate first, then rotate
  * - This ensures element is positioned correctly before rotation
  * 
- * Phase 4.2: Performance optimization with memoization.
+ * Performance optimization with memoization.
  */
 
 import { memo } from 'react';
@@ -81,6 +81,6 @@ function UnifiedOverlayRenderer({
   );
 }
 
-// Phase 4.2: Memoize to prevent unnecessary re-renders
+// Memoize to prevent unnecessary re-renders
 export default memo(UnifiedOverlayRenderer);
 

@@ -1,8 +1,8 @@
 /**
  * Bounding Box Styles
  * 
- * Phase 8.3: Modern Bounding Box Styling (Framer-style)
- * Phase 8.5: UX Enhancements (hover, floating shadow, opacity transitions)
+ * Modern Bounding Box Styling (Framer-style)
+ * UX Enhancements (hover, floating shadow, opacity transitions)
  * 
  * Design:
  * - Solid cyan border (1.5px)
@@ -28,7 +28,7 @@
               opacity 0.2s ease;
 }
 
-/* Phase 8.5: Hover state - subtle highlight */
+/* Hover state - subtle highlight */
 .bounding-box:hover {
   border-color: rgba(0, 220, 255, 0.8);
   background: rgba(0, 200, 255, 0.08);
@@ -48,7 +48,7 @@
               box-shadow 0.1s ease;
 }
 
-/* Phase 8.5: Resizing state - opacity change for visual feedback */
+/* Resizing state - opacity change for visual feedback */
 .bounding-box.resizing {
   opacity: 0.85;
   transition: opacity 0.15s ease;

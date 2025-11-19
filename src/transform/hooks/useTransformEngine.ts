@@ -21,7 +21,7 @@ import type { AppSettings } from '../../constants/defaults';
 import { moveElement, type MoveOperationConfig } from '../operations/MoveOperation';
 import { resizeElement, type ResizeOperationConfig } from '../operations/ResizeOperation';
 import { rotateElement, type RotateOperationConfig } from '../operations/RotateOperation';
-import { calculateOffsetScale } from '../engine/CoordinateSystem';
+import { isMetricElementData, isTextElementData } from '../../types/overlay';
 
 /**
  * Transform engine hook configuration.
@@ -235,10 +235,10 @@ export function useTransformEngine(
     
     // Get initial size
     let initialSize = 0;
-    if (element.type === 'metric') {
-      initialSize = (element.data as any).numberSize || 180;
-    } else if (element.type === 'text') {
-      initialSize = (element.data as any).textSize || 45;
+    if (element.type === 'metric' && isMetricElementData(element.data)) {
+      initialSize = element.data.numberSize || 180;
+    } else if (element.type === 'text' && isTextElementData(element.data)) {
+      initialSize = element.data.textSize || 45;
     } else {
       return; // Only metric and text can be resized
     }

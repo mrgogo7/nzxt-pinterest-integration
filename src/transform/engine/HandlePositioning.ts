@@ -106,7 +106,7 @@ export function calculateHandlePositions(
  */
 function calculateResizeHandlePositions(
   element: OverlayElement,
-  aabb: BoundingBox,
+  _aabb: BoundingBox,
   angle: number,
   config: HandlePositioningConfig
 ): Map<ResizeHandle, HandlePosition> {

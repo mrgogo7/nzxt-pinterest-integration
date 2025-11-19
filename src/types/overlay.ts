@@ -2,7 +2,7 @@
  * Shared overlay types and helpers for Kraken LCD overlays.
  * This file intentionally does not contain any JSX.
  * 
- * FAZ1: Element-based overlay architecture.
+ * Element-based overlay architecture:
  * - New unified Overlay model with OverlayElement array
  * - Legacy OverlaySettings kept for migration compatibility
  */
@@ -111,13 +111,13 @@ export type OverlayMetrics = {
 };
 
 // ============================================================================
-// NEW ELEMENT-BASED TYPES (FAZ1)
+// NEW ELEMENT-BASED TYPES
 // ============================================================================
 
 /**
  * Overlay element types.
- * FAZ1: Only metric, text, and divider are supported.
- * Icon and weather types reserved for future use (FAZ2+).
+ * Only metric, text, and divider are supported.
+ * Icon and weather types reserved for future use.
  */
 export type OverlayElementType = "metric" | "text" | "divider";
 
@@ -144,18 +144,18 @@ export interface TextElementData {
 
 /**
  * Divider element data.
- * FAZ1: Only vertical orientation is supported.
+ * Only vertical orientation is supported.
  */
 export interface DividerElementData {
   width: number; // Percentage of height
   thickness: number; // Pixels
   color: string;
-  orientation: "vertical"; // FAZ1: Only vertical, horizontal reserved for future
+  orientation: "vertical"; // Only vertical, horizontal reserved for future
 }
 
 /**
  * Overlay element.
- * Phase 4.2: Added rotation support.
+ * Supports rotation via angle property.
  */
 export interface OverlayElement {
   id: string;
@@ -169,10 +169,10 @@ export interface OverlayElement {
 
 /**
  * New unified overlay model.
- * FAZ1: mode is "none" | "custom". "preset" will be added in FAZ2.
+ * Mode is "none" | "custom". "preset" will be added in future.
  */
 export interface Overlay {
-  mode: "none" | "custom"; // FAZ2: "preset" will be added
+  mode: "none" | "custom"; // "preset" will be added in future
   elements: OverlayElement[];
 }
 
@@ -271,4 +271,50 @@ export function getOverlayLabelAndValue(
 ): OverlayValueInfo {
   // Delegate to centralized metrics domain
   return getMetricDisplayInfo(key, rawValue);
+}
+
+/**
+ * Type guard for MetricElementData.
+ * Checks if data object is MetricElementData.
+ */
+export function isMetricElementData(data: unknown): data is MetricElementData {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'metric' in data &&
+    'numberColor' in data &&
+    'numberSize' in data &&
+    'textColor' in data &&
+    'textSize' in data
+  );
+}
+
+/**
+ * Type guard for TextElementData.
+ * Checks if data object is TextElementData.
+ */
+export function isTextElementData(data: unknown): data is TextElementData {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'text' in data &&
+    'textColor' in data &&
+    'textSize' in data &&
+    !('metric' in data) // Ensure it's not a metric element
+  );
+}
+
+/**
+ * Type guard for DividerElementData.
+ * Checks if data object is DividerElementData.
+ */
+export function isDividerElementData(data: unknown): data is DividerElementData {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'thickness' in data &&
+    ('width' in data || 'color' in data) &&
+    !('metric' in data) &&
+    !('text' in data)
+  );
 }

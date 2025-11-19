@@ -9,12 +9,11 @@ import { moveElement, type MoveOperationConfig } from '../transform/operations/M
 /**
  * Hook for managing all drag handlers in ConfigPreview.
  * 
- * FAZ3: Fully migrated to element-based drag handlers.
  * Handles:
  * - Background drag (media positioning)
  * - Element drag (unified for all element types: metric, text, divider)
  * 
- * Phase 5: Added undo/redo support via onMoveComplete callback.
+ * Supports undo/redo via onMoveComplete callback.
  * 
  * @param offsetScale - Scale factor for converting preview to LCD pixels
  * @param settingsRef - Ref to current settings (to avoid stale closures)
@@ -34,10 +33,10 @@ export function useDragHandlers(
   const [draggingElementId, setDraggingElementId] = useState<string | null>(null);
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   
-  // Phase 4.2: Snapping guides state
+  // Snapping guides state
   const [activeGuides, setActiveGuides] = useState<AlignmentGuide[]>([]);
   
-  // Phase 4.2: Snapping state for escape tolerance
+  // Snapping state for escape tolerance
   const snappingState = useRef<SnappingState>({
     lastSnappedX: null,
     lastSnappedY: null,
@@ -48,12 +47,11 @@ export function useDragHandlers(
   // Drag refs
   const dragStart = useRef<{ x: number; y: number } | null>(null);
   const elementDragStart = useRef<{ x: number; y: number; elementId: string } | null>(null);
-  const selectedItemMousePos = useRef<{ x: number; y: number } | null>(null);
   
-  // Phase 4.2: Previous position for velocity calculation
+  // Previous position for velocity calculation
   const lastPosition = useRef<{ x: number; y: number } | null>(null);
   
-  // Phase 5: Store initial position for undo/redo
+  // Store initial position for undo/redo
   const moveInitialPosition = useRef<{ x: number; y: number } | null>(null);
 
   // Background drag handlers
@@ -101,7 +99,7 @@ export function useDragHandlers(
       setDraggingElementId(elementId);
       elementDragStart.current = { x: e.clientX, y: e.clientY, elementId };
       
-      // Phase 5: Store initial position for undo/redo
+      // Store initial position for undo/redo
       const currentSettings = settingsRef.current;
       const currentOverlay = currentSettings.overlay;
       if (currentOverlay && typeof currentOverlay === 'object' && 'elements' in currentOverlay) {
@@ -114,7 +112,6 @@ export function useDragHandlers(
     } else {
       // First click: just select, don't start dragging
       setSelectedElementId(elementId);
-      selectedItemMousePos.current = { x: e.clientX, y: e.clientY };
     }
   }, [selectedElementId, settingsRef]);
 
@@ -157,14 +154,14 @@ export function useDragHandlers(
       const newX = moveResult.x;
       const newY = moveResult.y;
       
-      // Phase 4.2: Calculate velocity for escape detection
+      // Calculate velocity for escape detection
       if (lastPosition.current) {
         snappingState.current.escapeVelocityX = newX - lastPosition.current.x;
         snappingState.current.escapeVelocityY = newY - lastPosition.current.y;
       }
       lastPosition.current = { x: newX, y: newY };
       
-      // Phase 4.2: Snapping - detect alignment guides (only show when within threshold)
+      // Snapping - detect alignment guides (only show when within threshold)
       const otherElements = overlay.elements.filter(el => el.id !== element.id);
       const guides = detectAlignment(
         { ...element, x: newX, y: newY },
@@ -196,7 +193,7 @@ export function useDragHandlers(
         if (escapedY) snappingState.current.lastSnappedY = null;
       }
       
-      // Phase 4.2: Boundary control - constrain element to stay within circle
+      // Boundary control - constrain element to stay within circle
       const constrained = constrainToCircle(element, snapped.x, snapped.y, offsetScale);
       
       const updatedElements = [...overlay.elements];
@@ -220,7 +217,7 @@ export function useDragHandlers(
   }, [offsetScale, setSettings, settingsRef]);
 
   const handleElementMouseUp = useCallback(() => {
-    // Phase 5: Record move action for undo/redo
+    // Record move action for undo/redo
     if (elementDragStart.current && moveInitialPosition.current && onMoveComplete) {
       const currentSettings = settingsRef.current;
       const currentOverlay = currentSettings.overlay;
@@ -295,7 +292,6 @@ export function useDragHandlers(
         
         // Deselect
         setSelectedElementId(null);
-        selectedItemMousePos.current = null;
       }
     };
 
@@ -317,7 +313,7 @@ export function useDragHandlers(
     selectedElementId,
     handleElementMouseDown,
     
-    // Phase 4.2: Snapping guides
+    // Snapping guides
     activeGuides,
   };
 }

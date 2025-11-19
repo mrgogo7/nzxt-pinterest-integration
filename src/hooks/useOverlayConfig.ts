@@ -6,7 +6,7 @@ import type { AppSettings } from '../constants/defaults';
 /**
  * Hook for computing overlay configuration from settings.
  * 
- * FAZ3: Fully migrated to element-based system.
+ * Fully migrated to element-based system.
  * - Returns new Overlay model (mode: "none" | "custom", elements[])
  * - Automatically migrates legacy OverlaySettings if detected
  * - Migration is done in useMemo for performance

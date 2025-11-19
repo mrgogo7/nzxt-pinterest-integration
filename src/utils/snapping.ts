@@ -8,7 +8,7 @@ import { getElementBounds } from './boundaries';
 
 /**
  * Snapping thresholds in LCD pixels.
- * Phase 4.2: Refined snapping behavior - soft, magnetic, escapable.
+ * Soft, magnetic, escapable snapping behavior.
  */
 const SNAP_THRESHOLD = 5; // Distance at which snapping becomes active (reduced for natural feel)
 const SNAP_ESCAPE_TOLERANCE = 15; // Distance needed to escape snapping once engaged (larger for easy escape)
@@ -47,7 +47,7 @@ interface SnappingState {
 
 /**
  * Detects alignment between elements and returns snapping guides.
- * Phase 4.2: Only shows guides when within threshold for better UX.
+ * Only shows guides when within threshold for better UX.
  */
 export function detectAlignment(
   draggedElement: OverlayElement,
@@ -117,7 +117,7 @@ export function detectAlignment(
 
 /**
  * Applies soft, magnetic snapping to a position based on detected guides.
- * Phase 4.2: Smooth interpolation for natural feel, not hard snapping.
+ * Uses smooth interpolation for natural feel, not hard snapping.
  */
 export function applySnapping(
   x: number,

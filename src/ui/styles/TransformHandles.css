@@ -1,9 +1,9 @@
 /**
  * Transform Handles Styles
  * 
- * Phase 8.1: Resize Handle Redesign (Figma-style)
- * Phase 8.2: Rotation Handle Redesign (Figma-style)
- * Phase 8.4: Handle Size Optimization (minimal, Figma-like)
+ * Resize Handle Redesign (Figma-style)
+ * Rotation Handle Redesign (Figma-style)
+ * Handle Size Optimization (minimal, Figma-like)
  * 
  * Design:
  * - 8px × 8px square handles (resize) - optimized for 200px preview
@@ -16,7 +16,7 @@
 /* Wrapper for resize handle (handles positioning and rotation) */
 /* Position and rotation handled by inline styles in TSX */
 
-/* Base resize handle - Phase 8.4 Micro-patch: Optimized to 6px × 6px for minimal look */
+/* Base resize handle - Optimized to 6px × 6px for minimal look */
 .resize-handle {
   position: relative;
   width: 6px;
@@ -47,7 +47,7 @@
   cursor: inherit; /* Inherit cursor from parent */
 }
 
-/* Hover state - subtle scale and glow - Phase 8.4 Micro-patch: Adjusted for 6px size */
+/* Hover state - subtle scale and glow - Adjusted for 6px size */
 .resize-handle:hover {
   transform: scale(1.1);
   background: rgba(255, 255, 255, 1);
@@ -55,7 +55,7 @@
   box-shadow: 0 0 0 1.5px rgba(0, 200, 255, 0.3);
 }
 
-/* Active state (during resize) - more pronounced - Phase 8.4 Micro-patch: Adjusted for 6px size */
+/* Active state (during resize) - more pronounced - Adjusted for 6px size */
 .resize-handle.active {
   transform: scale(1.15);
   background: rgba(255, 255, 255, 1);
@@ -67,7 +67,7 @@
               box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Phase 8.5: Resizing state - opacity change for visual feedback */
+/* Resizing state - opacity change for visual feedback */
 .resize-handle.resizing {
   opacity: 0.9;
   transition: opacity 0.15s ease;
@@ -77,13 +77,13 @@
 /* Reserved for future customization: .resize-handle--nw, .resize-handle--n, etc. */
 
 /* ============================================
-   Rotation Handle Styles (Phase 8.2)
+   Rotation Handle Styles
    ============================================ */
 
 /* Wrapper for rotation handle (handles positioning and rotation) */
 /* Position and rotation handled by inline styles in TSX */
 
-/* Base rotation handle - Phase 8.4: Optimized to 24px × 24px to prevent overlap */
+/* Base rotation handle - Optimized to 24px × 24px to prevent overlap */
 .rotation-handle {
   position: relative;
   width: 24px;
@@ -96,7 +96,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: auto;
-  opacity: 0.85; /* Phase 8.5: Default opacity for non-rotating state */
+  opacity: 0.85; /* Default opacity for non-rotating state */
   transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
               background 0.15s cubic-bezier(0.4, 0, 0.2, 1),
               border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
@@ -114,7 +114,7 @@
   /* Empty ruleset kept for future customization */
 }
 
-/* Hover state - subtle scale and glow - Phase 8.4: Adjusted for smaller size */
+/* Hover state - subtle scale and glow - Adjusted for smaller size */
 .rotation-handle:hover {
   transform: scale(1.08);
   background: rgba(0, 200, 255, 0.25);
@@ -122,7 +122,7 @@
   box-shadow: 0 0 0 1.5px rgba(0, 200, 255, 0.3);
 }
 
-/* Active state (during rotation) - more pronounced - Phase 8.4: Adjusted for smaller size */
+/* Active state (during rotation) - more pronounced - Adjusted for smaller size */
 .rotation-handle.active {
   transform: scale(1.12);
   background: rgba(0, 200, 255, 0.35);
@@ -134,7 +134,7 @@
               box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Phase 8.5: Rotating state - enhanced visibility */
+/* Rotating state - enhanced visibility */
 .rotation-handle.rotating {
   opacity: 1;
   background: rgba(0, 200, 255, 0.25);

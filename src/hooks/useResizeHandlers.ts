@@ -1,7 +1,6 @@
 /**
  * Hook for managing element resize handlers.
  * 
- * Phase 4.2: Resize UX improvements.
  * Handles resize for metric and text elements with min/max constraints.
  */
 
@@ -15,7 +14,7 @@ import type { AppSettings } from '../constants/defaults';
 /**
  * Hook for managing element resize.
  * 
- * Phase 5: Added undo/redo support via onResizeComplete callback.
+ * Supports undo/redo via onResizeComplete callback.
  */
 export function useResizeHandlers(
   offsetScale: number,
@@ -123,7 +122,7 @@ export function useResizeHandlers(
   }, [offsetScale, setSettings, settingsRef]);
 
   const handleResizeMouseUp = useCallback(() => {
-    // Phase 5: Record resize action for undo/redo
+    // Record resize action for undo/redo
     if (resizeStart.current && onResizeComplete) {
       const currentSettings = settingsRef.current;
       const currentOverlay = currentSettings.overlay;

@@ -40,7 +40,7 @@ interface OverlayPreviewProps {
  * Overlay preview component.
  * Displays overlay preview with element-based rendering and drag support.
  * 
- * FAZ3: Fully migrated to element-based system.
+ * Fully migrated to element-based system:
  * - Uses UnifiedOverlayRenderer for all element types
  * - Unified element drag handlers for all element types
  * - Element-based hit area calculation
@@ -73,7 +73,7 @@ export default function OverlayPreview({
             className={`preview-circle overlay-preview ${draggingElementId ? 'dragging' : ''}`}
             style={{ position: 'relative', width: '200px', height: '200px' }}
           >
-            {/* Phase 4.2: Alignment guides */}
+            {/* Alignment guides */}
             {activeGuides.length > 0 && (
               <div
                 style={{
@@ -229,8 +229,8 @@ export default function OverlayPreview({
                         }}
                       />
                       
-                      {/* Phase 8.3: AABB Bounding Box (Modern Framer-style) - shown when selected */}
-                      {/* Phase 8.5: Added resizing state for opacity feedback */}
+                      {/* AABB Bounding Box (Modern Framer-style) - shown when selected */}
+                      {/* Resizing state for opacity feedback */}
                       {isSelected && (
                         <div
                           className={`bounding-box ${isDraggingThis ? 'dragging' : ''} ${isResizingThis ? 'resizing' : ''}`}
@@ -244,7 +244,7 @@ export default function OverlayPreview({
                         />
                       )}
                       
-                      {/* Phase 4.2: Element label - shown when selected */}
+                      {/* Element label - shown when selected */}
                       {isSelected && (
                         <div
                           style={{
@@ -272,13 +272,13 @@ export default function OverlayPreview({
                         </div>
                       )}
                       
-                      {/* Phase 8.2: Rotation handle - positioned at top-right (Figma-style) */}
-                      {/* Phase 8.4 Micro-patch: Rotation handle pushed outside bounding box at top-right */}
+                      {/* Rotation handle - positioned at top-right (Figma-style) */}
+                      {/* Rotation handle pushed outside bounding box at top-right */}
                       {isSelected && handlePositions && (() => {
                         // Check if this handle is currently being rotated
                         const isActive = rotatingElementId === element.id;
                         
-                        // Phase 8.4 Micro-patch: Position rotation handle at top-right corner of bounding box
+                        // Position rotation handle at top-right corner of bounding box
                         // Calculate top-right corner position in preview coordinates
                         const topRightX = aabbAtPosition.right;
                         const topRightY = aabbAtPosition.top;
@@ -316,7 +316,7 @@ export default function OverlayPreview({
                             className="rotation-handle-wrapper"
                             style={{
                               position: 'absolute',
-                              // Phase 8.4 Micro-patch: Position at top-right corner with offset
+                              // Position at top-right corner with offset
                               left: `calc(50% + ${finalX}px)`,
                               top: `calc(50% + ${finalY}px)`,
                               transform: `translate(-50%, -50%) rotate(${handleAngle}deg)`,
@@ -325,8 +325,8 @@ export default function OverlayPreview({
                               zIndex: (element.zIndex !== undefined ? element.zIndex : 0) + 250,
                             }}
                           >
-                            {/* Phase 8.2: Figma-style rotation handle with CSS classes */}
-                            {/* Phase 8.5: Added rotating state for enhanced visibility */}
+                            {/* Figma-style rotation handle with CSS classes */}
+                            {/* Rotating state for enhanced visibility */}
                             <div className={`rotation-handle ${isActive ? 'active' : ''} ${isRotatingThis ? 'rotating' : ''}`}>
                               {/* Icon wrapper with counter-rotation to keep icon upright */}
                               <div
@@ -342,7 +342,7 @@ export default function OverlayPreview({
                         );
                       })()}
                       
-                      {/* Phase 8.1: Resize handles - all 8 handles (Figma-style) */}
+                      {/* Resize handles - all 8 handles (Figma-style) */}
                       {isSelected && canResize && handlePositions && (
                         <>
                           {/* All 8 resize handles: 4 corners + 4 edges */}
@@ -372,8 +372,8 @@ export default function OverlayPreview({
                                   cursor: `${handle}-resize`,
                                 }}
                               >
-                                {/* Phase 8.1: Figma-style handle with CSS classes */}
-                                {/* Phase 8.5: Added resizing state for opacity feedback */}
+                                {/* Figma-style handle with CSS classes */}
+                                {/* Resizing state for opacity feedback */}
                                 <div
                                   className={`resize-handle resize-handle--${handle} ${isActive ? 'active' : ''} ${isResizingThis ? 'resizing' : ''}`}
                                 />

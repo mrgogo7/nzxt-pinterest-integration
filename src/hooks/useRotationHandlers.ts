@@ -1,7 +1,7 @@
 /**
  * Hook for managing element rotation handlers.
  * 
- * Phase 4.2: Rotation support with smooth rotation and snapping.
+ * Supports smooth rotation and snapping.
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
@@ -12,7 +12,7 @@ import type { AppSettings } from '../constants/defaults';
 /**
  * Hook for managing element rotation.
  * 
- * Phase 5: Added undo/redo support via onRotateComplete callback.
+ * Supports undo/redo via onRotateComplete callback.
  */
 export function useRotationHandlers(
   _offsetScale: number,
@@ -32,8 +32,8 @@ export function useRotationHandlers(
 
   const handleRotationMouseDown = useCallback((
     elementId: string,
-    centerX: number,
-    centerY: number,
+    _centerX: number,
+    _centerY: number,
     e: React.MouseEvent
   ) => {
     e.preventDefault();
@@ -134,7 +134,7 @@ export function useRotationHandlers(
   }, [_offsetScale, setSettings, settingsRef]);
 
   const handleRotationMouseUp = useCallback(() => {
-    // Phase 5: Record rotate action for undo/redo
+    // Record rotate action for undo/redo
     if (rotationStart.current && onRotateComplete) {
       const currentSettings = settingsRef.current;
       const currentOverlay = currentSettings.overlay;

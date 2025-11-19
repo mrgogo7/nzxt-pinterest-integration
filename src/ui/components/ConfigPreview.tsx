@@ -66,7 +66,7 @@ export default function ConfigPreview() {
   // Overlay config
   const overlayConfig = useOverlayConfig(settings);
 
-  // Phase 5: Undo/Redo system
+  // Undo/Redo system
   // WHY: Command pattern-based undo/redo for all transform operations.
   // Keyboard shortcuts: Ctrl+Z (undo), Ctrl+Y / Ctrl+Shift+Z (redo)
   const undoRedo = useUndoRedo({ maxHistorySize: 50, enableKeyboardShortcuts: true });
@@ -105,7 +105,7 @@ export default function ConfigPreview() {
     });
   };
 
-  // Phase 5: Callbacks for undo/redo
+  // Callbacks for undo/redo
   // WHY: These callbacks are called when transform operations complete (mouseup).
   // They create command objects and record them in the action history.
   const handleMoveComplete = (elementId: string, oldPos: { x: number; y: number }, newPos: { x: number; y: number }) => {
@@ -175,7 +175,7 @@ export default function ConfigPreview() {
     activeGuides,
   } = useDragHandlers(offsetScale, settingsRef, setSettings, handleMoveComplete);
 
-  // Phase 4.2: Resize handlers
+  // Resize handlers
   const { resizingElementId, handleResizeMouseDown } = useResizeHandlers(
     offsetScale, 
     settingsRef, 
@@ -183,7 +183,7 @@ export default function ConfigPreview() {
     handleResizeComplete
   );
   
-  // Phase 4.2: Rotation handlers
+  // Rotation handlers
   const { rotatingElementId, handleRotationMouseDown } = useRotationHandlers(
     offsetScale, 
     settingsRef, 

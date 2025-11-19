@@ -11,7 +11,7 @@ import styles from '../styles/KrakenOverlay.module.css';
  * KrakenOverlay component.
  * LCD render surface for NZXT Kraken Elite.
  * 
- * FAZ3: Fully migrated to element-based overlay system.
+ * Fully migrated to element-based overlay system.
  * - Uses UnifiedOverlayRenderer for all element types
  * - Reads media URL + settings from localStorage (same keys as ConfigPreview)
  * - Mirrors the LCD transform logic (scale, offset, align, fit)

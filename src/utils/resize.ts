@@ -2,14 +2,14 @@
  * Resize utilities for overlay elements.
  * Handles resize constraints and size calculations.
  * 
- * Phase 4.2: Refined resize UX - stable, predictable, smooth.
+ * Refined resize UX - stable, predictable, smooth.
  */
 
 import type { OverlayElement, MetricElementData, TextElementData } from '../types/overlay';
 
 /**
  * Resize constants for smooth, controlled resizing.
- * Phase 4.2: Adjusted for natural, responsive resize feel.
+ * Adjusted for natural, responsive resize feel.
  */
 export const RESIZE_SPEED_FACTOR = 0.6; // Normalizes mouse movement to size delta (increased for responsiveness)
 export const RESIZE_SMOOTHING_FACTOR = 0.15; // Interpolation factor for smooth resize (reduced for more direct control)
@@ -71,7 +71,7 @@ export function constrainSize(
 
 /**
  * Calculates resize delta based on handle position and mouse movement.
- * Phase 4.2: Proper direction detection and normalized delta.
+ * Proper direction detection and normalized delta.
  * 
  * @param handle - Resize handle position
  * @param dx - Mouse movement in X direction (preview pixels)

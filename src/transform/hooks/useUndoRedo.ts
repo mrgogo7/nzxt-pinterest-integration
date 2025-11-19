@@ -65,7 +65,7 @@ export function useUndoRedo(
   if (!historyRef.current) {
     historyRef.current = new ActionHistory();
     // Set max history size
-    (historyRef.current as any).maxHistorySize = maxHistorySize;
+    historyRef.current.setMaxHistorySize(maxHistorySize);
   }
 
   const history = historyRef.current;

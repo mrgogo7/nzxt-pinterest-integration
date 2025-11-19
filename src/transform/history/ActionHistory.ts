@@ -135,5 +135,19 @@ export class ActionHistory {
   getRedoCount(): number {
     return this.redoStack.length;
   }
+
+  /**
+   * Sets the maximum history size.
+   * 
+   * @param size - Maximum number of actions to keep in history
+   */
+  setMaxHistorySize(size: number): void {
+    this.maxHistorySize = size;
+    
+    // Trim undo stack if it exceeds new max size
+    if (this.undoStack.length > size) {
+      this.undoStack = this.undoStack.slice(-size);
+    }
+  }
 }
 

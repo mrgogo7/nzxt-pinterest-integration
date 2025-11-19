@@ -96,7 +96,7 @@ export function updateCustomText(
 }
 
 // ============================================================================
-// NEW ELEMENT-BASED HELPERS (FAZ1)
+// NEW ELEMENT-BASED HELPERS
 // ============================================================================
 
 /**
@@ -338,7 +338,7 @@ export function updateOverlayElementAngle(
 }
 
 /**
- * Phase 4.2: Alignment helper functions.
+ * Alignment helper functions.
  */
 
 /**

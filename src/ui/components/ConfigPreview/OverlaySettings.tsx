@@ -19,7 +19,7 @@ interface OverlaySettingsProps {
  * Overlay settings component.
  * Provides controls for overlay mode and element-based settings.
  * 
- * Phase 4.1: Modernized UI with improved grouping, spacing, and i18n support.
+ * Modernized UI with improved grouping, spacing, and i18n support.
  * - Uses unified element array (Overlay.elements)
  * - Element-based add/remove/reorder operations
  * - Element-specific settings (metric, text, divider)

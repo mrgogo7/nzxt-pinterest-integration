@@ -231,7 +231,7 @@ export function globalToLocal(
  */
 export function screenDeltaToLocal(
   screenDelta: { x: number; y: number },
-  previewRect: DOMRect,
+  _previewRect: DOMRect,
   offsetScale: number,
   elementTransform: TransformMatrix
 ): { x: number; y: number } {
