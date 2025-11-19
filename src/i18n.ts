@@ -6,16 +6,12 @@ export const LANG_KEY = "nzxtLang";
 
 const dict: Record<Lang, Record<string, string>> = {
   en: {
-    // Application title shown in header
-    appTitle: "NZXT Elite Screen Customizer",
     // Language selector label
     language: "Language",
     // Reset button text - resets all settings to defaults
     reset: "Reset",
     // Confirmation message when reset button is clicked
     resetConfirm: "Are you sure? This will reset ALL settings including the URL.",
-    // Legacy media URL label (may not be used in current UI)
-    urlLabel: "Media URL",
     // Placeholder text for URL input field - shows accepted formats
     urlPlaceholder: "https://...mp4 / ...jpg / ...gif",
     // Save/Update button text - saves the URL input to storage
@@ -37,18 +33,16 @@ const dict: Record<Lang, Record<string, string>> = {
     colorPickerTitle: "Background Color",
     // Description text for Background Color picker - explains when color is displayed (currently not used in UI, but available for tooltips/help text)
     colorPickerDescription: "Select a solid color for your LCD screen background. The color will be displayed when no media URL is set.",
-    // Quick preset colors label (not currently used in ColorPicker component)
-    quickPresets: "Quick Presets",
     // Title for Media Preview section - shows background media preview
     previewTitle: "Media Preview",
     // Title for Overlay Preview section - shows overlay metrics preview
     overlayPreviewTitle: "Overlay Preview",
     // Settings section title - shown above media positioning controls (scale, offset, align, fit)
     settingsTitle: "Media Options",
-    // Alternative media options title (duplicate of settingsTitle, may be consolidated)
-    mediaOptionsTitle: "Media Options",
     // Overlay settings section title - shown above overlay configuration controls
     overlaySettingsTitle: "Overlay Options",
+    // Overlay title when disabled
+    overlayTitle: "Overlay",
     // Background settings section title - shown above background media positioning controls
     backgroundSectionTitle: "Background Settings",
     // Overlay section title - shown above overlay mode and metric selection controls
@@ -61,109 +55,34 @@ const dict: Record<Lang, Record<string, string>> = {
     yOffset: "Y Offset",
     // Overlay X-axis offset label - horizontal position adjustment for overlay metrics
     overlayXOffset: "Overlay X Offset",
-    // Overlay Y-axis offset label - vertical position adjustment for overlay metrics
-    overlayYOffset: "Overlay Y Offset",
     // Alignment control label - positions background media (center, top, bottom, left, right)
     align: "Align",
     // Fit mode control label - controls how background media fills screen (cover, contain, fill)
     fit: "Fit",
-    // Center alignment option
-    alignCenter: "center",
-    // Top alignment option
-    alignTop: "top",
-    // Bottom alignment option
-    alignBottom: "bottom",
-    // Left alignment option
-    alignLeft: "left",
-    // Right alignment option
-    alignRight: "right",
-    // Cover fit mode - fills screen, may crop content
-    fitCover: "cover",
-    // Contain fit mode - shows full content, may have letterboxing
-    fitContain: "contain",
-    // Fill fit mode - stretches to fill screen, may distort aspect ratio
-    fitFill: "fill",
+    // Align tooltips - shown on hover for alignment buttons
+    alignCenter: "Center",
+    alignTop: "Top",
+    alignBottom: "Bottom",
+    alignLeft: "Left",
+    alignRight: "Right",
+    // Fit tooltips - shown on hover for fit mode buttons
+    fitCover: "Cover",
+    fitContain: "Contain",
+    fitFill: "Fill",
     // Overlay guide lines toggle label - shows/hides alignment guides in preview
     overlayGuide: "Overlay Guide",
     // Overlay mode selector label - choose between Single, Dual, or Triple metric display
     overlayMode: "Mode",
-    // Primary metric selector label - first/main metric shown in overlay
-    primaryReading: "Primary Reading",
-    // Secondary metric selector label - second metric shown in Dual/Triple mode
-    secondaryReading: "Secondary Reading",
-    // Tertiary metric selector label - third metric shown in Triple mode
-    tertiaryReading: "Tertiary Reading",
-    // Generic number color label (used in Single mode)
-    numberColor: "Number Color",
-    // Generic text color label (used in Single mode)
-    textColor: "Text Color",
-    // Generic number size label (used in Single mode)
-    numberSize: "Number Size",
-    // Generic text size label (used in Single mode)
-    textSize: "Text Size",
-    // Primary metric number size label - controls size of main metric number
-    primaryNumberSize: "Primary Number Size",
-    // Primary metric text size label - controls size of main metric label text
-    primaryTextSize: "Primary Text Size",
-    // Secondary metric number size label - controls size of second metric number
-    secondaryNumberSize: "Secondary Number Size",
-    // Secondary metric text size label - controls size of second metric label text
-    secondaryTextSize: "Secondary Text Size",
-    // Toggle to show/hide divider line between primary and secondary metrics in Dual/Triple mode
-    showDivider: "Show Divider",
-    // Divider line width control - horizontal length of divider
-    dividerWidth: "Divider Width",
-    // Divider line thickness control - vertical thickness/height of divider
-    dividerThickness: "Divider Thickness",
-    // Primary metric number color picker label - color of main metric number
-    primaryNumberColor: "Primary Number Color",
-    // Primary metric text color picker label - color of main metric label text
-    primaryTextColor: "Primary Text Color",
-    // Secondary metric number color picker label - color of second metric number
-    secondaryNumberColor: "Secondary Number Color",
-    // Secondary metric text color picker label - color of second metric label text
-    secondaryTextColor: "Secondary Text Color",
-    // Tertiary metric number color picker label - color of third metric number
-    tertiaryNumberColor: "Tertiary Number Color",
-    // Tertiary metric text color picker label - color of third metric label text
-    tertiaryTextColor: "Tertiary Text Color",
-    // Tertiary metric number size label - controls size of third metric number
-    tertiaryNumberSize: "Tertiary Number Size",
-    // Tertiary metric text size label - controls size of third metric label text
-    tertiaryTextSize: "Tertiary Text Size",
-    // Gap control label - spacing between primary and divider in Dual/Triple mode
-    gap: "Gap",
-    // Gap between secondary and tertiary metrics in Triple mode
-    gapSecondaryTertiary: "Gap (Secondary-Tertiary)",
-    // Divider line color picker label - color of divider between metrics
-    dividerColor: "Divider Color",
-    // Spacing between divider line and secondary metrics
-    dividerGap: "Divider Gap",
-    // Horizontal offset for primary metric and divider group
-    primaryXOffset: "Primary X Offset",
-    // Vertical offset for primary metric and divider group
-    primaryYOffset: "Primary Y Offset",
-    // Horizontal offset for secondary metric in Dual mode
-    secondaryXOffset: "Secondary X Offset",
-    // Vertical offset for secondary metric in Dual mode
-    secondaryYOffset: "Secondary Y Offset",
-    // Horizontal offset for secondary and tertiary metrics group in Triple mode
-    dualReadersXOffset: "Dual Readers X Offset",
-    // Vertical offset for secondary and tertiary metrics group in Triple mode
-    dualReadersYOffset: "Dual Readers Y Offset",
     // Description text shown in overlay options section - explains real-time updates
     overlayOptionsDescription: "Settings take effect immediately. Adjust overlay appearance and positioning in real-time.",
+    // Message shown when overlay is disabled - prompts user to activate overlay first
+    overlayActivateFirst: "Please activate the overlay first. ",
+    // Switch status when overlay is off
+    overlayStatusOff: "Off",
+    // Switch status when overlay is active
+    overlayStatusActive: "Active",
     // Button to reset overlay settings to default values
     revertToDefaults: "Revert to Defaults",
-    revertToDefaultsCustom: "Reset all reading and text options to defaults (keeps items)",
-    // Generic reader options section title
-    readerOptions: "Reader Options",
-    // First reader options section title in Triple mode
-    firstReaderOptions: "1st Reader Options",
-    // Second reader options section title in Triple mode
-    secondReaderOptions: "2nd Reader Options",
-    // Third reader options section title in Triple mode
-    thirdReaderOptions: "3rd Reader Options",
     // Warning message shown when NZXT CAM API is unavailable - displayed in preview when using mock data
     mockDataWarning: "⚠️ Running in browser mode. NZXT CAM API is not available. Displayed values are mock data and do not reflect actual system metrics.",
     // Copy button tooltip - copies color code to clipboard (used in ColorPicker component)
@@ -179,7 +98,6 @@ const dict: Record<Lang, Record<string, string>> = {
     // Timeout message when URL resolution takes too long
     urlResolveTimeout: "URL resolution timed out. Please try again.",
     // Custom mode specific translations
-    customMode: "Custom InfoGraphic(s)",
     addReading: "Add Reading",
     removeReading: "Remove Reading",
     firstReading: "1st Reading",
@@ -206,7 +124,6 @@ const dict: Record<Lang, Record<string, string>> = {
     thirdText: "3rd Text",
     fourthText: "4th Text",
     text: "Text",
-    textInput: "Text",
     moveTextUp: "Move Up",
     moveTextDown: "Move Down",
     textInputPlaceholder: "Please enter text (max 120 characters)",
@@ -220,7 +137,6 @@ const dict: Record<Lang, Record<string, string>> = {
     metricGpuClock: "GPU Clock",
     // Element management
     noElements: "No elements added yet. Use the buttons above to add readings or text.",
-    elementCount: "Elements",
     // Element management
     addElement: "Add Element",
     // Divider labels
@@ -235,15 +151,20 @@ const dict: Record<Lang, Record<string, string>> = {
     moveDividerDown: "Move Down",
     thickness: "Thickness",
     dividerLength: "Length",
+    // Angle control label - rotation angle for overlay elements
+    angle: "Angle",
     // Reset tooltips
     resetToDefault: "Reset to default value",
+    // Social media link tooltips
+    tooltipGitHub: "GitHub",
+    tooltipInstagram: "Instagram",
+    tooltipLinkedIn: "LinkedIn",
+    tooltipSponsor: "Sponsor",
   },
   tr: {
-    appTitle: "NZXT Elite Screen Customizer",
     language: "Dil",
     reset: "Sıfırla",
     resetConfirm: "Emin misiniz? Bu işlem URL dahil TÜM ayarları sıfırlar.",
-    urlLabel: "Medya URL",
     urlPlaceholder: "https://...mp4 / ...jpg / ...gif",
     save: "Kaydet / Güncelle",
     clear: "Temizle",
@@ -255,69 +176,35 @@ const dict: Record<Lang, Record<string, string>> = {
     colorTab: "Renk",
     colorPickerTitle: "Arka Plan Rengi",
     colorPickerDescription: "LCD ekran arka planı için katı bir renk seçin. Medya URL'si ayarlanmadığında bu renk gösterilir.",
-    quickPresets: "Hızlı Ayarlar",
     previewTitle: "Background Önizleme",
     overlayPreviewTitle: "Overlay Önizleme",
     settingsTitle: "Medya Seçenekleri",
     overlaySettingsTitle: "Overlay Seçenekleri",
+    overlayTitle: "Overlay",
     backgroundSectionTitle: "Arka Plan Ayarları",
     overlaySectionTitle: "Overlay Ayarları",
     scale: "Ölçek",
     xOffset: "X Ofset",
     yOffset: "Y Ofset",
-    overlayXOffset: "Overlay X Ofset",
-    overlayYOffset: "Overlay Y Ofset",
     align: "Hizalama",
     fit: "Sığdırma",
-    alignCenter: "merkez",
-    alignTop: "üst",
-    alignBottom: "alt",
-    alignLeft: "sol",
-    alignRight: "sağ",
-    fitCover: "kapla",
-    fitContain: "içer",
-    fitFill: "doldur",
+    // Align tooltips - shown on hover for alignment buttons
+    alignCenter: "Merkez",
+    alignTop: "Üst",
+    alignBottom: "Alt",
+    alignLeft: "Sol",
+    alignRight: "Sağ",
+    // Fit tooltips - shown on hover for fit mode buttons
+    fitCover: "Kapla",
+    fitContain: "İçer",
+    fitFill: "Doldur",
     overlayGuide: "Rehber Çizgileri",
     overlayMode: "Mod",
-    primaryReading: "Ana Metrik",
-    secondaryReading: "İkincil Metrik",
-    tertiaryReading: "Üçüncül Metrik",
-    numberColor: "Sayı Rengi",
-    textColor: "Metin Rengi",
-    numberSize: "Sayı Boyutu",
-    textSize: "Metin Boyutu",
-    primaryNumberSize: "Ana Sayı Boyutu",
-    primaryTextSize: "Ana Metin Boyutu",
-    secondaryNumberSize: "İkincil Sayı Boyutu",
-    secondaryTextSize: "İkincil Metin Boyutu",
-    showDivider: "Ayırıcı Çizgi Göster",
-    dividerWidth: "Ayırıcı Genişliği",
-    dividerThickness: "Ayırıcı Kalınlığı",
-    primaryNumberColor: "Ana Sayı Rengi",
-    primaryTextColor: "Ana Metin Rengi",
-    secondaryNumberColor: "İkincil Sayı Rengi",
-    secondaryTextColor: "İkincil Metin Rengi",
-    tertiaryNumberColor: "Üçüncül Sayı Rengi",
-    tertiaryTextColor: "Üçüncül Metin Rengi",
-    tertiaryNumberSize: "Üçüncül Sayı Boyutu",
-    tertiaryTextSize: "Üçüncül Metin Boyutu",
-    gap: "Mesafe",
-    gapSecondaryTertiary: "Mesafe (İkincil-Üçüncül)",
-    dividerColor: "Ayırıcı Rengi",
-    dividerGap: "Ayırıcı Boşluğu",
-    primaryXOffset: "Birincil X Ofset",
-    primaryYOffset: "Birincil Y Ofset",
-    secondaryXOffset: "İkincil X Ofset",
-    secondaryYOffset: "İkincil Y Ofset",
-    dualReadersXOffset: "İkili Okuyucular X Ofset",
-    dualReadersYOffset: "İkili Okuyucular Y Ofset",
     overlayOptionsDescription: "Ayarlar anında geçerli olur. Overlay görünümünü ve konumunu gerçek zamanlı olarak ayarlayın.",
+    overlayActivateFirst: "Lütfen önce overlay'ı aktif ediniz. ",
+    overlayStatusOff: "Kapalı",
+    overlayStatusActive: "Aktif",
     revertToDefaults: "Varsayılana Döndür",
-    revertToDefaultsCustom: "Tüm reading ve text seçeneklerini varsayılanlara sıfırla (öğeleri korur)",
-    readerOptions: "Okuyucu Seçenekleri",
-    firstReaderOptions: "1. Okuyucu Seçenekleri",
-    secondReaderOptions: "2. Okuyucu Seçenekleri",
-    thirdReaderOptions: "3. Okuyucu Seçeneki",
     mockDataWarning: "⚠️ Tarayıcı modunda çalışıyor. NZXT CAM API'sine erişilemiyor. Görüntülenen değerler mock veridir ve gerçek sistem metriklerini yansıtmaz.",
     copy: "Kopyala",
     paste: "Yapıştır",
@@ -330,7 +217,6 @@ const dict: Record<Lang, Record<string, string>> = {
     // Timeout message when URL resolution takes too long
     urlResolveTimeout: "URL çözümleme zaman aşımına uğradı. Lütfen tekrar deneyin.",
     // Custom mode specific translations
-    customMode: "Özel Bilgi Grafiği(ler)",
     addReading: "Reading Ekle",
     removeReading: "Reading Kaldır",
     firstReading: "1. Reading",
@@ -357,7 +243,6 @@ const dict: Record<Lang, Record<string, string>> = {
     thirdText: "3. Text",
     fourthText: "4. Text",
     text: "Text",
-    textInput: "Text",
     moveTextUp: "Yukarı Taşı",
     moveTextDown: "Aşağı Taşı",
     textInputPlaceholder: "Lütfen metin giriniz (maksimum 120 karakter)",
@@ -371,7 +256,6 @@ const dict: Record<Lang, Record<string, string>> = {
     metricGpuClock: "GPU Saat Hızı",
     // Element management
     noElements: "Henüz öğe eklenmedi. Yukarıdaki butonları kullanarak reading veya text ekleyin.",
-    elementCount: "Öğeler",
     // Element management
     addElement: "Element Ekle",
     // Divider labels
@@ -386,8 +270,15 @@ const dict: Record<Lang, Record<string, string>> = {
     moveDividerDown: "Aşağı Taşı",
     thickness: "Kalınlık",
     dividerLength: "Uzunluk",
+    // Angle control label - rotation angle for overlay elements
+    angle: "Açı",
     // Reset tooltips
     resetToDefault: "Varsayılan değere sıfırla",
+    // Social media link tooltips
+    tooltipGitHub: "GitHub",
+    tooltipInstagram: "Instagram",
+    tooltipLinkedIn: "LinkedIn",
+    tooltipSponsor: "Sponsor",
   },
 };
 

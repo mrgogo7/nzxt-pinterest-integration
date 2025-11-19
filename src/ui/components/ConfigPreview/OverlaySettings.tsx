@@ -71,33 +71,38 @@ export default function OverlaySettingsComponent({
   return (
     <div className="settings-column overlay-options-area">
       <div className="panel">
-        {/* Header with Mode Selector */}
+        {/* Header with Mode Switch */}
         <div className="panel-header">
-          <h3>{t('overlaySettingsTitle', lang)}</h3>
-          <select
-            className="url-input select-narrow"
-            value={overlayConfig.mode}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-              const newMode = e.target.value as "none" | "custom";
-              setSettings({
-                ...settings,
-                overlay: {
-                  ...overlayConfig,
-                  mode: newMode,
-                  elements: newMode === 'none' ? [] : overlayConfig.elements,
-                },
-              });
-            }}
-          >
-            <option value="none">None</option>
-            <option value="custom">{t('customMode', lang)}</option>
-          </select>
+          <h3>{overlayConfig.mode === 'custom' ? t('overlaySettingsTitle', lang) : t('overlayTitle', lang)}</h3>
+          <div className="overlay-toggle-compact">
+            <span>{overlayConfig.mode === 'custom' ? t('overlayStatusActive', lang) : t('overlayStatusOff', lang)}</span>
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={overlayConfig.mode === 'custom'}
+                onChange={(e) => {
+                  const newMode = e.target.checked ? 'custom' : 'none';
+                  setSettings({
+                    ...settings,
+                    overlay: {
+                      ...overlayConfig,
+                      mode: newMode,
+                      elements: newMode === 'none' ? [] : overlayConfig.elements,
+                    },
+                  });
+                }}
+              />
+              <span className="slider" />
+            </label>
+          </div>
         </div>
 
         {/* Description */}
         <div style={{ marginBottom: '16px' }}>
           <p style={{ margin: 0, color: '#9aa3ad', fontSize: '12px', lineHeight: '1.5' }}>
-            {t('overlayOptionsDescription', lang)}
+            {overlayConfig.mode === 'none' 
+              ? t('overlayActivateFirst', lang) + t('overlayOptionsDescription', lang)
+              : t('overlayOptionsDescription', lang)}
           </p>
         </div>
 
@@ -584,7 +589,7 @@ export default function OverlaySettingsComponent({
                             {/* Angle */}
                             <OverlayField
                               type="number"
-                              label={t('angle', lang) || 'Angle'}
+                              label={t('angle', lang)}
                               value={element.angle ?? 0}
                               onChange={(value) => setSettings(updateOverlayElementAngle(settings, overlayConfig, element.id, value))}
                               onReset={() => setSettings(updateOverlayElementAngle(settings, overlayConfig, element.id, 0))}
@@ -816,7 +821,7 @@ export default function OverlaySettingsComponent({
                             {/* Angle */}
                             <OverlayField
                               type="number"
-                              label={t('angle', lang) || 'Angle'}
+                              label={t('angle', lang)}
                               value={element.angle ?? 0}
                               onChange={(value) => setSettings(updateOverlayElementAngle(settings, overlayConfig, element.id, value))}
                               onReset={() => setSettings(updateOverlayElementAngle(settings, overlayConfig, element.id, 0))}
@@ -1033,7 +1038,7 @@ export default function OverlaySettingsComponent({
                             {/* Angle */}
                             <OverlayField
                               type="number"
-                              label={t('angle', lang) || 'Angle'}
+                              label={t('angle', lang)}
                               value={element.angle ?? 0}
                               onChange={(value) => setSettings(updateOverlayElementAngle(settings, overlayConfig, element.id, value))}
                               onReset={() => setSettings(updateOverlayElementAngle(settings, overlayConfig, element.id, 0))}
