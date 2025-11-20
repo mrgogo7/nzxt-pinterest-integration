@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import Config from "./ui/Config";
 import KrakenOverlay from "./ui/components/KrakenOverlay";
 import { isNZXTCAM } from "./environment";
+import { initAntiCache } from "./utils/useAntiCache";
 
 /**
  * Main entry point for index.html.
@@ -10,6 +11,9 @@ import { isNZXTCAM } from "./environment";
  * Detects environment and renders either Config page (browser) or KrakenOverlay (NZXT CAM).
  * Uses centralized environment detection module.
  */
+
+// Initialize anti-cache system before rendering
+initAntiCache();
 
 const rootElement = document.getElementById("root");
 
