@@ -50,6 +50,90 @@ function isConfigBrowser(): boolean {
 }
 
 /**
+ * Check if running in local development environment.
+ * 
+ * Returns true if any of the following conditions are met:
+ * - Vite dev mode (import.meta.env.DEV === true)
+ * - HTTP protocol (not HTTPS)
+ * - Hostname is localhost, 127.0.0.1, or private IP range (192.168.*.*, 10.*.*.*)
+ * 
+ * This is used to disable redirects in local dev to prevent NZXT CAM LCD
+ * from entering strict security mode with HTTP.
+ */
+function isLocalDev(): boolean {
+  // Check Vite dev mode
+  try {
+    // @ts-ignore - import.meta.env is a Vite-specific feature
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV === true) {
+      return true;
+    }
+  } catch {
+    // import.meta not available (e.g., in some build contexts)
+  }
+  
+  // Check HTTP protocol
+  if (window.location.protocol === 'http:') {
+    return true;
+  }
+  
+  // Check hostname
+  const hostname = window.location.hostname.toLowerCase();
+  
+  // localhost or 127.0.0.1
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return true;
+  }
+  
+  // Private IP ranges: 192.168.*.*
+  if (/^192\.168\.\d+\.\d+$/.test(hostname)) {
+    return true;
+  }
+  
+  // Private IP ranges: 10.*.*.*
+  if (/^10\.\d+\.\d+\.\d+$/.test(hostname)) {
+    return true;
+  }
+  
+  return false;
+}
+
+/**
+ * Check if redirects should be disabled.
+ * 
+ * Redirects are disabled if:
+ * - URL has ?http=1 parameter (manual override to force HTTP/local dev mode)
+ * - Local dev mode is active (auto-detection when no parameter)
+ * 
+ * Redirects are enabled if:
+ * - URL has ?http=0 parameter (manual override to force production mode)
+ * - HTTPS environment (production, auto-detection when no parameter)
+ * 
+ * @returns True if redirects should be disabled
+ */
+function shouldDisableRedirect(): boolean {
+  const params = new URLSearchParams(window.location.search);
+  const httpParam = params.get('http');
+  
+  // Manual override: ?http=1 forces HTTP/local dev mode (redirects disabled)
+  if (httpParam === '1') {
+    return true;
+  }
+  
+  // Manual override: ?http=0 forces production mode (redirects enabled)
+  if (httpParam === '0') {
+    return false;
+  }
+  
+  // Auto-disable in local dev mode (when no parameter)
+  if (isLocalDev()) {
+    return true;
+  }
+  
+  // Enable redirects in HTTPS/production (when no parameter)
+  return false;
+}
+
+/**
  * Get current app version from build-time injection.
  * Falls back to '0.0.0' if not available.
  */
@@ -71,8 +155,18 @@ function getUrlVersion(): string | null {
 
 /**
  * Reload page with version parameter to bust cache.
+ * 
+ * Respects local dev safe mode - redirects are disabled in local dev
+ * unless explicitly enabled via ?http=1 parameter.
  */
 function reloadWithVersion(version: string): void {
+  if (shouldDisableRedirect()) {
+    // Redirect disabled (local dev safe mode)
+    // Update localStorage silently to keep version in sync
+    localStorage.setItem(VERSION_STORAGE_KEY, version);
+    return;
+  }
+  
   const url = new URL(window.location.href);
   url.searchParams.set('v', version);
   window.location.href = url.toString();
@@ -80,8 +174,17 @@ function reloadWithVersion(version: string): void {
 
 /**
  * Hard reload the page (bypasses cache).
+ * 
+ * Respects local dev safe mode - redirects are disabled in local dev
+ * unless explicitly enabled via ?http=1 parameter.
  */
 function hardReload(): void {
+  if (shouldDisableRedirect()) {
+    // Redirect disabled (local dev safe mode)
+    // Non-destructive operations can continue (session updates, etc.)
+    return;
+  }
+  
   window.location.reload();
 }
 
