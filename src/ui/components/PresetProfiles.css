@@ -1,0 +1,96 @@
+/* Preset Profiles Dropdown Styles */
+
+.preset-profiles-container {
+  position: relative;
+  display: inline-block;
+}
+
+.preset-profiles-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #2c2c2c;
+  border: 1px solid #3a3a3a;
+  color: #f2f2f2;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.preset-profiles-button:hover:not(:disabled) {
+  background: #3a3a3a;
+  border-color: #3a3a3a;
+}
+
+.preset-profiles-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.preset-profiles-chevron {
+  transition: transform 0.15s ease;
+}
+
+.preset-profiles-chevron.open {
+  transform: rotate(180deg);
+}
+
+.preset-profiles-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background: #202020;
+  border: 1px solid #2e2e2e;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.preset-profiles-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: #f2f2f2;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.preset-profiles-option:hover:not(:disabled) {
+  background: #2c2c2c;
+}
+
+.preset-profiles-option:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.preset-profiles-option:not(:last-child) {
+  border-bottom: 1px solid #2e2e2e;
+}
+
+.preset-profiles-loading {
+  margin-left: auto;
+  color: #a0a0a0;
+  font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .preset-profiles-dropdown {
+    right: auto;
+    left: 0;
+  }
+}
+

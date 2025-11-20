@@ -6,9 +6,9 @@
 .color-picker-trigger {
   width: 40px;
   height: 32px;
-  border: 1px solid #2d3140;
+  border: 1px solid #3a3a3a;
   border-radius: 6px;
-  background: #181a21;
+  background: #2c2c2c;
   cursor: pointer;
   padding: 2px;
   display: flex;
@@ -18,7 +18,8 @@
 }
 
 .color-picker-trigger:hover {
-  border-color: #4a5683;
+  border-color: #8a2be2;
+  background: #353535;
 }
 
 .color-picker-preview {
@@ -35,8 +36,8 @@
 }
 
 .color-picker-container {
-  background: #121317;
-  border: 1px solid #242734;
+  background: #202020;
+  border: 1px solid #2e2e2e;
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   padding: 16px;
@@ -102,10 +103,10 @@
   flex: 1;
   min-width: 0;
   padding: 8px 12px;
-  background: #181a21;
-  border: 1px solid #2d3140;
+  background: #2c2c2c;
+  border: 1px solid #3a3a3a;
   border-radius: 6px;
-  color: #ffffff;
+  color: #f2f2f2;
   font-family: monospace;
   font-size: 13px;
   transition: all 0.15s ease;
@@ -116,10 +117,14 @@
   -ms-user-select: text;
 }
 
+.color-picker-input:hover {
+  background: #353535;
+}
+
 .color-picker-input:focus {
   outline: none;
-  border-color: #4a5683;
-  box-shadow: 0 0 0 2px rgba(74, 86, 131, 0.2);
+  border-color: #8a2be2;
+  box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
 }
 
 .color-picker-input::placeholder {
@@ -136,10 +141,10 @@
   width: 28px;
   height: 28px;
   padding: 0;
-  background: #181a21;
-  border: 1px solid #2d3140;
+  background: #2c2c2c;
+  border: 1px solid #3a3a3a;
   border-radius: 6px;
-  color: #ffffff;
+  color: #f2f2f2;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -148,13 +153,13 @@
 }
 
 .color-picker-action-btn:hover {
-  background: #1f2329;
-  border-color: #4a5683;
-  color: #d8e2ff;
+  background: #3a3a3a;
+  border-color: #8a2be2;
+  color: #c29cff;
 }
 
 .color-picker-action-btn:active {
-  background: #14161a;
+  background: #252525;
 }
 
 /* Inline color picker styles */

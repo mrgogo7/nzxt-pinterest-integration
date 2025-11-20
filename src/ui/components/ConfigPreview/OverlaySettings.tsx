@@ -99,7 +99,7 @@ export default function OverlaySettingsComponent({
 
         {/* Description */}
         <div style={{ marginBottom: '16px' }}>
-          <p style={{ margin: 0, color: '#9aa3ad', fontSize: '12px', lineHeight: '1.5' }}>
+          <p style={{ margin: 0, color: '#a0a0a0', fontSize: '12px', lineHeight: '1.5' }}>
             {overlayConfig.mode === 'none' 
               ? t('overlayActivateFirst', lang) + t('overlayOptionsDescription', lang)
               : t('overlayOptionsDescription', lang)}
@@ -119,10 +119,10 @@ export default function OverlaySettingsComponent({
                 style={{
                   width: '100%',
                   padding: '12px 16px',
-                  background: '#263146',
-                  border: '1px solid #3b5a9a',
-                  color: '#d9e6ff',
-                  borderRadius: '8px',
+                  background: '#2c2c2c',
+                  border: '1px solid #3a3a3a',
+                  color: '#f2f2f2',
+                  borderRadius: '6px',
                   cursor: 'pointer',
                   fontSize: '14px',
                   fontWeight: 600,
@@ -132,12 +132,12 @@ export default function OverlaySettingsComponent({
                   transition: 'all 0.15s ease',
                 }}
                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                  e.currentTarget.style.background = '#2e3a55';
-                  e.currentTarget.style.borderColor = '#4a6ba8';
+                  e.currentTarget.style.background = '#3a3a3a';
+                  e.currentTarget.style.borderColor = '#8a2be2';
                 }}
                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                  e.currentTarget.style.background = '#263146';
-                  e.currentTarget.style.borderColor = '#3b5a9a';
+                  e.currentTarget.style.background = '#2c2c2c';
+                  e.currentTarget.style.borderColor = '#3a3a3a';
                 }}
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -158,9 +158,9 @@ export default function OverlaySettingsComponent({
                 <div style={{
                   marginTop: '8px',
                   padding: '8px',
-                  background: '#1a1f2e',
-                  borderRadius: '8px',
-                  border: '1px solid #2a3441',
+                  background: '#252525',
+                  borderRadius: '6px',
+                  border: '1px solid #2e2e2e',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '6px',
@@ -188,9 +188,9 @@ export default function OverlaySettingsComponent({
                 }}
                 disabled={metricCount >= 8 || totalCount >= 8}
                 style={{
-                  background: metricCount >= 8 || totalCount >= 8 ? '#1a1f2e' : '#263146',
-                  border: '1px solid #3b5a9a',
-                  color: metricCount >= 8 || totalCount >= 8 ? '#5a6b7d' : '#d9e6ff',
+                  background: metricCount >= 8 || totalCount >= 8 ? '#252525' : '#2c2c2c',
+                  border: '1px solid #3a3a3a',
+                  color: metricCount >= 8 || totalCount >= 8 ? '#a0a0a0' : '#f2f2f2',
                   padding: '10px 16px',
                   borderRadius: '6px',
                   cursor: metricCount >= 8 || totalCount >= 8 ? 'not-allowed' : 'pointer',
@@ -205,14 +205,14 @@ export default function OverlaySettingsComponent({
                 }}
                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                   if (metricCount < 8 && totalCount < 8) {
-                    e.currentTarget.style.background = '#2e3a55';
-                    e.currentTarget.style.borderColor = '#4a6ba8';
+                    e.currentTarget.style.background = '#3a3a3a';
+                    e.currentTarget.style.borderColor = '#8a2be2';
                   }
                 }}
                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                   if (metricCount < 8 && totalCount < 8) {
-                    e.currentTarget.style.background = '#263146';
-                    e.currentTarget.style.borderColor = '#3b5a9a';
+                    e.currentTarget.style.background = '#2c2c2c';
+                    e.currentTarget.style.borderColor = '#3a3a3a';
                   }
                 }}
               >
@@ -239,9 +239,9 @@ export default function OverlaySettingsComponent({
                 }}
                 disabled={textCount >= 8 || totalCount >= 8}
                 style={{
-                  background: textCount >= 8 || totalCount >= 8 ? '#1a1f2e' : '#263146',
-                  border: '1px solid #3b5a9a',
-                  color: textCount >= 8 || totalCount >= 8 ? '#5a6b7d' : '#d9e6ff',
+                  background: textCount >= 8 || totalCount >= 8 ? '#252525' : '#2c2c2c',
+                  border: '1px solid #3a3a3a',
+                  color: textCount >= 8 || totalCount >= 8 ? '#a0a0a0' : '#f2f2f2',
                   padding: '10px 16px',
                   borderRadius: '6px',
                   cursor: textCount >= 8 || totalCount >= 8 ? 'not-allowed' : 'pointer',
@@ -256,14 +256,14 @@ export default function OverlaySettingsComponent({
                 }}
                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                   if (textCount < 8 && totalCount < 8) {
-                    e.currentTarget.style.background = '#2e3a55';
-                    e.currentTarget.style.borderColor = '#4a6ba8';
+                    e.currentTarget.style.background = '#3a3a3a';
+                    e.currentTarget.style.borderColor = '#8a2be2';
                   }
                 }}
                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                   if (textCount < 8 && totalCount < 8) {
-                    e.currentTarget.style.background = '#263146';
-                    e.currentTarget.style.borderColor = '#3b5a9a';
+                    e.currentTarget.style.background = '#2c2c2c';
+                    e.currentTarget.style.borderColor = '#3a3a3a';
                   }
                 }}
               >
@@ -290,9 +290,9 @@ export default function OverlaySettingsComponent({
                 }}
                 disabled={dividerCount >= 8 || totalCount >= 8}
                 style={{
-                  background: dividerCount >= 8 || totalCount >= 8 ? '#1a1f2e' : '#263146',
-                  border: '1px solid #3b5a9a',
-                  color: dividerCount >= 8 || totalCount >= 8 ? '#5a6b7d' : '#d9e6ff',
+                  background: dividerCount >= 8 || totalCount >= 8 ? '#252525' : '#2c2c2c',
+                  border: '1px solid #3a3a3a',
+                  color: dividerCount >= 8 || totalCount >= 8 ? '#a0a0a0' : '#f2f2f2',
                   padding: '10px 16px',
                   borderRadius: '6px',
                   cursor: dividerCount >= 8 || totalCount >= 8 ? 'not-allowed' : 'pointer',
@@ -307,14 +307,14 @@ export default function OverlaySettingsComponent({
                 }}
                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                   if (dividerCount < 8 && totalCount < 8) {
-                    e.currentTarget.style.background = '#2e3a55';
-                    e.currentTarget.style.borderColor = '#4a6ba8';
+                    e.currentTarget.style.background = '#3a3a3a';
+                    e.currentTarget.style.borderColor = '#8a2be2';
                   }
                 }}
                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                   if (dividerCount < 8 && totalCount < 8) {
-                    e.currentTarget.style.background = '#263146';
-                    e.currentTarget.style.borderColor = '#3b5a9a';
+                    e.currentTarget.style.background = '#2c2c2c';
+                    e.currentTarget.style.borderColor = '#3a3a3a';
                   }
                 }}
               >
@@ -335,9 +335,9 @@ export default function OverlaySettingsComponent({
                   style={{
                     width: '100%',
                     padding: '10px 16px',
-                    background: '#263146',
-                    border: '1px solid #3b5a9a',
-                    color: '#d9e6ff',
+                    background: '#2c2c2c',
+                    border: '1px solid #3a3a3a',
+                    color: '#f2f2f2',
                     borderRadius: '6px',
                     cursor: 'pointer',
                     fontSize: '13px',
@@ -345,12 +345,12 @@ export default function OverlaySettingsComponent({
                     transition: 'all 0.15s ease',
                   }}
                   onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.currentTarget.style.background = '#2e3a55';
-                    e.currentTarget.style.borderColor = '#4a6ba8';
+                    e.currentTarget.style.background = '#3a3a3a';
+                    e.currentTarget.style.borderColor = '#8a2be2';
                   }}
                   onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.currentTarget.style.background = '#263146';
-                    e.currentTarget.style.borderColor = '#3b5a9a';
+                    e.currentTarget.style.background = '#2c2c2c';
+                    e.currentTarget.style.borderColor = '#3a3a3a';
                   }}
                 >
                   {t('revertToDefaults', lang)}
@@ -363,11 +363,11 @@ export default function OverlaySettingsComponent({
               <div style={{
                 padding: '24px',
                 textAlign: 'center',
-                color: '#5a6b7d',
+                color: '#a0a0a0',
                 fontSize: '13px',
-                background: '#1a1f2e',
-                borderRadius: '8px',
-                border: '1px solid #2a3441',
+                background: '#252525',
+                borderRadius: '6px',
+                border: '1px solid #2e2e2e',
               }}>
                 {t('noElements', lang)}
               </div>
@@ -403,9 +403,9 @@ export default function OverlaySettingsComponent({
                           key={element.id} 
                           style={{ 
                             padding: '16px',
-                            background: '#1a1f2e',
-                            borderRadius: '8px',
-                            border: '1px solid #2a3441',
+                            background: '#252525',
+                            borderRadius: '6px',
+                            border: '1px solid #2e2e2e',
                           }}
                         >
                           {/* Element Header */}
@@ -416,10 +416,10 @@ export default function OverlaySettingsComponent({
                               justifyContent: 'space-between',
                               marginBottom: '16px',
                               paddingBottom: '12px',
-                              borderBottom: '1px solid #2a3441',
+                              borderBottom: '1px solid #2e2e2e',
                             }}
                           >
-                            <span style={{ color: '#d9e6ff', fontSize: '14px', fontWeight: 600 }}>
+                            <span style={{ color: '#f2f2f2', fontSize: '14px', fontWeight: 600 }}>
                               {readingLabels[metricIndex] || `${metricIndex + 1}${metricIndex === 0 ? 'st' : metricIndex === 1 ? 'nd' : metricIndex === 2 ? 'rd' : 'th'} ${t('reading', lang)}`}
                             </span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -434,9 +434,9 @@ export default function OverlaySettingsComponent({
                                 }}
                                 disabled={unifiedIndex === 0}
                                 style={{
-                                  background: unifiedIndex === 0 ? '#1a1f2e' : '#263146',
-                                  border: '1px solid #3b5a9a',
-                                  color: unifiedIndex === 0 ? '#5a6b7d' : '#d9e6ff',
+                                  background: unifiedIndex === 0 ? '#252525' : '#2c2c2c',
+                                  border: '1px solid #3a3a3a',
+                                  color: unifiedIndex === 0 ? '#a0a0a0' : '#f2f2f2',
                                   padding: '6px 10px',
                                   borderRadius: '4px',
                                   cursor: unifiedIndex === 0 ? 'not-allowed' : 'pointer',
@@ -448,12 +448,14 @@ export default function OverlaySettingsComponent({
                                 data-tooltip-content={t('moveReadingUp', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex > 0) {
-                                    e.currentTarget.style.background = '#2e3a55';
+                                    e.currentTarget.style.background = '#3a3a3a';
+                                    e.currentTarget.style.borderColor = '#8a2be2';
                                   }
                                 }}
                                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex > 0) {
-                                    e.currentTarget.style.background = '#263146';
+                                    e.currentTarget.style.background = '#2c2c2c';
+                                    e.currentTarget.style.borderColor = '#3a3a3a';
                                   }
                                 }}
                               >
@@ -470,9 +472,9 @@ export default function OverlaySettingsComponent({
                                 }}
                                 disabled={unifiedIndex === sortedElements.length - 1}
                                 style={{
-                                  background: unifiedIndex === sortedElements.length - 1 ? '#1a1f2e' : '#263146',
-                                  border: '1px solid #3b5a9a',
-                                  color: unifiedIndex === sortedElements.length - 1 ? '#5a6b7d' : '#d9e6ff',
+                                  background: unifiedIndex === sortedElements.length - 1 ? '#252525' : '#2c2c2c',
+                                  border: '1px solid #3a3a3a',
+                                  color: unifiedIndex === sortedElements.length - 1 ? '#a0a0a0' : '#f2f2f2',
                                   padding: '6px 10px',
                                   borderRadius: '4px',
                                   cursor: unifiedIndex === sortedElements.length - 1 ? 'not-allowed' : 'pointer',
@@ -484,12 +486,14 @@ export default function OverlaySettingsComponent({
                                 data-tooltip-content={t('moveReadingDown', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex < sortedElements.length - 1) {
-                                    e.currentTarget.style.background = '#2e3a55';
+                                    e.currentTarget.style.background = '#3a3a3a';
+                                    e.currentTarget.style.borderColor = '#8a2be2';
                                   }
                                 }}
                                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex < sortedElements.length - 1) {
-                                    e.currentTarget.style.background = '#263146';
+                                    e.currentTarget.style.background = '#2c2c2c';
+                                    e.currentTarget.style.borderColor = '#3a3a3a';
                                   }
                                 }}
                               >
@@ -626,9 +630,9 @@ export default function OverlaySettingsComponent({
                           key={element.id} 
                           style={{ 
                             padding: '16px',
-                            background: '#1a1f2e',
-                            borderRadius: '8px',
-                            border: '1px solid #2a3441',
+                            background: '#252525',
+                            borderRadius: '6px',
+                            border: '1px solid #2e2e2e',
                           }}
                         >
                           {/* Element Header */}
@@ -639,10 +643,10 @@ export default function OverlaySettingsComponent({
                               justifyContent: 'space-between',
                               marginBottom: '16px',
                               paddingBottom: '12px',
-                              borderBottom: '1px solid #2a3441',
+                              borderBottom: '1px solid #2e2e2e',
                             }}
                           >
-                            <span style={{ color: '#d9e6ff', fontSize: '14px', fontWeight: 600 }}>
+                            <span style={{ color: '#f2f2f2', fontSize: '14px', fontWeight: 600 }}>
                               {textLabels[textIndex] || `${textIndex + 1}${textIndex === 0 ? 'st' : textIndex === 1 ? 'nd' : textIndex === 2 ? 'rd' : 'th'} ${t('text', lang)}`}
                             </span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -657,9 +661,9 @@ export default function OverlaySettingsComponent({
                                 }}
                                 disabled={unifiedIndex === 0}
                                 style={{
-                                  background: unifiedIndex === 0 ? '#1a1f2e' : '#263146',
-                                  border: '1px solid #3b5a9a',
-                                  color: unifiedIndex === 0 ? '#5a6b7d' : '#d9e6ff',
+                                  background: unifiedIndex === 0 ? '#252525' : '#2c2c2c',
+                                  border: '1px solid #3a3a3a',
+                                  color: unifiedIndex === 0 ? '#a0a0a0' : '#f2f2f2',
                                   padding: '6px 10px',
                                   borderRadius: '4px',
                                   cursor: unifiedIndex === 0 ? 'not-allowed' : 'pointer',
@@ -671,12 +675,14 @@ export default function OverlaySettingsComponent({
                                 data-tooltip-content={t('moveTextUp', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex > 0) {
-                                    e.currentTarget.style.background = '#2e3a55';
+                                    e.currentTarget.style.background = '#3a3a3a';
+                                    e.currentTarget.style.borderColor = '#8a2be2';
                                   }
                                 }}
                                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex > 0) {
-                                    e.currentTarget.style.background = '#263146';
+                                    e.currentTarget.style.background = '#2c2c2c';
+                                    e.currentTarget.style.borderColor = '#3a3a3a';
                                   }
                                 }}
                               >
@@ -693,9 +699,9 @@ export default function OverlaySettingsComponent({
                                 }}
                                 disabled={unifiedIndex === sortedElements.length - 1}
                                 style={{
-                                  background: unifiedIndex === sortedElements.length - 1 ? '#1a1f2e' : '#263146',
-                                  border: '1px solid #3b5a9a',
-                                  color: unifiedIndex === sortedElements.length - 1 ? '#5a6b7d' : '#d9e6ff',
+                                  background: unifiedIndex === sortedElements.length - 1 ? '#252525' : '#2c2c2c',
+                                  border: '1px solid #3a3a3a',
+                                  color: unifiedIndex === sortedElements.length - 1 ? '#a0a0a0' : '#f2f2f2',
                                   padding: '6px 10px',
                                   borderRadius: '4px',
                                   cursor: unifiedIndex === sortedElements.length - 1 ? 'not-allowed' : 'pointer',
@@ -707,12 +713,14 @@ export default function OverlaySettingsComponent({
                                 data-tooltip-content={t('moveTextDown', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex < sortedElements.length - 1) {
-                                    e.currentTarget.style.background = '#2e3a55';
+                                    e.currentTarget.style.background = '#3a3a3a';
+                                    e.currentTarget.style.borderColor = '#8a2be2';
                                   }
                                 }}
                                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex < sortedElements.length - 1) {
-                                    e.currentTarget.style.background = '#263146';
+                                    e.currentTarget.style.background = '#2c2c2c';
+                                    e.currentTarget.style.borderColor = '#3a3a3a';
                                   }
                                 }}
                               >
@@ -849,9 +857,9 @@ export default function OverlaySettingsComponent({
                           key={element.id} 
                           style={{ 
                             padding: '16px',
-                            background: '#1a1f2e',
-                            borderRadius: '8px',
-                            border: '1px solid #2a3441',
+                            background: '#252525',
+                            borderRadius: '6px',
+                            border: '1px solid #2e2e2e',
                           }}
                         >
                           {/* Element Header */}
@@ -862,10 +870,10 @@ export default function OverlaySettingsComponent({
                               justifyContent: 'space-between',
                               marginBottom: '16px',
                               paddingBottom: '12px',
-                              borderBottom: '1px solid #2a3441',
+                              borderBottom: '1px solid #2e2e2e',
                             }}
                           >
-                            <span style={{ color: '#d9e6ff', fontSize: '14px', fontWeight: 600 }}>
+                            <span style={{ color: '#f2f2f2', fontSize: '14px', fontWeight: 600 }}>
                               {dividerLabels[dividerIndex] || `${dividerIndex + 1}${dividerIndex === 0 ? 'st' : dividerIndex === 1 ? 'nd' : dividerIndex === 2 ? 'rd' : 'th'} ${t('divider', lang)}`}
                             </span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -880,9 +888,9 @@ export default function OverlaySettingsComponent({
                                 }}
                                 disabled={unifiedIndex === 0}
                                 style={{
-                                  background: unifiedIndex === 0 ? '#1a1f2e' : '#263146',
-                                  border: '1px solid #3b5a9a',
-                                  color: unifiedIndex === 0 ? '#5a6b7d' : '#d9e6ff',
+                                  background: unifiedIndex === 0 ? '#252525' : '#2c2c2c',
+                                  border: '1px solid #3a3a3a',
+                                  color: unifiedIndex === 0 ? '#a0a0a0' : '#f2f2f2',
                                   padding: '6px 10px',
                                   borderRadius: '4px',
                                   cursor: unifiedIndex === 0 ? 'not-allowed' : 'pointer',
@@ -894,12 +902,14 @@ export default function OverlaySettingsComponent({
                                 data-tooltip-content={t('moveDividerUp', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex > 0) {
-                                    e.currentTarget.style.background = '#2e3a55';
+                                    e.currentTarget.style.background = '#3a3a3a';
+                                    e.currentTarget.style.borderColor = '#8a2be2';
                                   }
                                 }}
                                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex > 0) {
-                                    e.currentTarget.style.background = '#263146';
+                                    e.currentTarget.style.background = '#2c2c2c';
+                                    e.currentTarget.style.borderColor = '#3a3a3a';
                                   }
                                 }}
                               >
@@ -916,9 +926,9 @@ export default function OverlaySettingsComponent({
                                 }}
                                 disabled={unifiedIndex === sortedElements.length - 1}
                                 style={{
-                                  background: unifiedIndex === sortedElements.length - 1 ? '#1a1f2e' : '#263146',
-                                  border: '1px solid #3b5a9a',
-                                  color: unifiedIndex === sortedElements.length - 1 ? '#5a6b7d' : '#d9e6ff',
+                                  background: unifiedIndex === sortedElements.length - 1 ? '#252525' : '#2c2c2c',
+                                  border: '1px solid #3a3a3a',
+                                  color: unifiedIndex === sortedElements.length - 1 ? '#a0a0a0' : '#f2f2f2',
                                   padding: '6px 10px',
                                   borderRadius: '4px',
                                   cursor: unifiedIndex === sortedElements.length - 1 ? 'not-allowed' : 'pointer',
@@ -930,12 +940,14 @@ export default function OverlaySettingsComponent({
                                 data-tooltip-content={t('moveDividerDown', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex < sortedElements.length - 1) {
-                                    e.currentTarget.style.background = '#2e3a55';
+                                    e.currentTarget.style.background = '#3a3a3a';
+                                    e.currentTarget.style.borderColor = '#8a2be2';
                                   }
                                 }}
                                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex < sortedElements.length - 1) {
-                                    e.currentTarget.style.background = '#263146';
+                                    e.currentTarget.style.background = '#2c2c2c';
+                                    e.currentTarget.style.borderColor = '#3a3a3a';
                                   }
                                 }}
                               >
