@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import 'react-tooltip/dist/react-tooltip.css';
 import './styles/tooltip.css';
 import { normalizePinterestUrl, fetchPinterestMedia } from '../utils/pinterest';
+import PresetManager from './components/PresetManager/PresetManager';
 
 export default function Config() {
   const [lang, setLangState] = useState<Lang>(getInitialLang());
@@ -20,6 +21,7 @@ export default function Config() {
   const [urlInput, setUrlInput] = useState<string>(mediaUrl);
   const [isResolving, setIsResolving] = useState(false);
   const [resolveMessage, setResolveMessage] = useState<string | null>(null);
+  const [isPresetManagerOpen, setIsPresetManagerOpen] = useState(false);
 
   // Sync urlInput with mediaUrl changes
   useEffect(() => {
@@ -164,15 +166,27 @@ export default function Config() {
             <div style={{ fontSize: '12px', color: '#9aa3ad', fontWeight: 400, lineHeight: '1.2' }}>
               by Gokhan AKGUL (mRGogo)
             </div>
-            <motion.button 
-              className="reset-btn" 
-              onClick={handleReset}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            >
-              {t("reset", lang)}
-            </motion.button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <motion.button 
+                className="reset-btn" 
+                onClick={handleReset}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
+                {t("reset", lang)}
+              </motion.button>
+              <motion.button 
+                className="preset-profiles-button" 
+                onClick={() => setIsPresetManagerOpen(true)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                title={t('presetProfiles', lang)}
+              >
+                {t('presetProfiles', lang)}
+              </motion.button>
+            </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
             <a
@@ -315,6 +329,17 @@ export default function Config() {
 
       {/* Preview + Settings */}
       <ConfigPreview />
+
+      {/* Preset Manager */}
+      <PresetManager
+        isOpen={isPresetManagerOpen}
+        onClose={() => setIsPresetManagerOpen(false)}
+        lang={lang}
+        settings={settings}
+        setSettings={setSettings}
+        mediaUrl={mediaUrl}
+        setMediaUrl={setMediaUrl}
+      />
     </div>
   );
 }
