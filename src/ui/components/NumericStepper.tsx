@@ -155,12 +155,12 @@ export default function NumericStepper({
     }
   };
 
-  const handleInputFocus = (e: FocusEvent<HTMLInputElement>) => {
+  const handleInputFocus = () => {
     setIsEditing(true);
     setDisplayValue(String(value ?? ''));
   };
 
-  const handleInputBlur = (e: FocusEvent<HTMLInputElement>) => {
+  const handleInputBlur = () => {
     setIsEditing(false);
     // Ensure display value matches the actual value on blur
     setDisplayValue(String(value ?? ''));

@@ -156,54 +156,6 @@ export default function OverlaySettingsComponent({
     setIsResetModalOpen(true);
   };
 
-  // Helper: Reset a single metric element to defaults
-  const resetMetricElement = (elementId: string) => {
-    // Update data first
-    const updatedSettings1 = updateMetricElementData(settings, overlayConfig, elementId, {
-      metric: 'cpuTemp' as OverlayMetricKey,
-      numberColor: 'rgba(255, 255, 255, 1)',
-      numberSize: 180,
-      textColor: 'transparent',
-      textSize: 0,
-      showLabel: false,
-    });
-    // Then update position and angle in one call
-    const updatedOverlay = updatedSettings1.overlay as Overlay;
-    const updatedSettings2 = updateOverlayElementPosition(updatedSettings1, updatedOverlay, elementId, 0, 0);
-    const finalSettings = updateOverlayElementAngle(updatedSettings2, updatedOverlay, elementId, 0);
-    setSettings(finalSettings);
-  };
-
-  // Helper: Reset a single text element to defaults
-  const resetTextElement = (elementId: string) => {
-    // Update data first
-    const updatedSettings1 = updateTextElementData(settings, overlayConfig, elementId, {
-      text: 'Text',
-      textColor: 'rgba(255, 255, 255, 1)',
-      textSize: 45,
-    });
-    // Then update position and angle in one call
-    const updatedOverlay = updatedSettings1.overlay as Overlay;
-    const updatedSettings2 = updateOverlayElementPosition(updatedSettings1, updatedOverlay, elementId, 0, 0);
-    const finalSettings = updateOverlayElementAngle(updatedSettings2, updatedOverlay, elementId, 0);
-    setSettings(finalSettings);
-  };
-
-  // Helper: Reset a single divider element to defaults
-  const resetDividerElement = (elementId: string) => {
-    // Update data first
-    const updatedSettings1 = updateDividerElementData(settings, overlayConfig, elementId, {
-      width: 2,
-      height: 384,
-      color: 'rgba(255, 255, 255, 0.3)',
-    });
-    // Then update position and angle in one call
-    const updatedOverlay = updatedSettings1.overlay as Overlay;
-    const updatedSettings2 = updateOverlayElementPosition(updatedSettings1, updatedOverlay, elementId, 0, 0);
-    const finalSettings = updateOverlayElementAngle(updatedSettings2, updatedOverlay, elementId, 0);
-    setSettings(finalSettings);
-  };
-
   // Helper: Actually perform the reset
   const performReset = () => {
     const resetElements = overlayConfig.elements.map((element) => {
