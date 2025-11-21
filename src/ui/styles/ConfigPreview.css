@@ -292,6 +292,12 @@
   align-items: center;
   gap: 12px;
 }
+.background-color-section-inline {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
 .background-color-label {
   color:#f2f2f2;
   font-weight:600;
@@ -323,6 +329,13 @@
   border-bottom: 1px solid #2e2e2e;
 }
 
+.section-description {
+  margin: 12px 0 16px 0;
+  color: #a0a0a0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .section-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -342,7 +355,9 @@
   font-size: 14px; 
   margin-bottom: 8px; 
   color: #a0a0a0; 
-  text-align: center; 
+  text-align: left; 
+  position: absolute;
+  left: 0;
 }
 
 /* ==== Circular preview ==== */
@@ -351,7 +366,7 @@
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  border: 2px solid #444;
+  border: 14px solid #000;
   overflow: hidden;
   background: #000;
   display: flex;
@@ -361,15 +376,106 @@
 }
 .preview-circle.dragging { cursor: grabbing; }
 
+/* ==== NZXT Kraken Elite Style Glow Effect ==== */
+/* Wrapper for layered outer glow effects (modular - can be toggled with .enabled class in future) */
+.nzxt-glow-wrapper {
+  position: relative;
+  display: inline-block;
+  width: auto;
+  height: auto;
+  overflow: visible; /* Allow glow layers to extend outside */
+  margin-top: 40px;
+}
+
+/* Layer 1: NZXT LED Ring - Real LED light ring, not glow (outermost, z-index: -2) */
+.nzxt-glow-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -2px; /* LED ring spread area */
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    transparent 48%,
+    transparent 49%, /* Sharp cutoff before LED ring */
+    rgba(138, 43, 226, 0.95) 49.2%, /* LED ring start - uniform intensity */
+    rgba(138, 43, 226, 1.0) 49.5%, /* Full LED brightness */
+    rgba(138, 43, 226, 1.0) 50%, /* Peak LED intensity - uniform ring */
+    rgba(138, 43, 226, 1.0) 50.5%, /* Full LED brightness */
+    rgba(138, 43, 226, 0.95) 50.8%, /* LED ring end - uniform intensity */
+    transparent 51%, /* Sharp cutoff after LED ring */
+    transparent 52% /* Clean outer edge */
+  );
+  pointer-events: none;
+  z-index: -2; /* Behind bezel ring */
+  filter: blur(0.5px); /* Minimal blur - sharp LED ring, almost no blur */
+  box-shadow: 
+    0 0 8px rgba(138, 43, 226, 0.9), /* Tight LED light spread */
+    0 0 16px rgba(138, 43, 226, 0.7), /* Medium LED light spread */
+    0 0 24px rgba(138, 43, 226, 0.5), /* Wide LED light spread */
+    0 0 32px rgba(138, 43, 226, 0.3), /* Extended LED aura */
+    0 0 48px rgba(138, 43, 226, 0.2); /* Wide NZXT aura effect */
+}
+
+/* Layer 2: Dark Bezel Ring - Sharp separator between LED ring and inner circle (middle, z-index: -1) */
+.nzxt-glow-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: -2px; /* Precise bezel positioning */
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    transparent 48%, /* Inner edge - sharp cutoff */
+    rgba(0, 0, 0, 1.0) 48.3%, /* Pure black - maximum contrast */
+    rgba(0, 0, 0, 1.0) 48.6%, /* Solid black core */
+    rgba(0, 0, 0, 1.0) 49%, /* Maximum darkness */
+    rgba(0, 0, 0, 1.0) 49.3%, /* Peak black intensity */
+    rgba(0, 0, 0, 1.0) 50%, /* Uniform black ring */
+    rgba(0, 0, 0, 1.0) 50.7%, /* Peak black intensity */
+    rgba(0, 0, 0, 1.0) 51%, /* Maximum darkness */
+    rgba(0, 0, 0, 1.0) 51.4%, /* Solid black core */
+    rgba(0, 0, 0, 1.0) 51.7%, /* Pure black - maximum contrast */
+    transparent 52% /* Sharp cutoff - clean separation from LED ring */
+  );
+  pointer-events: none;
+  z-index: -1; /* Between LED ring and inner circle */
+  /* Ultra sharp bezel - creates hard separation between inner circle and LED ring */
+}
+
+/* Inner Circle (Main Element) - No effects, stays as is (z-index: 0, default) */
+.nzxt-glow-wrapper .preview-circle {
+  position: relative;
+  z-index: 0; /* Main element is on top */
+}
+
+/* Future: Toggle support - can be enabled with .enabled modifier */
+/* Example: .nzxt-glow-wrapper.enabled { ... } or conditional class based on state */
+
 .scale-label {
   position: absolute;
-  top: -26px;
-  left: 0;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   color: #ccc;
   font-size: 12px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.7);
   padding: 2px 6px;
   border-radius: 4px;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.offset-label {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ccc;
+  font-size: 12px;
+  background: rgba(0,0,0,0.7);
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 10;
+  white-space: nowrap;
 }
 
 /* crosshair overlay extended */
@@ -499,7 +605,7 @@
 }
 .setting-row label {
   flex: 1;
-  color:#a0a0a0; font-size:12px; white-space:nowrap;
+  color:#a0a0a0; font-size:11px; white-space:nowrap;
   text-align: left;
 }
 
@@ -578,11 +684,11 @@ select:focus {
 
 /* Text input styling - should match number input style but with wider width */
 .setting-row input[type="text"] {
-  width: 147px;
-  text-align: left;
+  width: 166px;
+  text-align: center;
   background:#2c2c2c; 
   border:1px solid #3a3a3a;
-  border-radius:6px; 
+  border-radius: 0; 
   padding:6px 10px; 
   color:#f2f2f2;
   font-size: 12px;
@@ -602,7 +708,11 @@ select:focus {
 .setting-row input[type="text"]:focus {
   outline: none;
   border-color: #8a2be2;
-  box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+}
+
+/* NumericStepper input styling - matches text input center alignment */
+.setting-row .numeric-stepper-input {
+  text-align: center;
 }
 
 /* Combined Text + Color Input - Color Picker Trigger Override */
@@ -628,7 +738,7 @@ select:focus {
 .overlay-preview {
   min-height: 200px;
   cursor: move;
-  border: 2px solid #444;
+  border: 14px solid #111;
   border-radius: 50%;
   overflow: hidden;
   background: #000;
@@ -646,6 +756,80 @@ select:focus {
   pointer-events: none;
   width: 100%;
   height: 100%;
+}
+
+/* Overlay Element Item Selection Highlight */
+.overlay-element-item {
+  position: relative;
+}
+
+/* Form elements inside overlay items should use their default cursors */
+.overlay-element-item input[type="text"],
+.overlay-element-item input[type="number"] {
+  cursor: text;
+}
+
+.overlay-element-item select {
+  cursor: pointer;
+}
+
+.overlay-element-item button {
+  cursor: pointer;
+}
+
+.overlay-element-item .color-picker-trigger {
+  cursor: pointer;
+}
+
+.overlay-element-item.selected {
+  border-color: rgba(138, 43, 226, 0.4) !important;
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(138, 43, 226, 0.3),
+    0 0 12px rgba(138, 43, 226, 0.2),
+    inset 0 0 8px rgba(138, 43, 226, 0.1) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(138, 43, 226, 0.08) 0%,
+    rgba(138, 43, 226, 0.04) 50%,
+    rgba(138, 43, 226, 0.08) 100%
+  ) !important;
+}
+
+.overlay-element-item.selected::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 6px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(138, 43, 226, 0.6),
+    rgba(186, 85, 211, 0.4),
+    rgba(138, 43, 226, 0.6)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: glow-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    filter: blur(2px);
+  }
+  50% {
+    opacity: 0.8;
+    filter: blur(3px);
+  }
+}
+
+.overlay-element-item:hover:not(.selected) {
+  border-color: rgba(138, 43, 226, 0.2) !important;
+  background: rgba(138, 43, 226, 0.03) !important;
 }
 
 /* responsive */

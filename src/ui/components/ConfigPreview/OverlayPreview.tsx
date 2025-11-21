@@ -1,6 +1,7 @@
 import UnifiedOverlayRenderer from '../UnifiedOverlayRenderer';
 import type { Overlay, OverlayMetrics } from '../../../types/overlay';
 import type { Lang, t as tFunction } from '../../../i18n';
+import type { AppSettings } from '../../../constants/defaults';
 import { lcdToPreview } from '../../../utils/positioning';
 import type { AlignmentGuide } from '../../../utils/snapping';
 import { canResizeElement } from '../../../utils/resize';
@@ -34,6 +35,7 @@ interface OverlayPreviewProps {
   isRealDataReceived: boolean;
   lang: Lang;
   t: typeof tFunction;
+  settings: AppSettings;
 }
 
 /**
@@ -63,16 +65,23 @@ export default function OverlayPreview({
   isRealDataReceived,
   lang,
   t,
+  settings,
 }: OverlayPreviewProps) {
   return (
     <div className="preview-column">
       {overlayConfig.mode !== 'none' ? (
         <>
           <div className="preview-title">{t('overlayPreviewTitle', lang)}</div>
-          <div
-            className={`preview-circle overlay-preview ${draggingElementId ? 'dragging' : ''}`}
-            style={{ position: 'relative', width: '200px', height: '200px' }}
-          >
+          <div className="nzxt-glow-wrapper">
+            <div
+              className={`preview-circle overlay-preview ${draggingElementId ? 'dragging' : ''}`}
+              style={{ 
+                position: 'relative', 
+                width: '200px', 
+                height: '200px',
+                backgroundColor: settings.backgroundColor || '#000000',
+              }}
+            >
             {/* Alignment guides */}
             {activeGuides.length > 0 && (
               <div
@@ -411,12 +420,13 @@ export default function OverlayPreview({
                 })}
               </>
             )}
+            </div>
           </div>
           {/* Mock data warning */}
           {!isRealDataReceived && (
             <div
               style={{
-                marginTop: '12px',
+                marginTop: '45px',
                 padding: '8px 12px',
                 background: 'rgba(255, 193, 7, 0.15)',
                 border: '1px solid rgba(255, 193, 7, 0.3)',

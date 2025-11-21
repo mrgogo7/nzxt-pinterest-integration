@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { ChevronUp, ChevronDown, Plus, X, BarChart3, Type, Minus, RefreshCw } from 'lucide-react';
+import { ChevronUp, ChevronDown, Plus, X, BarChart3, Type, Minus } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import type { AppSettings } from '../../../constants/defaults';
 import type { Overlay, OverlayMetricKey, OverlayElement, MetricElementData, TextElementData, DividerElementData } from '../../../types/overlay';
@@ -8,6 +8,7 @@ import type { Lang, t as tFunction } from '../../../i18n';
 import { addOverlayElement, removeOverlayElement, reorderOverlayElements, updateMetricElementData, updateTextElementData, updateDividerElementData, updateOverlayElementPosition, updateOverlayElementAngle } from '../../../utils/overlaySettingsHelpers';
 import OverlayField from './OverlayField';
 import ResetConfirmationModal from './ResetConfirmationModal';
+import RemoveConfirmationModal from './RemoveConfirmationModal';
 import ColorPicker from '../ColorPicker';
 import CombinedTextColorInput from './CombinedTextColorInput';
 
@@ -17,6 +18,8 @@ interface OverlaySettingsProps {
   setSettings: (settings: AppSettings) => void;
   lang: Lang;
   t: typeof tFunction;
+  selectedElementId: string | null;
+  setSelectedElementId: (elementId: string | null) => void;
 }
 
 /**
@@ -36,6 +39,8 @@ export default function OverlaySettingsComponent({
   setSettings,
   lang,
   t,
+  selectedElementId,
+  setSelectedElementId,
 }: OverlaySettingsProps) {
   // Helper: Get metric, text, and divider element counts
   const metricElements = overlayConfig.elements.filter(el => el.type === 'metric');
@@ -54,6 +59,13 @@ export default function OverlaySettingsComponent({
 
   // State for Reset Confirmation Modal
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+
+  // State for Remove Confirmation Modal
+  const [removeModalState, setRemoveModalState] = useState<{ isOpen: boolean; elementId: string | null; elementType: 'metric' | 'text' | 'divider' | null }>({
+    isOpen: false,
+    elementId: null,
+    elementType: null,
+  });
 
   // State for collapsible elements (default: all open)
   const [collapsedElements, setCollapsedElements] = useState<Set<string>>(new Set());
@@ -546,7 +558,7 @@ export default function OverlaySettingsComponent({
                 background: '#242424',
                 borderRadius: '6px',
                 border: '1px solid rgba(255, 255, 255, 0.04)',
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.6)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -612,20 +624,25 @@ export default function OverlaySettingsComponent({
                       ];
 
                       const isCollapsed = collapsedElements.has(element.id);
+                      const isSelected = selectedElementId === element.id;
                       
                       return (
                         <div 
                           key={element.id} 
+                          className={isSelected ? 'overlay-element-item selected' : 'overlay-element-item'}
+                          onClick={() => setSelectedElementId(element.id)}
                           style={{ 
                             padding: '8px',
                             background: '#242424',
                             borderRadius: '6px',
                             border: '1px solid rgba(255, 255, 255, 0.04)',
-                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.6)',
+                            transition: 'all 0.2s ease',
                           }}
                         >
                           {/* Compact Element Header */}
                           <div
+                            onClick={() => setSelectedElementId(element.id)}
                             style={{
                               display: 'flex',
                               alignItems: 'center',
@@ -637,11 +654,15 @@ export default function OverlaySettingsComponent({
                               background: '#262626',
                               borderRadius: '4px',
                               padding: '0 4px',
+                              cursor: 'pointer',
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <button
-                                onClick={() => toggleCollapse(element.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleCollapse(element.id);
+                                }}
                                 aria-label={isCollapsed ? t('expand', lang) || 'Expand' : t('collapse', lang) || 'Collapse'}
                                 style={{
                                   background: 'transparent',
@@ -662,47 +683,43 @@ export default function OverlaySettingsComponent({
                               </span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              {/* Move Up Button - Icon Only */}
+                              {/* Remove Button - Outline Style with Red Icon */}
                               <button
                                 onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.preventDefault();
                                   e.stopPropagation();
-                                  if (unifiedIndex > 0) {
-                                    setSettings(reorderOverlayElements(settings, overlayConfig, element.id, unifiedIndex - 1));
-                                  }
+                                  setRemoveModalState({
+                                    isOpen: true,
+                                    elementId: element.id,
+                                    elementType: element.type,
+                                  });
                                 }}
-                                disabled={unifiedIndex === 0}
-                                aria-label={t('moveReadingUp', lang) || 'Move Up'}
+                                aria-label={t('removeReading', lang) || t('removeText', lang) || t('removeDivider', lang) || 'Remove'}
                                 style={{
                                   width: '28px',
                                   height: '28px',
-                                  background: unifiedIndex === 0 ? '#252525' : '#2c2c2c',
+                                  background: 'transparent',
                                   border: '1px solid #3a3a3a',
-                                  color: unifiedIndex === 0 ? '#a0a0a0' : '#f2f2f2',
+                                  color: '#ff6b6b',
                                   borderRadius: '4px',
-                                  cursor: unifiedIndex === 0 ? 'not-allowed' : 'pointer',
+                                  cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   transition: 'all 0.15s ease',
                                   padding: '0',
                                 }}
-                                data-tooltip-id="move-up-tooltip"
-                                data-tooltip-content={t('moveReadingUp', lang)}
+                                data-tooltip-id="remove-reading-tooltip"
+                                data-tooltip-content={t('removeReading', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                                  if (unifiedIndex > 0) {
-                                    e.currentTarget.style.background = '#3a3a3a';
-                                    e.currentTarget.style.borderColor = '#8a2be2';
-                                  }
+                                  e.currentTarget.style.borderColor = '#ff6b6b';
+                                  e.currentTarget.style.background = '#3a1f1f';
                                 }}
                                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                                  if (unifiedIndex > 0) {
-                                    e.currentTarget.style.background = '#2c2c2c';
-                                    e.currentTarget.style.borderColor = '#3a3a3a';
-                                  }
+                                  e.currentTarget.style.borderColor = '#3a3a3a';
+                                  e.currentTarget.style.background = 'transparent';
                                 }}
                               >
-                                <ChevronUp size={12} />
+                                <X size={12} />
                               </button>
                               {/* Move Down Button - Icon Only */}
                               <button
@@ -746,71 +763,47 @@ export default function OverlaySettingsComponent({
                               >
                                 <ChevronDown size={12} />
                               </button>
-                              {/* Reset Element Button */}
+                              {/* Move Up Button - Icon Only */}
                               <button
-                                onClick={() => resetMetricElement(element.id)}
-                                aria-label={t('resetToDefault', lang) || 'Reset Element'}
+                                onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (unifiedIndex > 0) {
+                                    setSettings(reorderOverlayElements(settings, overlayConfig, element.id, unifiedIndex - 1));
+                                  }
+                                }}
+                                disabled={unifiedIndex === 0}
+                                aria-label={t('moveReadingUp', lang) || 'Move Up'}
                                 style={{
                                   width: '28px',
                                   height: '28px',
-                                  background: 'transparent',
+                                  background: unifiedIndex === 0 ? '#252525' : '#2c2c2c',
                                   border: '1px solid #3a3a3a',
-                                  color: '#a0a0a0',
+                                  color: unifiedIndex === 0 ? '#a0a0a0' : '#f2f2f2',
                                   borderRadius: '4px',
-                                  cursor: 'pointer',
+                                  cursor: unifiedIndex === 0 ? 'not-allowed' : 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   transition: 'all 0.15s ease',
                                   padding: '0',
                                 }}
-                                data-tooltip-id="reset-element-tooltip"
-                                data-tooltip-content={t('resetToDefault', lang) || 'Reset Element'}
+                                data-tooltip-id="move-up-tooltip"
+                                data-tooltip-content={t('moveReadingUp', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#8a2be2';
-                                  e.currentTarget.style.background = '#2c2c2c';
-                                  e.currentTarget.style.color = '#f2f2f2';
+                                  if (unifiedIndex > 0) {
+                                    e.currentTarget.style.background = '#3a3a3a';
+                                    e.currentTarget.style.borderColor = '#8a2be2';
+                                  }
                                 }}
                                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#3a3a3a';
-                                  e.currentTarget.style.background = 'transparent';
-                                  e.currentTarget.style.color = '#a0a0a0';
+                                  if (unifiedIndex > 0) {
+                                    e.currentTarget.style.background = '#2c2c2c';
+                                    e.currentTarget.style.borderColor = '#3a3a3a';
+                                  }
                                 }}
                               >
-                                <RefreshCw size={12} />
-                              </button>
-                              {/* Remove Button - Outline Style with Red Icon */}
-                              <button
-                                onClick={() => {
-                                  setSettings(removeOverlayElement(settings, overlayConfig, element.id));
-                                }}
-                                aria-label={t('removeReading', lang) || t('removeText', lang) || t('removeDivider', lang) || 'Remove'}
-                                style={{
-                                  width: '28px',
-                                  height: '28px',
-                                  background: 'transparent',
-                                  border: '1px solid #3a3a3a',
-                                  color: '#ff6b6b',
-                                  borderRadius: '4px',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  transition: 'all 0.15s ease',
-                                  padding: '0',
-                                }}
-                                data-tooltip-id="remove-reading-tooltip"
-                                data-tooltip-content={t('removeReading', lang)}
-                                onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#ff6b6b';
-                                  e.currentTarget.style.background = '#3a1f1f';
-                                }}
-                                onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#3a3a3a';
-                                  e.currentTarget.style.background = 'transparent';
-                                }}
-                              >
-                                <X size={12} />
+                                <ChevronUp size={12} />
                               </button>
                             </div>
                           </div>
@@ -820,14 +813,21 @@ export default function OverlaySettingsComponent({
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                               {/* Sensor with Color on the right */}
                               <div className="setting-row">
-                                <label style={{ fontSize: '12px' }}>{t('sensor', lang) || t('reading', lang)}</label>
+                                <label 
+                                  style={{ fontSize: '11px', cursor: 'help' }}
+                                  data-tooltip-id={`sensor-tooltip-${element.id}`}
+                                  data-tooltip-content={t('tooltipSensor', lang)}
+                                >
+                                  {t('sensor', lang) || t('reading', lang)}
+                                </label>
+                                <Tooltip id={`sensor-tooltip-${element.id}`} />
                                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flex: 1 }}>
                                   <select
                                     className="url-input"
                                     value={data.metric}
                                     onChange={(e) => setSettings(updateMetricElementData(settings, overlayConfig, element.id, { metric: e.target.value as OverlayMetricKey }))}
                                     aria-label={t('sensor', lang) || t('reading', lang)}
-                                    style={{ width: '150px' }}
+                                    style={{ width: '134px' }}
                                   >
                                     {getMetricOptions().map(opt => (
                                       <option key={opt.value} value={opt.value}>
@@ -835,7 +835,7 @@ export default function OverlaySettingsComponent({
                                       </option>
                                     ))}
                                   </select>
-                                  <div data-tooltip-id={`color-tooltip-${element.id}`} data-tooltip-content={t('color', lang)}>
+                                  <div data-tooltip-id={`color-tooltip-${element.id}`} data-tooltip-content={t('tooltipColor', lang)}>
                                     <ColorPicker
                                       value={data.numberColor || '#ffffff'}
                                       onChange={(color) => setSettings(updateMetricElementData(settings, overlayConfig, element.id, { numberColor: color }))}
@@ -854,6 +854,8 @@ export default function OverlaySettingsComponent({
                                 value={data.numberSize}
                                 onChange={(value) => setSettings(updateMetricElementData(settings, overlayConfig, element.id, { numberSize: value }))}
                                 step={1}
+                                labelTooltipId={`size-tooltip-${element.id}`}
+                                labelTooltipContent={t('tooltipSize', lang)}
                               />
                               <OverlayField
                                 type="number"
@@ -863,6 +865,8 @@ export default function OverlaySettingsComponent({
                                 step={1}
                                 min={0}
                                 max={360}
+                                labelTooltipId={`angle-tooltip-${element.id}`}
+                                labelTooltipContent={t('tooltipAngle', lang)}
                               />
 
                               {/* Row 2: X Off | Y Off */}
@@ -872,6 +876,8 @@ export default function OverlaySettingsComponent({
                                 value={element.x}
                                 onChange={(value) => setSettings(updateOverlayElementPosition(settings, overlayConfig, element.id, value, element.y))}
                                 step={1}
+                                labelTooltipId={`xoffset-tooltip-${element.id}`}
+                                labelTooltipContent={t('tooltipXOffset', lang)}
                               />
                               <OverlayField
                                 type="number"
@@ -879,6 +885,8 @@ export default function OverlaySettingsComponent({
                                 value={element.y}
                                 onChange={(value) => setSettings(updateOverlayElementPosition(settings, overlayConfig, element.id, element.x, value))}
                                 step={1}
+                                labelTooltipId={`yoffset-tooltip-${element.id}`}
+                                labelTooltipContent={t('tooltipYOffset', lang)}
                               />
                               </div>
                             </div>
@@ -906,20 +914,25 @@ export default function OverlaySettingsComponent({
                       };
 
                       const isCollapsed = collapsedElements.has(element.id);
+                      const isSelected = selectedElementId === element.id;
                       
                       return (
                         <div 
                           key={element.id} 
+                          className={isSelected ? 'overlay-element-item selected' : 'overlay-element-item'}
+                          onClick={() => setSelectedElementId(element.id)}
                           style={{ 
                             padding: '8px',
                             background: '#242424',
                             borderRadius: '6px',
                             border: '1px solid rgba(255, 255, 255, 0.04)',
-                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.6)',
+                            transition: 'all 0.2s ease',
                           }}
                         >
                           {/* Compact Element Header */}
                           <div
+                            onClick={() => setSelectedElementId(element.id)}
                             style={{
                               display: 'flex',
                               alignItems: 'center',
@@ -931,11 +944,15 @@ export default function OverlaySettingsComponent({
                               background: '#262626',
                               borderRadius: '4px',
                               padding: '0 4px',
+                              cursor: 'pointer',
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <button
-                                onClick={() => toggleCollapse(element.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleCollapse(element.id);
+                                }}
                                 aria-label={isCollapsed ? t('expand', lang) || 'Expand' : t('collapse', lang) || 'Collapse'}
                                 style={{
                                   background: 'transparent',
@@ -956,47 +973,43 @@ export default function OverlaySettingsComponent({
                               </span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              {/* Move Up Button - Icon Only */}
+                              {/* Remove Button - Outline Style with Red Icon */}
                               <button
                                 onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.preventDefault();
                                   e.stopPropagation();
-                                  if (unifiedIndex > 0) {
-                                    setSettings(reorderOverlayElements(settings, overlayConfig, element.id, unifiedIndex - 1));
-                                  }
+                                  setRemoveModalState({
+                                    isOpen: true,
+                                    elementId: element.id,
+                                    elementType: element.type,
+                                  });
                                 }}
-                                disabled={unifiedIndex === 0}
-                                aria-label={t('moveReadingUp', lang) || 'Move Up'}
+                                aria-label={t('removeReading', lang) || t('removeText', lang) || t('removeDivider', lang) || 'Remove'}
                                 style={{
                                   width: '28px',
                                   height: '28px',
-                                  background: unifiedIndex === 0 ? '#252525' : '#2c2c2c',
+                                  background: 'transparent',
                                   border: '1px solid #3a3a3a',
-                                  color: unifiedIndex === 0 ? '#a0a0a0' : '#f2f2f2',
+                                  color: '#ff6b6b',
                                   borderRadius: '4px',
-                                  cursor: unifiedIndex === 0 ? 'not-allowed' : 'pointer',
+                                  cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   transition: 'all 0.15s ease',
                                   padding: '0',
                                 }}
-                                data-tooltip-id="move-text-up-tooltip"
-                                data-tooltip-content={t('moveTextUp', lang)}
+                                data-tooltip-id="remove-text-tooltip"
+                                data-tooltip-content={t('removeText', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                                  if (unifiedIndex > 0) {
-                                    e.currentTarget.style.background = '#3a3a3a';
-                                    e.currentTarget.style.borderColor = '#8a2be2';
-                                  }
+                                  e.currentTarget.style.borderColor = '#ff6b6b';
+                                  e.currentTarget.style.background = '#3a1f1f';
                                 }}
                                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                                  if (unifiedIndex > 0) {
-                                    e.currentTarget.style.background = '#2c2c2c';
-                                    e.currentTarget.style.borderColor = '#3a3a3a';
-                                  }
+                                  e.currentTarget.style.borderColor = '#3a3a3a';
+                                  e.currentTarget.style.background = 'transparent';
                                 }}
                               >
-                                <ChevronUp size={12} />
+                                <X size={12} />
                               </button>
                               {/* Move Down Button - Icon Only */}
                               <button
@@ -1040,199 +1053,6 @@ export default function OverlaySettingsComponent({
                               >
                                 <ChevronDown size={12} />
                               </button>
-                              {/* Reset Element Button */}
-                              <button
-                                onClick={() => resetTextElement(element.id)}
-                                aria-label={t('resetToDefault', lang) || 'Reset Element'}
-                                style={{
-                                  width: '28px',
-                                  height: '28px',
-                                  background: 'transparent',
-                                  border: '1px solid #3a3a3a',
-                                  color: '#a0a0a0',
-                                  borderRadius: '4px',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  transition: 'all 0.15s ease',
-                                  padding: '0',
-                                }}
-                                data-tooltip-id="reset-text-element-tooltip"
-                                data-tooltip-content={t('resetToDefault', lang) || 'Reset Element'}
-                                onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#8a2be2';
-                                  e.currentTarget.style.background = '#2c2c2c';
-                                  e.currentTarget.style.color = '#f2f2f2';
-                                }}
-                                onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#3a3a3a';
-                                  e.currentTarget.style.background = 'transparent';
-                                  e.currentTarget.style.color = '#a0a0a0';
-                                }}
-                              >
-                                <RefreshCw size={12} />
-                              </button>
-                              {/* Remove Button - Outline Style with Red Icon */}
-                              <button
-                                onClick={() => {
-                                  setSettings(removeOverlayElement(settings, overlayConfig, element.id));
-                                }}
-                                aria-label={t('removeReading', lang) || t('removeText', lang) || t('removeDivider', lang) || 'Remove'}
-                                style={{
-                                  width: '28px',
-                                  height: '28px',
-                                  background: 'transparent',
-                                  border: '1px solid #3a3a3a',
-                                  color: '#ff6b6b',
-                                  borderRadius: '4px',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  transition: 'all 0.15s ease',
-                                  padding: '0',
-                                }}
-                                data-tooltip-id="remove-text-tooltip"
-                                data-tooltip-content={t('removeText', lang)}
-                                onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#ff6b6b';
-                                  e.currentTarget.style.background = '#3a1f1f';
-                                }}
-                                onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#3a3a3a';
-                                  e.currentTarget.style.background = 'transparent';
-                                }}
-                              >
-                                <X size={12} />
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Compact 2-Column Element Settings */}
-                          {!isCollapsed && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                              {/* Combined Text + Color Input */}
-                              <div className="setting-row">
-                                <label htmlFor={`text-input-${element.id}`} style={{ fontSize: '12px' }}>{t('text', lang)}</label>
-                                <CombinedTextColorInput
-                                  id={`text-input-${element.id}`}
-                                  text={data.text}
-                                  onTextChange={(text) => {
-                                    const sanitized = sanitizeText(text);
-                                    setSettings(updateTextElementData(settings, overlayConfig, element.id, { text: sanitized }));
-                                  }}
-                                  color={data.textColor || '#ffffff'}
-                                  onColorChange={(color) => setSettings(updateTextElementData(settings, overlayConfig, element.id, { textColor: color }))}
-                                  placeholder={t('textInputPlaceholder', lang)}
-                                  maxLength={120}
-                                  sanitizeText={sanitizeText}
-                                />
-                              </div>
-
-                              {/* 2-Column Grid for other fields */}
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                                {/* Row 1: Size | Angle */}
-                                <OverlayField
-                                  type="number"
-                                  label={t('size', lang)}
-                                  value={data.textSize}
-                                  onChange={(value) => setSettings(updateTextElementData(settings, overlayConfig, element.id, { textSize: Math.max(6, value) }))}
-                                  step={1}
-                                  min={6}
-                                />
-                                <OverlayField
-                                  type="number"
-                                  label={t('angle', lang)}
-                                  value={element.angle ?? 0}
-                                  onChange={(value) => setSettings(updateOverlayElementAngle(settings, overlayConfig, element.id, value))}
-                                  step={1}
-                                  min={0}
-                                  max={360}
-                                />
-
-                                {/* Row 2: X Off | Y Off */}
-                                <OverlayField
-                                  type="number"
-                                  label={t('customXOffset', lang)}
-                                  value={element.x}
-                                  onChange={(value) => setSettings(updateOverlayElementPosition(settings, overlayConfig, element.id, value, element.y))}
-                                  step={1}
-                                />
-                                <OverlayField
-                                  type="number"
-                                  label={t('customYOffset', lang)}
-                                  value={element.y}
-                                  onChange={(value) => setSettings(updateOverlayElementPosition(settings, overlayConfig, element.id, element.x, value))}
-                                  step={1}
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    } else if (element.type === 'divider') {
-                      const data = element.data as DividerElementData;
-                      const dividerIndex = dividerElements.findIndex(el => el.id === element.id);
-                      
-                      const dividerLabels = [
-                        t('firstDivider', lang),
-                        t('secondDivider', lang),
-                        t('thirdDivider', lang),
-                        t('fourthDivider', lang),
-                      ];
-
-                      const isCollapsed = collapsedElements.has(element.id);
-                      
-                      return (
-                        <div 
-                          key={element.id} 
-                          style={{ 
-                            padding: '8px',
-                            background: '#242424',
-                            borderRadius: '6px',
-                            border: '1px solid rgba(255, 255, 255, 0.04)',
-                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
-                          }}
-                        >
-                          {/* Compact Element Header */}
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              height: '36px',
-                              marginBottom: isCollapsed ? '0' : '8px',
-                              paddingBottom: isCollapsed ? '0' : '8px',
-                              borderBottom: isCollapsed ? 'none' : '1px solid rgba(255, 255, 255, 0.04)',
-                              background: '#262626',
-                              borderRadius: '4px',
-                              padding: '0 4px',
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <button
-                                onClick={() => toggleCollapse(element.id)}
-                                aria-label={isCollapsed ? t('expand', lang) || 'Expand' : t('collapse', lang) || 'Collapse'}
-                                style={{
-                                  background: 'transparent',
-                                  border: 'none',
-                                  color: '#a0a0a0',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  padding: '2px',
-                                  transition: 'transform 0.15s ease',
-                                  transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
-                                }}
-                              >
-                                <ChevronDown size={14} />
-                              </button>
-                              <span style={{ color: '#f2f2f2', fontSize: '13px', fontWeight: 600 }}>
-                                {dividerLabels[dividerIndex] || `${dividerIndex + 1}${dividerIndex === 0 ? 'st' : dividerIndex === 1 ? 'nd' : dividerIndex === 2 ? 'rd' : 'th'} ${t('divider', lang)}`}
-                              </span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                               {/* Move Up Button - Icon Only */}
                               <button
                                 onClick={(e: MouseEvent<HTMLButtonElement>) => {
@@ -1258,8 +1078,8 @@ export default function OverlaySettingsComponent({
                                   transition: 'all 0.15s ease',
                                   padding: '0',
                                 }}
-                                data-tooltip-id="move-divider-up-tooltip"
-                                data-tooltip-content={t('moveDividerUp', lang)}
+                                data-tooltip-id="move-text-up-tooltip"
+                                data-tooltip-content={t('moveTextUp', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                                   if (unifiedIndex > 0) {
                                     e.currentTarget.style.background = '#3a3a3a';
@@ -1274,6 +1094,197 @@ export default function OverlaySettingsComponent({
                                 }}
                               >
                                 <ChevronUp size={12} />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Compact 2-Column Element Settings */}
+                          {!isCollapsed && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              {/* Combined Text + Color Input */}
+                              <div className="setting-row">
+                                <label 
+                                  htmlFor={`text-input-${element.id}`} 
+                                  style={{ fontSize: '11px', cursor: 'help' }}
+                                  data-tooltip-id={`text-tooltip-${element.id}`}
+                                  data-tooltip-content={t('tooltipText', lang)}
+                                >
+                                  {t('text', lang)}
+                                </label>
+                                <Tooltip id={`text-tooltip-${element.id}`} />
+                                <CombinedTextColorInput
+                                  id={`text-input-${element.id}`}
+                                  text={data.text}
+                                  onTextChange={(text) => {
+                                    const sanitized = sanitizeText(text);
+                                    setSettings(updateTextElementData(settings, overlayConfig, element.id, { text: sanitized }));
+                                  }}
+                                  color={data.textColor || '#ffffff'}
+                                  onColorChange={(color) => setSettings(updateTextElementData(settings, overlayConfig, element.id, { textColor: color }))}
+                                  placeholder={t('textInputPlaceholder', lang)}
+                                  maxLength={120}
+                                  sanitizeText={sanitizeText}
+                                  colorTooltipContent={t('tooltipColor', lang)}
+                                />
+                              </div>
+
+                              {/* 2-Column Grid for other fields */}
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                {/* Row 1: Size | Angle */}
+                                <OverlayField
+                                  type="number"
+                                  label={t('size', lang)}
+                                  value={data.textSize}
+                                  onChange={(value) => setSettings(updateTextElementData(settings, overlayConfig, element.id, { textSize: Math.max(6, value) }))}
+                                  step={1}
+                                  min={6}
+                                  labelTooltipId={`text-size-tooltip-${element.id}`}
+                                  labelTooltipContent={t('tooltipSize', lang)}
+                                />
+                                <OverlayField
+                                  type="number"
+                                  label={t('angle', lang)}
+                                  value={element.angle ?? 0}
+                                  onChange={(value) => setSettings(updateOverlayElementAngle(settings, overlayConfig, element.id, value))}
+                                  step={1}
+                                  min={0}
+                                  max={360}
+                                  labelTooltipId={`text-angle-tooltip-${element.id}`}
+                                  labelTooltipContent={t('tooltipAngle', lang)}
+                                />
+
+                                {/* Row 2: X Off | Y Off */}
+                                <OverlayField
+                                  type="number"
+                                  label={t('customXOffset', lang)}
+                                  value={element.x}
+                                  onChange={(value) => setSettings(updateOverlayElementPosition(settings, overlayConfig, element.id, value, element.y))}
+                                  step={1}
+                                  labelTooltipId={`text-xoffset-tooltip-${element.id}`}
+                                  labelTooltipContent={t('tooltipXOffset', lang)}
+                                />
+                                <OverlayField
+                                  type="number"
+                                  label={t('customYOffset', lang)}
+                                  value={element.y}
+                                  onChange={(value) => setSettings(updateOverlayElementPosition(settings, overlayConfig, element.id, element.x, value))}
+                                  step={1}
+                                  labelTooltipId={`text-yoffset-tooltip-${element.id}`}
+                                  labelTooltipContent={t('tooltipYOffset', lang)}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    } else if (element.type === 'divider') {
+                      const data = element.data as DividerElementData;
+                      const dividerIndex = dividerElements.findIndex(el => el.id === element.id);
+                      
+                      const dividerLabels = [
+                        t('firstDivider', lang),
+                        t('secondDivider', lang),
+                        t('thirdDivider', lang),
+                        t('fourthDivider', lang),
+                      ];
+
+                      const isCollapsed = collapsedElements.has(element.id);
+                      const isSelected = selectedElementId === element.id;
+                      
+                      return (
+                        <div 
+                          key={element.id} 
+                          className={isSelected ? 'overlay-element-item selected' : 'overlay-element-item'}
+                          onClick={() => setSelectedElementId(element.id)}
+                          style={{ 
+                            padding: '8px',
+                            background: '#242424',
+                            borderRadius: '6px',
+                            border: '1px solid rgba(255, 255, 255, 0.04)',
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.6)',
+                            transition: 'all 0.2s ease',
+                          }}
+                        >
+                          {/* Compact Element Header */}
+                          <div
+                            onClick={() => setSelectedElementId(element.id)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              height: '36px',
+                              marginBottom: isCollapsed ? '0' : '8px',
+                              paddingBottom: isCollapsed ? '0' : '8px',
+                              borderBottom: isCollapsed ? 'none' : '1px solid rgba(255, 255, 255, 0.04)',
+                              background: '#262626',
+                              borderRadius: '4px',
+                              padding: '0 4px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleCollapse(element.id);
+                                }}
+                                aria-label={isCollapsed ? t('expand', lang) || 'Expand' : t('collapse', lang) || 'Collapse'}
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: '#a0a0a0',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  padding: '2px',
+                                  transition: 'transform 0.15s ease',
+                                  transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+                                }}
+                              >
+                                <ChevronDown size={14} />
+                              </button>
+                              <span style={{ color: '#f2f2f2', fontSize: '13px', fontWeight: 600 }}>
+                                {dividerLabels[dividerIndex] || `${dividerIndex + 1}${dividerIndex === 0 ? 'st' : dividerIndex === 1 ? 'nd' : dividerIndex === 2 ? 'rd' : 'th'} ${t('divider', lang)}`}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              {/* Remove Button - Outline Style with Red Icon */}
+                              <button
+                                onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                                  e.stopPropagation();
+                                  setRemoveModalState({
+                                    isOpen: true,
+                                    elementId: element.id,
+                                    elementType: element.type,
+                                  });
+                                }}
+                                aria-label={t('removeReading', lang) || t('removeText', lang) || t('removeDivider', lang) || 'Remove'}
+                                style={{
+                                  width: '28px',
+                                  height: '28px',
+                                  background: 'transparent',
+                                  border: '1px solid #3a3a3a',
+                                  color: '#ff6b6b',
+                                  borderRadius: '4px',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  transition: 'all 0.15s ease',
+                                  padding: '0',
+                                }}
+                                data-tooltip-id="remove-divider-tooltip"
+                                data-tooltip-content={t('removeDivider', lang)}
+                                onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
+                                  e.currentTarget.style.borderColor = '#ff6b6b';
+                                  e.currentTarget.style.background = '#3a1f1f';
+                                }}
+                                onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
+                                  e.currentTarget.style.borderColor = '#3a3a3a';
+                                  e.currentTarget.style.background = 'transparent';
+                                }}
+                              >
+                                <X size={12} />
                               </button>
                               {/* Move Down Button - Icon Only */}
                               <button
@@ -1317,71 +1328,47 @@ export default function OverlaySettingsComponent({
                               >
                                 <ChevronDown size={12} />
                               </button>
-                              {/* Reset Element Button */}
+                              {/* Move Up Button - Icon Only */}
                               <button
-                                onClick={() => resetDividerElement(element.id)}
-                                aria-label={t('resetToDefault', lang) || 'Reset Element'}
+                                onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (unifiedIndex > 0) {
+                                    setSettings(reorderOverlayElements(settings, overlayConfig, element.id, unifiedIndex - 1));
+                                  }
+                                }}
+                                disabled={unifiedIndex === 0}
+                                aria-label={t('moveReadingUp', lang) || 'Move Up'}
                                 style={{
                                   width: '28px',
                                   height: '28px',
-                                  background: 'transparent',
+                                  background: unifiedIndex === 0 ? '#252525' : '#2c2c2c',
                                   border: '1px solid #3a3a3a',
-                                  color: '#a0a0a0',
+                                  color: unifiedIndex === 0 ? '#a0a0a0' : '#f2f2f2',
                                   borderRadius: '4px',
-                                  cursor: 'pointer',
+                                  cursor: unifiedIndex === 0 ? 'not-allowed' : 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   transition: 'all 0.15s ease',
                                   padding: '0',
                                 }}
-                                data-tooltip-id="reset-divider-element-tooltip"
-                                data-tooltip-content={t('resetToDefault', lang) || 'Reset Element'}
+                                data-tooltip-id="move-divider-up-tooltip"
+                                data-tooltip-content={t('moveDividerUp', lang)}
                                 onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#8a2be2';
-                                  e.currentTarget.style.background = '#2c2c2c';
-                                  e.currentTarget.style.color = '#f2f2f2';
+                                  if (unifiedIndex > 0) {
+                                    e.currentTarget.style.background = '#3a3a3a';
+                                    e.currentTarget.style.borderColor = '#8a2be2';
+                                  }
                                 }}
                                 onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#3a3a3a';
-                                  e.currentTarget.style.background = 'transparent';
-                                  e.currentTarget.style.color = '#a0a0a0';
+                                  if (unifiedIndex > 0) {
+                                    e.currentTarget.style.background = '#2c2c2c';
+                                    e.currentTarget.style.borderColor = '#3a3a3a';
+                                  }
                                 }}
                               >
-                                <RefreshCw size={12} />
-                              </button>
-                              {/* Remove Button - Outline Style with Red Icon */}
-                              <button
-                                onClick={() => {
-                                  setSettings(removeOverlayElement(settings, overlayConfig, element.id));
-                                }}
-                                aria-label={t('removeReading', lang) || t('removeText', lang) || t('removeDivider', lang) || 'Remove'}
-                                style={{
-                                  width: '28px',
-                                  height: '28px',
-                                  background: 'transparent',
-                                  border: '1px solid #3a3a3a',
-                                  color: '#ff6b6b',
-                                  borderRadius: '4px',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  transition: 'all 0.15s ease',
-                                  padding: '0',
-                                }}
-                                data-tooltip-id="remove-divider-tooltip"
-                                data-tooltip-content={t('removeDivider', lang)}
-                                onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#ff6b6b';
-                                  e.currentTarget.style.background = '#3a1f1f';
-                                }}
-                                onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                                  e.currentTarget.style.borderColor = '#3a3a3a';
-                                  e.currentTarget.style.background = 'transparent';
-                                }}
-                              >
-                                <X size={12} />
+                                <ChevronUp size={12} />
                               </button>
                             </div>
                           </div>
@@ -1395,6 +1382,8 @@ export default function OverlaySettingsComponent({
                                 label={t('color', lang)}
                                 value={data.color}
                                 onChange={(color) => setSettings(updateDividerElementData(settings, overlayConfig, element.id, { color }))}
+                                labelTooltipId={`divider-color-tooltip-${element.id}`}
+                                labelTooltipContent={t('tooltipColor', lang)}
                               />
                               <OverlayField
                                 type="number"
@@ -1404,6 +1393,8 @@ export default function OverlaySettingsComponent({
                                 step={1}
                                 min={1}
                                 max={400}
+                                labelTooltipId={`thickness-tooltip-${element.id}`}
+                                labelTooltipContent={t('tooltipThickness', lang)}
                               />
 
                               {/* Row 2: Height | Angle */}
@@ -1415,6 +1406,8 @@ export default function OverlaySettingsComponent({
                                 step={1}
                                 min={10}
                                 max={640}
+                                labelTooltipId={`divider-length-tooltip-${element.id}`}
+                                labelTooltipContent={t('tooltipDividerLength', lang)}
                               />
                               <OverlayField
                                 type="number"
@@ -1424,6 +1417,8 @@ export default function OverlaySettingsComponent({
                                 step={1}
                                 min={0}
                                 max={360}
+                                labelTooltipId={`divider-angle-tooltip-${element.id}`}
+                                labelTooltipContent={t('tooltipAngle', lang)}
                               />
 
                               {/* Row 3: X Off | Y Off */}
@@ -1433,6 +1428,8 @@ export default function OverlaySettingsComponent({
                                 value={element.x}
                                 onChange={(value) => setSettings(updateOverlayElementPosition(settings, overlayConfig, element.id, value, element.y))}
                                 step={1}
+                                labelTooltipId={`divider-xoffset-tooltip-${element.id}`}
+                                labelTooltipContent={t('tooltipXOffset', lang)}
                               />
                               <OverlayField
                                 type="number"
@@ -1440,6 +1437,8 @@ export default function OverlaySettingsComponent({
                                 value={element.y}
                                 onChange={(value) => setSettings(updateOverlayElementPosition(settings, overlayConfig, element.id, element.x, value))}
                                 step={1}
+                                labelTooltipId={`divider-yoffset-tooltip-${element.id}`}
+                                labelTooltipContent={t('tooltipYOffset', lang)}
                               />
                             </div>
                           )}
@@ -1461,6 +1460,21 @@ export default function OverlaySettingsComponent({
         onConfirm={performReset}
         lang={lang}
       />
+
+      {/* Remove Confirmation Modal */}
+      {removeModalState.elementId && removeModalState.elementType && (
+        <RemoveConfirmationModal
+          isOpen={removeModalState.isOpen}
+          onClose={() => setRemoveModalState({ isOpen: false, elementId: null, elementType: null })}
+          onConfirm={() => {
+            if (removeModalState.elementId) {
+              setSettings(removeOverlayElement(settings, overlayConfig, removeModalState.elementId));
+            }
+          }}
+          lang={lang}
+          elementType={removeModalState.elementType}
+        />
+      )}
     </div>
   );
 }

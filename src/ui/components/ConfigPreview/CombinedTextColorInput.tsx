@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import ColorPicker from '../ColorPicker';
+import { Tooltip } from 'react-tooltip';
 
 interface CombinedTextColorInputProps {
   text: string;
@@ -10,6 +11,7 @@ interface CombinedTextColorInputProps {
   maxLength?: number;
   id?: string;
   sanitizeText?: (text: string) => string;
+  colorTooltipContent?: string;
 }
 
 /**
@@ -26,6 +28,7 @@ export default function CombinedTextColorInput({
   maxLength = 120,
   id,
   sanitizeText,
+  colorTooltipContent,
 }: CombinedTextColorInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,8 +50,9 @@ export default function CombinedTextColorInput({
         border: '1px solid #3a3a3a',
         borderRadius: '6px',
         padding: '6px 10px',
-        height: '32px',
+        height: '20px',
         transition: 'all 0.15s ease',
+        boxShadow: 'none',
       }}
       onMouseEnter={(e) => {
         if (e.currentTarget !== document.activeElement?.closest('div')) {
@@ -69,11 +73,14 @@ export default function CombinedTextColorInput({
           alignItems: 'center',
         }}
         className="combined-text-color-picker-wrapper"
+        data-tooltip-id={colorTooltipContent ? `text-color-tooltip-${id}` : undefined}
+        data-tooltip-content={colorTooltipContent}
       >
         <ColorPicker
           value={color || '#ffffff'}
           onChange={onColorChange}
         />
+        {colorTooltipContent && <Tooltip id={`text-color-tooltip-${id}`} />}
       </div>
 
       {/* Text input */}
@@ -100,7 +107,7 @@ export default function CombinedTextColorInput({
           const container = e.currentTarget.parentElement;
           if (container) {
             container.style.borderColor = '#8a2be2';
-            container.style.boxShadow = '0 0 0 2px rgba(138, 43, 226, 0.2)';
+            container.style.boxShadow = 'none';
             container.style.background = '#2c2c2c';
           }
         }}

@@ -4,7 +4,7 @@
 }
 
 .color-picker-trigger {
-  width: 40px;
+  width: 78px;
   height: 32px;
   border: 1px solid #3a3a3a;
   border-radius: 6px;
@@ -15,6 +15,11 @@
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
+}
+
+/* Background Settings color picker - keep original width */
+.background-color-section-inline .color-picker-trigger {
+  width: 40px;
 }
 
 .color-picker-trigger:hover {

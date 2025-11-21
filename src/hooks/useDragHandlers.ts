@@ -407,6 +407,7 @@ export function useDragHandlers(
     // Element drag (unified)
     draggingElementId,
     selectedElementId,
+    setSelectedElementId,
     handleElementMouseDown,
     
     // Snapping guides

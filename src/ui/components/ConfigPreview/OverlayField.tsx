@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import ColorPicker from '../ColorPicker';
 import { Tooltip } from 'react-tooltip';
+import NumericStepper from '../NumericStepper';
 
 interface OverlayFieldProps {
   field?: string; // Optional, kept for backward compatibility (no longer used for type safety)
@@ -16,6 +17,8 @@ interface OverlayFieldProps {
   hideLabel?: boolean; // If true, don't render the label
   tooltipId?: string; // Optional tooltip ID for color picker
   tooltipContent?: string; // Optional tooltip content
+  labelTooltipId?: string; // Optional tooltip ID for label
+  labelTooltipContent?: string; // Optional tooltip content for label
 }
 
 /**
@@ -43,87 +46,29 @@ export default function OverlayField({
   hideLabel = false,
   tooltipId,
   tooltipContent,
+  labelTooltipId,
+  labelTooltipContent,
 }: OverlayFieldProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  
-  // Determine if this is an integer field (step >= 1 or undefined)
-  const isIntegerField = !step || step >= 1;
-  
-  // Handle mouse wheel and arrow keys for numeric inputs
-  useEffect(() => {
-    if (type !== 'number' || !inputRef.current) return;
-    
-    const input = inputRef.current;
-    
-    const handleWheel = (e: WheelEvent) => {
-      // Only handle wheel when input is focused
-      if (document.activeElement !== input) return;
-      
-      e.preventDefault();
-      const currentValue = typeof value === 'number' ? value : 0;
-      const delta = e.deltaY < 0 ? 1 : -1;
-      const newValue = isIntegerField 
-        ? Math.round(currentValue + delta)
-        : currentValue + delta * (step || 1);
-      
-      // Apply min/max constraints
-      let constrainedValue = newValue;
-      if (min !== undefined) constrainedValue = Math.max(constrainedValue, min);
-      if (max !== undefined) constrainedValue = Math.min(constrainedValue, max);
-      
-      onChange(constrainedValue);
-    };
-    
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle arrow keys when input is focused
-      if (document.activeElement !== input) return;
-      
-      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        const currentValue = typeof value === 'number' ? value : 0;
-        const delta = e.key === 'ArrowUp' ? 1 : -1;
-        const newValue = isIntegerField 
-          ? Math.round(currentValue + delta)
-          : currentValue + delta * (step || 1);
-        
-        // Apply min/max constraints
-        let constrainedValue = newValue;
-        if (min !== undefined) constrainedValue = Math.max(constrainedValue, min);
-        if (max !== undefined) constrainedValue = Math.min(constrainedValue, max);
-        
-        onChange(constrainedValue);
-      }
-    };
-    
-    input.addEventListener('wheel', handleWheel, { passive: false });
-    input.addEventListener('keydown', handleKeyDown);
-    
-    return () => {
-      input.removeEventListener('wheel', handleWheel);
-      input.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [type, value, onChange, step, min, max, isIntegerField]);
-  
   return (
     <div className="setting-row">
-      {!hideLabel && <label>{label}</label>}
+      {!hideLabel && (
+        <label 
+          data-tooltip-id={labelTooltipId} 
+          data-tooltip-content={labelTooltipContent}
+          style={{ cursor: labelTooltipId ? 'help' : 'default' }}
+        >
+          {label}
+        </label>
+      )}
+      {labelTooltipId && <Tooltip id={labelTooltipId} />}
       
       {type === 'number' && (
-        <input
-          ref={inputRef}
-          type="number"
-          step={step ?? (isIntegerField ? 1 : undefined)}
+        <NumericStepper
+          value={value ?? 0}
+          onChange={onChange}
+          step={step ?? 1}
           min={min}
           max={max}
-          value={value ?? ''}
-          onChange={(e) => {
-            // For integer fields, always use parseInt and round
-            // For float fields (step < 1), use parseFloat
-            const numValue = isIntegerField
-              ? Math.round(parseFloat(e.target.value || '0'))
-              : parseFloat(e.target.value || '0');
-            onChange(numValue);
-          }}
           className={className}
         />
       )}

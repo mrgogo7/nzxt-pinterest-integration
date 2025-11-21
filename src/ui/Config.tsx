@@ -302,7 +302,7 @@ export default function Config() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
             <h1 className="config-title" style={{ margin: 0, fontSize: '20px', fontWeight: 700, lineHeight: '1.2' }}>
-              NZXT Elite Screen Customizer v5.11.20
+              NZXT Elite Screen Customizer v5.11.21
             </h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <label className="lang-label" htmlFor="lang-select">
@@ -404,7 +404,26 @@ export default function Config() {
 
       {/* URL + Save */}
       <section className="url-section">
+        <h2 className="section-title">{t("backgroundSectionTitle", lang)}</h2>
+        <p className="section-description">{t("backgroundSectionDescription", lang)}</p>
         <div className="url-row">
+          <div className="background-color-section-inline">
+            <label 
+              className="background-color-label"
+              data-tooltip-id="background-color-tooltip"
+              data-tooltip-content={t("colorPickerTooltip", lang)}
+            >
+              {t("colorPickerTitle", lang)}
+            </label>
+            <Tooltip id="background-color-tooltip" />
+            <ColorPicker
+              value={settings.backgroundColor || '#000000'}
+              onChange={handleBackgroundColorChange}
+              showInline={false}
+              enableAlpha={false}
+              popupPosition="bottom-right"
+            />
+          </div>
           <label className="url-label-inline" htmlFor="mediaUrl">
             {t("backgroundMediaUrlLabel", lang)}
           </label>
@@ -455,7 +474,7 @@ export default function Config() {
                   padding: '4px 0',
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
                   zIndex: 1000,
-                  minWidth: '140px',
+                  minWidth: '70px',
                 }}
               >
                 <button
@@ -553,22 +572,6 @@ export default function Config() {
             {resolveMessage}
           </div>
         )}
-        
-        {/* Background Color Picker */}
-        <div className="background-color-section">
-          <label className="background-color-label">
-            {t("colorPickerTitle", lang)}
-          </label>
-          <ColorPicker
-            value={settings.backgroundColor || '#000000'}
-            onChange={handleBackgroundColorChange}
-            showInline={false}
-            enableAlpha={false}
-            popupPosition="bottom-right"
-          />
-        </div>
-        
-        <p className="hint">{t("note", lang)}</p>
       </section>
 
       {/* Preview + Settings */}

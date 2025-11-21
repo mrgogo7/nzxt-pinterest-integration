@@ -171,6 +171,7 @@ export default function ConfigPreview() {
     handleBackgroundMouseDown,
     draggingElementId,
     selectedElementId,
+    setSelectedElementId,
     handleElementMouseDown,
     activeGuides,
   } = useDragHandlers(offsetScale, settingsRef, setSettings, handleMoveComplete);
@@ -264,7 +265,6 @@ export default function ConfigPreview() {
     <div className="config-wrapper-vertical">
       {/* Background Section */}
       <div className="section-group">
-        <h2 className="section-title">{t('backgroundSectionTitle', lang)}</h2>
         <div className="section-content">
           {/* Background Preview */}
           <BackgroundPreview
@@ -314,6 +314,7 @@ export default function ConfigPreview() {
             isRealDataReceived={isRealDataReceived}
             lang={lang}
             t={t}
+            settings={settings}
           />
 
           {/* Overlay Options */}
@@ -323,6 +324,8 @@ export default function ConfigPreview() {
             setSettings={setSettings}
             lang={lang}
             t={t}
+            selectedElementId={selectedElementId}
+            setSelectedElementId={setSelectedElementId}
           />
         </div>
       </div>

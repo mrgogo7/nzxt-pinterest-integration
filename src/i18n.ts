@@ -15,14 +15,14 @@ const dict: Record<Lang, Record<string, string>> = {
     // Placeholder text for URL input field - shows accepted formats
     urlPlaceholder: "https://...mp4 / ...jpg / ...gif",
     // Save/Update button text - saves the URL input to storage
-    save: "Save / Update",
+    save: "Update",
     // Clear button text - clears the URL input field
     clear: "Clear",
     // Label for Background URL input field - shown above URL input
-    backgroundMediaUrlLabel: "Background URL",
-    // Description/hint text shown below Background URL section - explains URL usage and background color fallback
-    note:
-      "Enter the background media URL (video/image) you want to display. After entering the URL, you can fine-tune the position in the preview below. You can also set a background color that will be shown when no media URL is set or as a fallback.",
+    backgroundMediaUrlLabel: "URL",
+    // Description text shown below Background Settings title - explains URL usage and background color fallback
+    backgroundSectionDescription:
+      "You can add a media URL (video/image) for the background or use only a background color. You can adjust media and overlay position settings in real-time from the preview areas below.",
     // Generic "Background" label (used in tab navigation if implemented)
     background: "Background",
     // Media tab label (used in tab navigation if implemented)
@@ -30,7 +30,9 @@ const dict: Record<Lang, Record<string, string>> = {
     // Color tab label (used in tab navigation if implemented)
     colorTab: "Color",
     // Label for Background Color picker - shown next to color picker trigger button
-    colorPickerTitle: "Background Color",
+    colorPickerTitle: "Color",
+    // Tooltip text for Background Color picker
+    colorPickerTooltip: "This selection determines your background color.",
     // Description text for Background Color picker - explains when color is displayed (currently not used in UI, but available for tooltips/help text)
     colorPickerDescription: "Select a solid color for your LCD screen background. The color will be displayed when no media URL is set.",
     // Title for Media Preview section - shows background media preview
@@ -86,6 +88,9 @@ const dict: Record<Lang, Record<string, string>> = {
     revertToDefaults: "Reset all element values to their default settings",
     resetElementsConfirmTitle: "Reset Element Values",
     resetElementsConfirm: "Are you sure you want to reset all element values to their default settings? This action cannot be undone.",
+    removeElementConfirmTitle: "Remove Element",
+    removeElementConfirm: "Are you sure you want to remove this element? This action cannot be undone.",
+    remove: "Remove",
     // Warning message shown when NZXT CAM API is unavailable - displayed in preview when using mock data
     mockDataWarning: "⚠️ Running in browser mode. NZXT CAM API is not available. Displayed values are mock data and do not reflect actual system metrics.",
     // Copy button tooltip - copies color code to clipboard (used in ColorPicker component)
@@ -161,6 +166,16 @@ const dict: Record<Lang, Record<string, string>> = {
     dividerLength: "Length",
     // Angle control label - rotation angle for overlay elements
     angle: "Angle",
+    // Tooltips for element settings
+    tooltipSensor: "Select which system metric to display",
+    tooltipAngle: "Rotation angle in degrees (0-360)",
+    tooltipSize: "Font size for the displayed value",
+    tooltipXOffset: "Horizontal position offset",
+    tooltipYOffset: "Vertical position offset",
+    tooltipText: "Text content to display",
+    tooltipColor: "Color of the element",
+    tooltipThickness: "Line thickness for divider",
+    tooltipDividerLength: "Length of the divider line",
     // Reset tooltips
     resetToDefault: "Reset to default value",
     // Social media link tooltips
@@ -206,15 +221,17 @@ const dict: Record<Lang, Record<string, string>> = {
     reset: "Sıfırla",
     resetConfirm: "Emin misiniz? Bu işlem URL dahil TÜM ayarları sıfırlar.",
     urlPlaceholder: "https://...mp4 / ...jpg / ...gif",
-    save: "Kaydet / Güncelle",
+    save: "Güncelle",
     clear: "Temizle",
-    backgroundMediaUrlLabel: "Arka Plan URL",
-    note:
-      "Göstermek istediğiniz arka plan medya URL'sini (video/resim) giriniz. URL'yi girdikten sonra konumu aşağıdaki önizlemede ayarlayabilirsiniz. Medya URL'si olmadığında veya yedek olarak gösterilecek bir arka plan rengi de ayarlayabilirsiniz.",
+    backgroundMediaUrlLabel: "URL",
+    backgroundSectionDescription:
+      "Arka plan için bir medya URL'si (video/resim) ekleyebilir veya yalnızca arka plan rengi kullanabilirsiniz. Medya ve overlay konum ayarlarını, aşağıdaki önizleme alanları üzerinden gerçek zamanlı olarak düzenleyebilirsiniz.",
     background: "Arka Plan",
     mediaTab: "Medya",
     colorTab: "Renk",
-    colorPickerTitle: "Arka Plan Rengi",
+    colorPickerTitle: "Arkaplan",
+    // Tooltip text for Background Color picker
+    colorPickerTooltip: "Bu seçim arkaplan renginizi belirler",
     colorPickerDescription: "LCD ekran arka planı için katı bir renk seçin. Medya URL'si ayarlanmadığında bu renk gösterilir.",
     previewTitle: "Background Önizleme",
     overlayPreviewTitle: "Overlay Önizleme",
@@ -248,6 +265,9 @@ const dict: Record<Lang, Record<string, string>> = {
     revertToDefaults: "Tüm element değerlerini varsayılan ayarlara sıfırla",
     resetElementsConfirmTitle: "Element Değerlerini Sıfırla",
     resetElementsConfirm: "Tüm element değerlerini varsayılan ayarlara sıfırlamak istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+    removeElementConfirmTitle: "Element Kaldır",
+    removeElementConfirm: "Bu elementi kaldırmak istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+    remove: "Kaldır",
     mockDataWarning: "⚠️ Tarayıcı modunda çalışıyor. NZXT CAM API'sine erişilemiyor. Görüntülenen değerler mock veridir ve gerçek sistem metriklerini yansıtmaz.",
     copy: "Kopyala",
     cut: "Kes",
@@ -318,6 +338,16 @@ const dict: Record<Lang, Record<string, string>> = {
     dividerLength: "Uzunluk",
     // Angle control label - rotation angle for overlay elements
     angle: "Açı",
+    // Tooltips for element settings
+    tooltipSensor: "Gösterilecek sistem metriklerini seçin",
+    tooltipAngle: "Derece cinsinden döndürme açısı (0-360)",
+    tooltipSize: "Gösterilen değer için font boyutu",
+    tooltipXOffset: "Yatay konum ofseti",
+    tooltipYOffset: "Dikey konum ofseti",
+    tooltipText: "Gösterilecek metin içeriği",
+    tooltipColor: "Element rengi",
+    tooltipThickness: "Divider için çizgi kalınlığı",
+    tooltipDividerLength: "Divider çizgisinin uzunluğu",
     // Reset tooltips
     resetToDefault: "Varsayılan değere sıfırla",
     // Social media link tooltips

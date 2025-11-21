@@ -1,0 +1,100 @@
+/* Numeric Stepper Component Styles */
+.numeric-stepper {
+  display: flex;
+  align-items: center;
+  width: 60px;
+  background: #2c2c2c;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+.numeric-stepper:hover:not(.disabled) {
+  background: #353535;
+}
+
+.numeric-stepper:focus-within {
+  outline: none;
+  border-color: #8a2be2;
+}
+
+.numeric-stepper.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.numeric-stepper-button {
+  background: transparent;
+  border: none;
+  color: #f2f2f2;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 100%;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 0;
+  transition: all 0.15s ease;
+  user-select: none;
+  flex-shrink: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.numeric-stepper-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f2f2f2;
+}
+
+.numeric-stepper-button:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.numeric-stepper-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.numeric-stepper-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #f2f2f2;
+  text-align: center;
+  font-size: 13px;
+  padding: 6px 4px;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.numeric-stepper-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.numeric-stepper-input::placeholder {
+  color: #6b7280;
+  opacity: 0.7;
+}
+
+/* Narrow variant (for input-narrow class) */
+.numeric-stepper.input-narrow {
+  width: 75px;
+}
+
+.numeric-stepper.input-narrow .numeric-stepper-button {
+  width: 20px;
+  font-size: 13px;
+}
+
+.numeric-stepper.input-narrow .numeric-stepper-input {
+  font-size: 10px;
+  padding: 6px 4px;
+}
+
