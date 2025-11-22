@@ -3,6 +3,16 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "description": "A browser-based media and overlay editor for NZXT Kraken Elite LCD screens",
+  "license": "Personal-Use-Only",
+  "keywords": [
+    "nzxt",
+    "kraken-elite",
+    "lcd-screen",
+    "overlay-editor",
+    "web-integration",
+    "customization"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

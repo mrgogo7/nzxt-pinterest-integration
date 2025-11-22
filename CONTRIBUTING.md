@@ -2,7 +2,7 @@
 
 First off, thank you for considering contributing to NZXT-ESC! 🎉
 
-This document provides guidelines and instructions for contributing to the project. Following these guidelines helps communicate that you respect the time of the developers managing and developing this open source project.
+This document provides guidelines and instructions for contributing to the project. Following these guidelines helps communicate that you respect the time of the developers managing and developing this project.
 
 ## 📋 Table of Contents
 
@@ -22,11 +22,13 @@ This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participatin
 
 ## Getting Started
 
+**Important:** This project is licensed under the Personal Use License. All contributions must respect this license. No contributions intended for commercial deployment will be accepted.
+
 NZXT-ESC is a React/TypeScript project that provides a web-based configuration tool for NZXT Kraken Elite LCD displays. Before contributing, familiarize yourself with:
 
 - **Project Purpose**: Customize NZXT Kraken Elite LCD screens with system monitoring overlays and media display
 - **Tech Stack**: React 18, TypeScript, Vite, Framer Motion
-- **Architecture**: Dual entry points (config.html and index.html) with localStorage-based synchronization
+- **Architecture**: Web Integration that runs inside NZXT CAM with localStorage-based synchronization
 
 ## Development Setup
 
@@ -104,9 +106,11 @@ npm run build
 npm run preview
 ```
 
-**Important**: Test your changes in both environments:
-- **Config Page**: `http://localhost:5173/config.html`
-- **LCD Display**: `http://localhost:5173/?kraken=1`
+**Important**: Test your changes inside NZXT CAM Web Integration. The application has two entry points:
+- **Config Page**: `http://localhost:5173/config.html` (for development/testing)
+- **LCD Display**: `http://localhost:5173/?kraken=1` (LCD display mode)
+
+Note: In production, everything runs inside NZXT CAM via Web Integration.
 
 ### 4. Commit Your Changes
 

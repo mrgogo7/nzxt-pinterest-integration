@@ -6,6 +6,8 @@ import { readFileSync } from 'node:fs';
 /**
  * Vite configuration for NZXT Web Integration.
  * Supports multi-entry build (index.html + config.html).
+ * Note: The application runs inside NZXT CAM via Web Integration.
+ * config.html is used for configuration, index.html is for LCD display.
  */
 
 const packageJson = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8'));
