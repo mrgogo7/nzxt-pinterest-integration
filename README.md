@@ -1,318 +1,306 @@
-# 🎨 NZXT Elite Screen Customizer (NZXT-ESC) v5.11.15
+# NZXT Elite Screen Customizer (NZXT-ESC) v5.11.21
 
-**The Ultimate Customization Tool for NZXT Kraken Elite LCD Displays**
+A modern, browser-based media and overlay editor for NZXT Kraken Elite LCD screens.
 
----
+Create custom animated backgrounds, metric overlays, text layers, divider lines, and fully personalized layouts — all synchronized live inside NZXT CAM.
 
-## 📖 About
-
-**NZXT Elite Screen Customizer (NZXT-ESC)** is a powerful, open-source web application designed to unlock the full potential of your NZXT Kraken Elite AIO liquid cooler's LCD display. Whether you want to showcase custom media, monitor real-time system performance metrics, or create stunning visual overlays, NZXT-ESC provides everything you need to transform your Kraken Elite LCD into a personalized information center.
-
-### What Makes NZXT-ESC Special?
-
-**NZXT-ESC** seamlessly integrates with NZXT CAM software through Web Integration technology, offering a comprehensive customization platform for your Kraken Elite's circular LCD screen. Unlike basic customization tools, NZXT-ESC enables you to combine multiple elements—custom videos, images, GIFs, and real-time hardware monitoring data—into beautiful, fully personalized displays.
-
-**Key Advantages:**
-- 🎨 **Complete Visual Control** — Drag-and-drop interface for intuitive positioning of media and monitoring overlays
-- 📊 **Real-Time System Monitoring** — Display CPU temperature, GPU stats, clock speeds, and liquid temperature with animated metrics
-- 🎥 **Multi-Format Media Support** — Upload and display MP4 videos, JPG images, and animated GIFs on your LCD
-- ⚡ **Instant Synchronization** — See your changes reflected in real-time on both the preview and actual LCD display
-- 🌍 **Multi-Language Interface** — Full support for English and Turkish with easy language switching
-- 🔄 **Cross-Process Sync** — Seamless data synchronization between configuration and display pages
-
-Perfect for gamers, PC enthusiasts, content creators, and anyone who wants to make their NZXT Kraken Elite LCD display truly unique. NZXT-ESC works entirely within your browser and NZXT CAM, requiring no additional software installation or complex setup procedures.
+Free for personal use only — commercial use is strictly prohibited.
 
 ---
 
-<p>
-  <img src="https://raw.githubusercontent.com/mrgogo7/nzxt-esc/main/docs/demo.gif" width="540" alt="NZXT Elite Screen Customizer Preview">
-  <img src="https://raw.githubusercontent.com/mrgogo7/nzxt-esc/main/docs/demolive.gif" width="240" alt="NZXT Elite Screen Customizer Live Preview">
-  <br>
-  <em>Live NZXT LCD and configuration preview</em>
-</p>
+## 🚀 QUICK START
+
+NZXT-ESC works INSIDE NZXT CAM using the "Web Integration" feature.
+
+There are two ways to install it:
+
+### METHOD 1 — DIRECT LAUNCH (RECOMMENDED)
+
+1. Copy this into your browser's address bar:
+
+   ```text
+   nzxt-cam://action/load-web-integration?url=https://mrgogo7.github.io/nzxt-esc/
+   ```
+
+2. Press Enter.
+
+3. Your browser will display a question:
+
+   "Open nzxt-cam link with NZXT CAM?"
+
+   → Approve / Allow
+
+4. NZXT CAM will launch automatically.
+
+5. You will see a confirmation window:
+
+   Load Web Integration?
+
+   Are you sure you would like to load the following web integration?
+
+   ```text
+   https://mrgogo7.github.io/nzxt-esc/
+   ```
+
+6. Press "Load".
+
+7. After loading, open the "Custom Web Integration" card.
+
+### METHOD 2 — MANUAL INSTALLATION (INSIDE NZXT CAM)
+
+1. Open NZXT CAM.
+
+2. Go to:
+
+   Lighting → Kraken Elite V2 → LCD Display
+
+3. Change the display mode to:
+
+   Web Integration
+
+4. Find the card named:
+
+   Custom Web Integration
+
+5. Click "Settings".
+
+6. Enter the URL:
+
+   ```text
+   https://mrgogo7.github.io/nzxt-esc/
+   ```
+
+7. Press "Apply".
+
+8. Then press:
+
+   Add as Card
+
+9. A new Web Integration card called "My Web Integration" will appear.
+
+10. Select "My Web Integration".
+
+11. Press "Configure" to open the NZXT-ESC editor.
+
+### RECOMMENDED: RENAME THE INTEGRATION CARD
+
+NZXT CAM assigns the default name "My Web Integration".
+
+To rename:
+
+1. Select "My Web Integration".
+
+2. Press "Edit".
+
+3. Change the fields to:
+
+   Title:
+
+   ```text
+   Elite Screen Customizer
+   ```
+
+   Description:
+
+   ```text
+   NZXT Elite Screen Customizer (NZXT-ESC)
+   ```
+
+This helps distinguish the integration from others.
 
 ---
 
-## ✨ Key Features
+## 🎛 USING THE EDITOR (CONFIGURE BUTTON)
 
-### 🎥 Media Display
-- **Multi-format support** — MP4, JPG, GIF
-- **Real-time circular preview** — See exactly how your media will appear on the LCD
-- **Drag & drop positioning** — Intuitive visual positioning
-- **Advanced scaling** — Precise scale, offset, and alignment controls
-- **Fit modes** — `cover`, `contain`, `fill` for perfect media display
+All editing is performed INSIDE NZXT CAM via the "Configure" button.
 
-### 📊 System Monitoring Overlays
-- **Single, Dual, and Triple infographic modes** — Display 1, 2, or 3 metrics simultaneously
-- **Real-time monitoring** — CPU/GPU temperature, load, clock speeds, liquid temperature
-- **Smooth number animations** — Spring-based animations for metric value changes
-- **Customizable appearance** — Individual colors, sizes, and positioning for each metric
-- **Smart positioning** — Independent offset controls for primary and secondary/tertiary groups
-- **Divider customization** — Adjustable width, thickness, color, and gap
-- **Live data sync** — Real monitoring data in NZXT CAM, animated mock data in browser
+Inside the editor you can:
 
-### 🎨 Advanced Customization
-- **Independent metric groups** — Primary, secondary, and tertiary metrics with separate controls
-- **Precise positioning** — X/Y offset controls for each metric group
-- **Visual dividers** — Customizable dividers between metric groups
-- **Color customization** — Individual colors for numbers and labels
-- **Size controls** — Separate font sizes for numbers and text labels
-- **Gap management** — Fine-tune spacing between metrics and dividers
+- Add / remove metric, text, and divider elements
+- Adjust position, rotation, scale, opacity, and color
+- Choose MP4 / GIF / PNG / JPG background media
+- Manage presets (Import, Export, Duplicate, Delete, Rename, Apply)
+- Preview all changes in real time on your Kraken Elite LCD
 
-### ⚡ Real-time Synchronization
-- **100ms update interval** — Instant feedback on all changes
-- **Cross-process sync** — Seamless synchronization between Config and Display pages
-- **Persistent storage** — Auto-save via localStorage with cookie fallback
-- **Live preview** — See changes instantly in both preview and actual LCD
-
-### 🌍 User Experience
-- **Multi-language support** — English and Turkish
-- **Sticky preview** — Overlay preview stays visible while scrolling
-- **Revert to defaults** — One-click reset for current mode settings
-- **Visual feedback** — Mock data warnings when running in browser mode
-- **Responsive design** — Optimized for NZXT CAM integration
+No external URL or config.html is required anymore.
 
 ---
 
-## 🚀 Quick Start
+## 💡 WHAT MAKES NZXT-ESC SPECIAL?
 
-### Method 1: Direct Launch (via NZXT CAM)
+NZXT-ESC is not a theme pack — it is a full visual layout editor built specifically for the Kraken Elite LCD.
 
-Copy and paste this into your browser's address bar:
+It focuses on:
 
+- Creative freedom
+- Precision positioning
+- Real-time LCD feedback
+- A clean and intuitive editing experience
+
+### 1. DESIGN-ORIENTED EDITING EXPERIENCE
+
+- Free drag-and-drop placement
+- Rotation and scaling per element
+- Transform handles around the circular LCD preview
+- Arrow-key micro adjustments
+- Minimal and distraction-free interface
+- Accurate circular preview matching real hardware
+
+### 2. FULL ELEMENT-BASED OVERLAY ENGINE
+
+Legacy Single/Dual/Triple modes were removed entirely.
+
+You can now freely add:
+
+- Metric elements
+- Text elements
+- Divider elements
+
+Each element supports:
+
+- X/Y position
+- Rotation
+- Scale
+- Color & opacity
+- Selection highlight
+
+### 3. REAL-TIME LCD SYNCHRONIZATION
+
+- Updates ~100ms throttle for stability
+- No manual refresh needed
+- LCD screen updates instantly as you edit
+
+### 4. ADVANCED MEDIA ENGINE
+
+Supports:
+
+- MP4 video
+- GIF animations
+- PNG and JPG images
+
+Includes:
+
+- Cover / Contain / Fill modes
+- Scaling
+- Offset controls
+
+### 5. PRESET SYSTEM (EARLY ACCESS)
+
+Available actions:
+
+- Import
+- Export
+- Delete
+- Duplicate
+- Rename
+- Apply
+
+Presets store the full layout as JSON.
+
+---
+
+## 🧪 TECHNICAL DETAILS
+
+- React 18
+- TypeScript
+- Vite bundler
+- LocalStorage sync + event broadcasting
+- Circular LCD-aware render engine
+- AABB + rotation transform math
+- English and Turkish UI support
+
+---
+
+## 🔧 DEVELOPER INFORMATION
+
+Clone and Install:
+
+```bash
+git clone https://github.com/mrgogo7/nzxt-esc
+cd nzxt-esc
+npm install
 ```
-nzxt-cam://action/load-web-integration?url=https://mrgogo7.github.io/nzxt-esc/
+
+Start Dev Server:
+
+```bash
+npm run dev
 ```
 
-Press **Enter** to launch NZXT CAM and load the integration automatically.
+Expose on LAN for NZXT CAM testing:
 
-### Method 2: Manual Installation
-
-1. Open **NZXT CAM** → **Settings** → **Web Integrations** → **+ Add Custom Integration**
-2. Paste this URL: `https://mrgogo7.github.io/nzxt-esc/`
-3. Click **Add**, then open the integration from the list
-4. Your NZXT Kraken Elite LCD will now display **NZXT Elite Screen Customizer**
-
----
-
-## 📖 Usage Guide
-
-### Setting Up Media Display
-
-1. **Enter Media URL** — Paste your MP4, JPG, or GIF URL
-2. **Position Media** — Drag the preview circle to position your media
-3. **Adjust Scale** — Use the zoom buttons or scale input
-4. **Choose Fit Mode** — Select `cover`, `contain`, or `fill`
-5. **Fine-tune Alignment** — Use X/Y offset controls for pixel-perfect positioning
-
-### Configuring System Monitoring Overlays
-
-#### Single Mode
-- Display one metric (CPU/GPU temp, load, clock, or liquid temp)
-- Simple, focused display
-- Full customization of colors, sizes, and position
-
-#### Dual Mode
-- Display two metrics side by side
-- **Primary group** (left): Moves with divider, customizable gap
-- **Secondary group** (right): Independent positioning
-- Separate colors, sizes, and offsets for each metric
-
-#### Triple Mode
-- Display three metrics: one primary (large) and two secondary/tertiary (smaller)
-- **Primary group** (left): Moves with divider, customizable gap
-- **Dual Readers group** (right): Secondary and tertiary metrics move together
-- Complete independent control over all three metrics
-
-### Advanced Overlay Features
-
-- **Divider Controls** — Show/hide, adjust width, thickness, color, and gap
-- **Offset Management** — Primary X/Y offset for primary+divider, separate offsets for secondary/tertiary
-- **Visual Grouping** — Labeled dividers show "1st Reader Options", "2nd Reader Options"
-- **Real-time Updates** — All changes reflect instantly on the LCD
-
----
-
-## 🧰 Technical Details
-
-### Architecture
-
-NZXT-ESC uses the same storage event system as NZXT Web Integration, enabling instant synchronization between the **Config Page** and the **LCD Display**. When you adjust settings, updates are throttled to 100ms intervals for optimal performance.
-
-### Technology Stack
-
-| Technology | Purpose |
-|------------|---------|
-| **React 18** | Modern UI framework |
-| **TypeScript** | Type-safe development |
-| **Vite** | Fast build tool and dev server |
-| **Framer Motion** | Smooth animations and transitions |
-| **React Colorful** | Color picker component |
-| **Lucide Icons** | Modern icon library |
-| **CSS Modules** | Scoped styling |
-| **NZXT API** | Real-time monitoring data and LCD sync |
-
-### Project Structure
-
-```
-src/
-├── ui/
-│   ├── components/
-│   │   ├── ConfigPreview.tsx         # Main configuration UI
-│   │   ├── SingleInfographic.tsx     # Single metric overlay
-│   │   ├── DualInfographic.tsx       # Dual metric overlay
-│   │   ├── TripleInfographic.tsx     # Triple metric overlay
-│   │   ├── AnimateNumber.tsx         # Animated number component
-│   │   ├── KrakenOverlay.tsx         # LCD display component
-│   │   ├── MediaRenderer.tsx         # Media rendering
-│   │   └── ColorPicker.tsx           # Color selection
-│   └── styles/
-│       ├── ConfigPreview.css         # Main styles
-│       ├── ColorPicker.css           # Color picker styles
-│       ├── KrakenOverlay.module.css  # LCD overlay styles
-│       ├── SingleInfographic.module.css
-│       ├── DualInfographic.module.css
-│       └── TripleInfographic.module.css
-├── hooks/
-│   ├── useConfig.ts                  # Configuration management
-│   ├── useMediaUrl.ts                # Media URL management
-│   ├── useMonitoring.ts              # Real/mock monitoring data
-│   └── useStorageSync.ts             # Cross-process sync
-├── constants/
-│   ├── defaults.ts                   # Default settings & metrics
-│   ├── nzxt.ts                      # NZXT API constants
-│   └── storage.ts                    # Storage keys
-├── types/
-│   ├── overlay.ts                    # Overlay type definitions
-│   ├── nzxt.d.ts                    # NZXT API types
-│   └── css-modules.d.ts             # CSS modules types
-└── utils/
-    ├── monitoring.ts                 # Data mapping utilities
-    ├── positioning.ts                # Position calculations
-    ├── settings.ts                   # Settings merge/validation
-    ├── media.ts                      # Media type detection
-    └── storage.ts                    # Storage helpers (cookie fallback)
+```bash
+npm run dev -- --host
 ```
 
----
+Build:
 
-## 🧑‍💻 Developer Information
+```bash
+npm run build
+```
 
-### Environment Detection
+Preview build:
 
-NZXT CAM automatically appends `?kraken=1` to the URL when running inside the application. This parameter identifies the LCD display environment.
+```bash
+npm run preview
+```
 
-**Development URLs:**
-- 🖥️ **Config Page:** [https://mrgogo7.github.io/nzxt-esc/](https://mrgogo7.github.io/nzxt-esc/)
-- ⚙️ **LCD Display:** [https://mrgogo7.github.io/nzxt-esc/?kraken=1](https://mrgogo7.github.io/nzxt-esc/?kraken=1)
+Contributing:
 
-### Data Flow
-
-1. **Config Page** → User adjusts settings → `localStorage` updated
-2. **Storage Events** → Broadcast changes across processes
-3. **LCD Display** → Listens to storage events → Updates instantly
-4. **Monitoring Data** → NZXT API provides real-time metrics → Displayed in overlays
-
-### Key Design Decisions
-
-- **Dual Entry Points** — Separate HTML files for Config (`config.html`) and Display (`index.html`)
-- **Storage Events** — Cross-process synchronization via `localStorage` events
-- **Fallback Strategy** — Cookie fallback for robust storage in isolated processes
-- **Real-time Preview** — 200px circular preview with 1:1 scale mapping to 640px LCD
-- **Offset Scale Formula** — Critical formula: `previewSize / lcdResolution` (must be preserved)
-- **CSS Modules** — Scoped styling for better maintainability and performance
-- **Type Safety** — Full TypeScript coverage with strict mode enabled
-- **Modular Architecture** — Separated concerns: hooks, utils, constants, types
+- Open an Issue before starting major changes
+- Keep PRs small and focused
+- Use clear commit messages
+- Follow project structure
 
 ---
 
-## 🔮 Future Potential
+## 🕛 VERSION HISTORY
 
-NZXT-ESC is designed to be extensible and future-proof:
+v5.11.21 (Current)
 
-- **Plugin System** — Potential for custom metric plugins
-- **Theme Support** — Customizable color schemes and themes
-- **Animation Support** — ✅ Implemented: Smooth number transitions with spring physics
-- **Export/Import** — Share configurations with others
-- **Preset Library** — Pre-configured setups for common use cases
-- **API Integration** — Connect to external data sources
-- **Widget System** — Modular widget-based architecture
+- Element-based layout engine
+- Rotation & scale transform system
+- Selection highlight
+- Arrow-key movement
+- Legacy modes removed
+- Full preset manager (Import/Export/Duplicate/Delete/Rename/Apply)
+- UX and stability improvements
 
----
-
-## 🧑‍💻 Author
-
-**Developed by Gökhan Akgül (mRGogo)**
-
-*"Transforming NZXT Kraken Elite LCD into a personalized information center."*
-
-🔗 [GitHub](https://github.com/mrgogo7) • [LinkedIn](https://www.linkedin.com/in/gokhanakgul/) • [Instagram](https://www.instagram.com/mrgogo_/)
+See GitHub Releases for older versions.
 
 ---
 
-## ☕️ Support
+## 🔗 LINKS
 
-If you find NZXT-ESC useful, consider supporting the project:
+Repository:
 
-[![GitHub Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-181717?logo=github&logoColor=white)](https://github.com/sponsors/mrgogo7) [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://www.patreon.com/mRGogo7) [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/mrgogo)
+https://github.com/mrgogo7/nzxt-esc/
 
----
+Support:
 
-## 🧭 Keywords
+- [GitHub Sponsors](https://github.com/sponsors/mrgogo7)
+- [Patreon](https://www.patreon.com/mRGogo7)
+- [Buy Me a Coffee](https://www.buymeacoffee.com/mrgogo)
 
-**NZXT Web Integration, NZXT LCD, Kraken Elite, NZXT-ESC, Screen Customizer, LCD Customization, System Monitoring, Overlay Configurator, Real-time Preview, React Configurator, NZXT CAM Integration**
+Issues:
 
----
-
-## 🙌 Acknowledgements
-
-This project was inspired by [brunoandradebr/nzxt](https://github.com/brunoandradebr/nzxt) — an open-source exploration of NZXT Web Integration capabilities.
-
-**NZXT Elite Screen Customizer (NZXT-ESC)** builds upon that foundation, expanding it into a comprehensive customization platform with:
-- Advanced overlay system with single, dual, and triple modes
-- Real-time system monitoring integration
-- Independent metric group positioning
-- Complete visual customization
-- Multi-language support
-- Professional-grade user experience
-
-Special thanks to the open-source community for keeping NZXT integrations alive and evolving.
+https://github.com/mrgogo7/nzxt-esc/issues
 
 ---
 
-## 🏷️ License
+## 📜 LICENSE
 
-MIT © 2025 — Free for personal and non-commercial use. See [LICENSE](LICENSE) for details.
+Personal Use License
 
----
+Allowed:
 
-## 📝 Version History
+- Personal use
+- Personal modifications
+- Redistribution with credit
 
-**v5.11.15** — Current version
-- Complete rebranding to NZXT Elite Screen Customizer
-- Enhanced overlay system with triple mode
-- Independent positioning for metric groups
-- Improved UI/UX with labeled dividers
-- Real-time monitoring data integration
-- Mock data support for browser testing
-- **Animation Enhancements:**
-  - Added AnimateNumber component for smooth metric transitions
-  - Spring-based physics animations using Framer Motion
-  - Replaced pulse effects with smooth counting animations
-- **Code Quality Improvements:**
-  - Refactored to modular architecture (hooks, utils, constants)
-  - Migrated inline styles to CSS modules
-  - Improved TypeScript type safety
-  - Enhanced code maintainability and documentation
+Not Allowed:
 
----
+- Commercial use
+- Selling, bundling, renting, or monetizing in any form
 
-## 🔗 Links
-
-- **Live Demo:** [https://mrgogo7.github.io/nzxt-esc/](https://mrgogo7.github.io/nzxt-esc/)
-- **GitHub Repository:** [https://github.com/mrgogo7/nzxt-esc](https://github.com/mrgogo7/nzxt-esc)
-- **NZXT CAM Protocol:** `nzxt-cam://action/load-web-integration?url=https://mrgogo7.github.io/nzxt-esc/`
-
----
-
-**Note:** If you're accessing this project via the old URL (`nzxt-web-integration-amc`), you'll be automatically redirected to the new location. The old repository contains redirect pages to ensure backward compatibility.
+NZXT-ESC is a hobby and community-driven project intended only for personal use.
