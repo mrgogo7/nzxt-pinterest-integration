@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=110&color=gradient&text=NZXT%20Elite%20Screen%20Customizer%20(NZXT-ESC)%20v5.11.21&animation=twinkling&fontSize=30&reversal=false&section=header&textBg=false&fontColor=000000&fontAlign=50&fontAlignY=29"/>
+</p>
+
 # NZXT Elite Screen Customizer (NZXT-ESC) v5.11.21
 
 ![License](https://img.shields.io/badge/License-Personal%20Use%20Only-red) ![NZXT CAM](https://img.shields.io/badge/NZXT%20CAM-Web%20Integration-purple) ![React](https://img.shields.io/badge/React-18-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Vite](https://img.shields.io/badge/Vite-Bundler-purple) ![GitHub release](https://img.shields.io/github/v/release/mrgogo7/nzxt-esc)
