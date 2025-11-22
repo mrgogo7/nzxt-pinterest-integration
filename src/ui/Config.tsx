@@ -316,6 +316,12 @@ export default function Config() {
               >
                 <option value="en">English</option>
                 <option value="tr">Türkçe</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+                <option value="pt-BR">Português (Brasil)</option>
+                <option value="fr">Français</option>
+                <option value="it">Italiano</option>
+                <option value="ja">日本語</option>
               </select>
             </div>
           </div>

@@ -5,6 +5,8 @@
  * Provides user-friendly error messages with i18n support.
  */
 
+import type { Lang } from '../i18n';
+
 /**
  * Error codes for preset operations.
  */
@@ -54,7 +56,7 @@ export class PresetError extends Error {
  * @param lang - Language code for i18n
  * @returns User-friendly error message
  */
-export function getUserFriendlyErrorMessage(error: PresetError, lang: 'en' | 'tr' = 'en'): string {
+export function getUserFriendlyErrorMessage(error: PresetError, lang: Lang = 'en'): string {
   const messages: Record<ErrorCode, { en: string; tr: string }> = {
     [ERROR_CODES.INVALID_FILE_TYPE]: {
       en: 'Invalid file type. Please select a .nzxt-esc-preset file.',
@@ -87,7 +89,9 @@ export function getUserFriendlyErrorMessage(error: PresetError, lang: 'en' | 'tr
   };
 
   const messageSet = messages[error.code] || messages[ERROR_CODES.UNKNOWN_ERROR];
-  return messageSet[lang];
+  // Fallback to English if language is not supported (tr or en)
+  const supportedLang = lang === 'tr' ? 'tr' : 'en';
+  return messageSet[supportedLang];
 }
 
 /**

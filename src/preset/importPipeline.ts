@@ -13,6 +13,7 @@
 
 import type { PresetFile } from './schema';
 import type { AppSettings } from '../constants/defaults';
+import type { Lang } from '../i18n';
 import { migratePreset, getSchemaVersion } from './migration';
 import { validatePresetFile, type ValidationResult } from './validation';
 import { normalizePresetFile, type NormalizationResult } from './normalization';
@@ -79,7 +80,7 @@ export interface ImportResult {
  */
 export async function importPresetPipeline(
   file: File,
-  lang: 'en' | 'tr' = 'en'
+  lang: Lang = 'en'
 ): Promise<ImportResult> {
   try {
     // Step 1: Validate file type

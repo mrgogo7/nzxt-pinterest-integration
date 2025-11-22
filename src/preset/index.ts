@@ -9,6 +9,7 @@
  */
 
 import type { PresetFile } from './schema';
+import type { Lang } from '../i18n';
 import { CURRENT_SCHEMA_VERSION } from './constants';
 import { importPresetPipeline, type ImportResult } from './importPipeline';
 import type { AppSettings } from '../constants/defaults';
@@ -128,7 +129,7 @@ export async function exportPreset(
  */
 export async function importPreset(
   file: File,
-  lang: 'en' | 'tr' = 'en'
+  lang: Lang = 'en'
 ): Promise<ImportResult> {
   return importPresetPipeline(file, lang);
 }
