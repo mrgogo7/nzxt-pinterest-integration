@@ -199,7 +199,7 @@ export function validateOverlayPresetFile(
       return;
     }
     
-    const data = element.data as Record<string, unknown>;
+    const data = element.data as unknown as Record<string, unknown>;
     
     if (element.type === 'metric') {
       // Metric element validation

@@ -4,7 +4,7 @@
  * Modal for choosing Replace/Append mode after successful file import.
  */
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload } from 'lucide-react';
 import type { OverlayElement } from '../../../types/overlay';

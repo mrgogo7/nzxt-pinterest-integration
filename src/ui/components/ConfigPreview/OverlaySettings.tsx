@@ -5,7 +5,7 @@ import { Tooltip } from 'react-tooltip';
 import type { AppSettings } from '../../../constants/defaults';
 import type { Overlay, OverlayMetricKey, OverlayElement, MetricElementData, TextElementData, DividerElementData } from '../../../types/overlay';
 import type { Lang, t as tFunction } from '../../../i18n';
-import { addOverlayElement, removeOverlayElement, reorderOverlayElements, updateMetricElementData, updateTextElementData, updateDividerElementData, updateOverlayElementPosition, updateOverlayElementAngle, MAX_OVERLAY_ELEMENTS, wouldExceedElementLimit } from '../../../utils/overlaySettingsHelpers';
+import { addOverlayElement, removeOverlayElement, reorderOverlayElements, updateMetricElementData, updateTextElementData, updateDividerElementData, updateOverlayElementPosition, updateOverlayElementAngle, MAX_OVERLAY_ELEMENTS } from '../../../utils/overlaySettingsHelpers';
 import OverlayField from './OverlayField';
 import ResetConfirmationModal from './ResetConfirmationModal';
 import RemoveConfirmationModal from './RemoveConfirmationModal';
