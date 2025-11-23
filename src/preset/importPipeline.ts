@@ -91,6 +91,14 @@ export async function importPresetPipeline(
       );
     }
 
+    // Reject overlay-preset format files (they should use overlay preset import)
+    if (file.name.endsWith('.nzxt-esc-overlay-preset')) {
+      throw new PresetError(
+        'This is an overlay preset file. Please use overlay import instead.',
+        ERROR_CODES.INVALID_FILE_TYPE
+      );
+    }
+
     // Step 2: Read and parse JSON
     let parsed: unknown;
     try {

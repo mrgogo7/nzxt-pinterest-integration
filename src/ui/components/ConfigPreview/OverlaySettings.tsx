@@ -1,16 +1,21 @@
 import type { MouseEvent } from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { ChevronUp, ChevronDown, Plus, X, BarChart3, Type, Minus } from 'lucide-react';
+import { ChevronUp, ChevronDown, Plus, X, BarChart3, Type, Minus, Layout } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import type { AppSettings } from '../../../constants/defaults';
 import type { Overlay, OverlayMetricKey, OverlayElement, MetricElementData, TextElementData, DividerElementData } from '../../../types/overlay';
 import type { Lang, t as tFunction } from '../../../i18n';
-import { addOverlayElement, removeOverlayElement, reorderOverlayElements, updateMetricElementData, updateTextElementData, updateDividerElementData, updateOverlayElementPosition, updateOverlayElementAngle } from '../../../utils/overlaySettingsHelpers';
+import { addOverlayElement, removeOverlayElement, reorderOverlayElements, updateMetricElementData, updateTextElementData, updateDividerElementData, updateOverlayElementPosition, updateOverlayElementAngle, MAX_OVERLAY_ELEMENTS, wouldExceedElementLimit } from '../../../utils/overlaySettingsHelpers';
 import OverlayField from './OverlayField';
 import ResetConfirmationModal from './ResetConfirmationModal';
 import RemoveConfirmationModal from './RemoveConfirmationModal';
+import ImportOverlayModal from './ImportOverlayModal';
+import OverlayPresetPickerModal from '../modals/OverlayPresetPickerModal';
 import ColorPicker from '../ColorPicker';
 import CombinedTextColorInput from './CombinedTextColorInput';
+import { exportOverlayPreset, importOverlayPreset } from '../../../overlayPreset';
+import { getTemplateElements } from '../../../overlayPreset/templates';
+import { normalizeZIndexForAppend, generateElementId } from '../../../overlayPreset/utils';
 
 interface OverlaySettingsProps {
   overlayConfig: Overlay;
@@ -67,6 +72,14 @@ export default function OverlaySettingsComponent({
     elementType: null,
   });
 
+  // State for Import Overlay Modal
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importedElements, setImportedElements] = useState<OverlayElement[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // State for Overlay Preset Picker Modal
+  const [isOverlayPresetModalOpen, setIsOverlayPresetModalOpen] = useState(false);
+
   // State for collapsible elements (default: all open)
   const [collapsedElements, setCollapsedElements] = useState<Set<string>>(new Set());
   
@@ -85,24 +98,60 @@ export default function OverlaySettingsComponent({
   // Calculate menu position based on button position
   useEffect(() => {
     if (isFloatingMenuOpen && floatingButtonRef.current) {
-      const buttonRect = floatingButtonRef.current.getBoundingClientRect();
-      const panelRect = floatingButtonRef.current.closest('.panel')?.getBoundingClientRect();
-      if (panelRect) {
-        const relativeTop = buttonRect.bottom - panelRect.top + 4; // 4px gap
-        // Check if button is in empty state (centered)
-        const emptyStateContainer = floatingButtonRef.current.closest('div[style*="textAlign: center"]');
-        if (emptyStateContainer) {
-          // Center the menu below the button
-          const buttonCenterX = buttonRect.left - panelRect.left + (buttonRect.width / 2);
+      // Use requestAnimationFrame to ensure menu is rendered before calculating position
+      requestAnimationFrame(() => {
+        if (!floatingButtonRef.current) return;
+        
+        const buttonRect = floatingButtonRef.current.getBoundingClientRect();
+        const panelRect = floatingButtonRef.current.closest('.panel')?.getBoundingClientRect();
+        if (panelRect) {
+          // Menu dimensions
           const menuWidth = 180;
-          const relativeLeft = buttonCenterX - (menuWidth / 2);
-          setMenuPosition({ top: relativeTop, left: relativeLeft });
-        } else {
-          // Align menu to the right of the button
-          const relativeRight = panelRect.right - buttonRect.right;
-          setMenuPosition({ top: relativeTop, right: relativeRight });
+          // Dynamically calculate menu height from ref, fallback to 170px
+          const menuHeight = floatingMenuRef.current?.offsetHeight ?? 170;
+          const gap = 4;
+
+          // Check if button is in empty state (centered)
+          const emptyStateContainer = floatingButtonRef.current.closest('div[style*="textAlign: center"]');
+          
+          if (emptyStateContainer) {
+            // Center the menu
+            const buttonCenterX = buttonRect.left - panelRect.left + (buttonRect.width / 2);
+            const relativeLeft = buttonCenterX - (menuWidth / 2);
+            
+            // Check if menu would overflow viewport bottom
+            const menuBottom = buttonRect.bottom + gap + menuHeight;
+            const wouldOverflow = menuBottom > window.innerHeight;
+            
+            if (wouldOverflow) {
+              // Open menu upward
+              const relativeTop = buttonRect.top - panelRect.top - menuHeight - gap;
+              setMenuPosition({ top: relativeTop, left: relativeLeft });
+            } else {
+              // Open menu downward
+              const relativeTop = buttonRect.bottom - panelRect.top + gap;
+              setMenuPosition({ top: relativeTop, left: relativeLeft });
+            }
+          } else {
+            // Align menu to the right of the button
+            const relativeRight = panelRect.right - buttonRect.right;
+            
+            // Check if menu would overflow viewport bottom
+            const menuBottom = buttonRect.bottom + gap + menuHeight;
+            const wouldOverflow = menuBottom > window.innerHeight;
+            
+            if (wouldOverflow) {
+              // Open menu upward
+              const relativeTop = buttonRect.top - panelRect.top - menuHeight - gap;
+              setMenuPosition({ top: relativeTop, right: relativeRight });
+            } else {
+              // Open menu downward
+              const relativeTop = buttonRect.bottom - panelRect.top + gap;
+              setMenuPosition({ top: relativeTop, right: relativeRight });
+            }
+          }
         }
-      }
+      });
     }
   }, [isFloatingMenuOpen]);
 
@@ -135,9 +184,6 @@ export default function OverlaySettingsComponent({
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isFloatingMenuOpen]);
-
-  // Helper: Generate unique element ID
-  const generateElementId = () => `element-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
   // Helper: Get metric option labels with i18n
   const getMetricOptions = () => [
@@ -211,6 +257,114 @@ export default function OverlaySettingsComponent({
         elements: resetElements,
       },
     });
+  };
+
+  // Handler: Export overlay preset
+  const handleExportOverlay = async () => {
+    try {
+      const presetName = `overlay-preset-${new Date().toISOString().split('T')[0]}`;
+      await exportOverlayPreset(overlayConfig.elements, presetName);
+    } catch (error) {
+      console.error('[OverlaySettings] Export error:', error);
+      const errorMessage = t('overlayExportError', lang);
+      alert(errorMessage);
+    }
+  };
+
+  // Handler: File input change - triggers import and opens modal if valid
+  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      // Reset input if no file selected
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    try {
+      const result = await importOverlayPreset(file);
+      
+      if (!result.success || !result.elements || result.elements.length === 0) {
+        console.error('[OverlaySettings] Import error:', result.error);
+        // Reset input on import failure
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        // Show error notification
+        const errorMessage = t('overlayImportError', lang)
+          .replace('{error}', result.error || 'Unknown error');
+        alert(errorMessage);
+        return;
+      }
+
+      // Store imported elements and open modal
+      setImportedElements(result.elements);
+      setIsImportModalOpen(true);
+    } catch (error) {
+      console.error('[OverlaySettings] Import error:', error);
+      // Reset input on any error
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      // Show error notification
+      const errorMessage = t('overlayImportError', lang)
+        .replace('{error}', error instanceof Error ? error.message : 'Unknown error');
+      alert(errorMessage);
+    }
+  };
+
+  // Handler: Apply imported elements (Replace or Append)
+  const handleImportOverlay = (elements: OverlayElement[], mode: 'replace' | 'append') => {
+    if (elements.length === 0) return;
+
+    if (mode === 'replace') {
+      // Replace all elements
+      setSettings({
+        ...settings,
+        overlay: {
+          ...overlayConfig,
+          elements: [...elements],
+        },
+      });
+    } else {
+      // Append to existing elements with zIndex normalization
+      const normalizedElements = normalizeZIndexForAppend(overlayConfig.elements, elements);
+      setSettings({
+        ...settings,
+        overlay: {
+          ...overlayConfig,
+          elements: [...overlayConfig.elements, ...normalizedElements],
+        },
+      });
+    }
+
+    // Reset state
+    setImportedElements([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Handler: Overlay preset template selection
+  const handleOverlayPresetSelect = (templateId: string) => {
+    try {
+      // Get template elements with assigned IDs
+      const templateElements = getTemplateElements(templateId);
+      
+      if (templateElements.length === 0) {
+        console.warn(`[OverlaySettings] Template elements empty for: ${templateId}`);
+        return;
+      }
+      
+      // Store in importedElements state
+      setImportedElements(templateElements);
+      
+      // Open import modal (FAZ 1 modal - Replace/Append)
+      setIsImportModalOpen(true);
+    } catch (error) {
+      console.error('[OverlaySettings] Template selection error:', error);
+    }
   };
 
   return (
@@ -338,7 +492,7 @@ export default function OverlaySettingsComponent({
                 {/* Add Reading */}
                 <button
                   onClick={() => {
-                    if (metricCount < 8 && totalCount < 8) {
+                    if (metricCount < MAX_OVERLAY_ELEMENTS && totalCount < MAX_OVERLAY_ELEMENTS) {
                       const newElement: OverlayElement = {
                         id: generateElementId(),
                         type: 'metric',
@@ -358,13 +512,13 @@ export default function OverlaySettingsComponent({
                       setIsFloatingMenuOpen(false);
                     }
                   }}
-                  disabled={metricCount >= 8 || totalCount >= 8}
+                  disabled={metricCount >= MAX_OVERLAY_ELEMENTS || totalCount >= MAX_OVERLAY_ELEMENTS}
                   style={{
                     height: '34px',
                     background: 'transparent',
                     border: 'none',
-                    color: metricCount >= 8 || totalCount >= 8 ? '#a0a0a0' : '#f2f2f2',
-                    cursor: metricCount >= 8 || totalCount >= 8 ? 'not-allowed' : 'pointer',
+                    color: metricCount >= MAX_OVERLAY_ELEMENTS || totalCount >= MAX_OVERLAY_ELEMENTS ? '#a0a0a0' : '#f2f2f2',
+                    cursor: metricCount >= MAX_OVERLAY_ELEMENTS || totalCount >= MAX_OVERLAY_ELEMENTS ? 'not-allowed' : 'pointer',
                     fontSize: '13px',
                     fontWeight: 400,
                     display: 'flex',
@@ -375,12 +529,12 @@ export default function OverlaySettingsComponent({
                     transition: 'background 0.15s ease',
                   }}
                   onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                    if (metricCount < 8 && totalCount < 8) {
+                    if (metricCount < MAX_OVERLAY_ELEMENTS && totalCount < MAX_OVERLAY_ELEMENTS) {
                       e.currentTarget.style.background = '#3a3a3a';
                     }
                   }}
                   onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                    if (metricCount < 8 && totalCount < 8) {
+                    if (metricCount < MAX_OVERLAY_ELEMENTS && totalCount < MAX_OVERLAY_ELEMENTS) {
                       e.currentTarget.style.background = 'transparent';
                     }
                   }}
@@ -394,7 +548,7 @@ export default function OverlaySettingsComponent({
                 {/* Add Text */}
                 <button
                   onClick={() => {
-                    if (textCount < 8 && totalCount < 8) {
+                    if (textCount < MAX_OVERLAY_ELEMENTS && totalCount < MAX_OVERLAY_ELEMENTS) {
                       const newElement: OverlayElement = {
                         id: generateElementId(),
                         type: 'text',
@@ -411,13 +565,13 @@ export default function OverlaySettingsComponent({
                       setIsFloatingMenuOpen(false);
                     }
                   }}
-                  disabled={textCount >= 8 || totalCount >= 8}
+                  disabled={textCount >= MAX_OVERLAY_ELEMENTS || totalCount >= MAX_OVERLAY_ELEMENTS}
                   style={{
                     height: '34px',
                     background: 'transparent',
                     border: 'none',
-                    color: textCount >= 8 || totalCount >= 8 ? '#a0a0a0' : '#f2f2f2',
-                    cursor: textCount >= 8 || totalCount >= 8 ? 'not-allowed' : 'pointer',
+                    color: textCount >= MAX_OVERLAY_ELEMENTS || totalCount >= MAX_OVERLAY_ELEMENTS ? '#a0a0a0' : '#f2f2f2',
+                    cursor: textCount >= MAX_OVERLAY_ELEMENTS || totalCount >= MAX_OVERLAY_ELEMENTS ? 'not-allowed' : 'pointer',
                     fontSize: '13px',
                     fontWeight: 400,
                     display: 'flex',
@@ -428,12 +582,12 @@ export default function OverlaySettingsComponent({
                     transition: 'background 0.15s ease',
                   }}
                   onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                    if (textCount < 8 && totalCount < 8) {
+                    if (textCount < MAX_OVERLAY_ELEMENTS && totalCount < MAX_OVERLAY_ELEMENTS) {
                       e.currentTarget.style.background = '#3a3a3a';
                     }
                   }}
                   onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                    if (textCount < 8 && totalCount < 8) {
+                    if (textCount < MAX_OVERLAY_ELEMENTS && totalCount < MAX_OVERLAY_ELEMENTS) {
                       e.currentTarget.style.background = 'transparent';
                     }
                   }}
@@ -447,7 +601,7 @@ export default function OverlaySettingsComponent({
                 {/* Add Divider */}
                 <button
                   onClick={() => {
-                    if (dividerCount < 8 && totalCount < 8) {
+                    if (dividerCount < MAX_OVERLAY_ELEMENTS && totalCount < MAX_OVERLAY_ELEMENTS) {
                       const newElement: OverlayElement = {
                         id: generateElementId(),
                         type: 'divider',
@@ -464,13 +618,13 @@ export default function OverlaySettingsComponent({
                       setIsFloatingMenuOpen(false);
                     }
                   }}
-                  disabled={dividerCount >= 8 || totalCount >= 8}
+                  disabled={dividerCount >= MAX_OVERLAY_ELEMENTS || totalCount >= MAX_OVERLAY_ELEMENTS}
                   style={{
                     height: '34px',
                     background: 'transparent',
                     border: 'none',
-                    color: dividerCount >= 8 || totalCount >= 8 ? '#a0a0a0' : '#f2f2f2',
-                    cursor: dividerCount >= 8 || totalCount >= 8 ? 'not-allowed' : 'pointer',
+                    color: dividerCount >= MAX_OVERLAY_ELEMENTS || totalCount >= MAX_OVERLAY_ELEMENTS ? '#a0a0a0' : '#f2f2f2',
+                    cursor: dividerCount >= MAX_OVERLAY_ELEMENTS || totalCount >= MAX_OVERLAY_ELEMENTS ? 'not-allowed' : 'pointer',
                     fontSize: '13px',
                     fontWeight: 400,
                     display: 'flex',
@@ -481,12 +635,12 @@ export default function OverlaySettingsComponent({
                     transition: 'background 0.15s ease',
                   }}
                   onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
-                    if (dividerCount < 8 && totalCount < 8) {
+                    if (dividerCount < MAX_OVERLAY_ELEMENTS && totalCount < MAX_OVERLAY_ELEMENTS) {
                       e.currentTarget.style.background = '#3a3a3a';
                     }
                   }}
                   onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
-                    if (dividerCount < 8 && totalCount < 8) {
+                    if (dividerCount < MAX_OVERLAY_ELEMENTS && totalCount < MAX_OVERLAY_ELEMENTS) {
                       e.currentTarget.style.background = 'transparent';
                     }
                   }}
@@ -495,6 +649,47 @@ export default function OverlaySettingsComponent({
                     <Minus size={16} />
                   </div>
                   <span>{t('addDivider', lang)}</span>
+                </button>
+
+                {/* Divider */}
+                <div style={{
+                  height: '1px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  margin: '4px 0',
+                }} />
+
+                {/* Add Overlay Presets */}
+                <button
+                  onClick={() => {
+                    setIsOverlayPresetModalOpen(true);
+                    setIsFloatingMenuOpen(false);
+                  }}
+                  style={{
+                    height: '34px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#f2f2f2',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: 400,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    gap: '10px',
+                    padding: '0 12px',
+                    transition: 'background 0.15s ease',
+                  }}
+                  onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
+                    e.currentTarget.style.background = '#3a3a3a';
+                  }}
+                  onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  <div style={{ width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Layout size={16} />
+                  </div>
+                  <span>{t('overlayPresetsButton', lang)}</span>
                 </button>
               </div>
             )}
@@ -1401,6 +1596,99 @@ export default function OverlaySettingsComponent({
                   })}
               </div>
             )}
+
+            {/* Overlay Preset Footer */}
+            {overlayConfig.mode === 'custom' && (
+              <div style={{
+                marginTop: '16px',
+                padding: '12px',
+                background: '#242424',
+                borderRadius: '6px',
+                border: '1px solid rgba(255, 255, 255, 0.04)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}>
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".nzxt-esc-overlay-preset"
+                  onChange={handleFileInputChange}
+                  style={{ display: 'none' }}
+                />
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  justifyContent: 'center',
+                }}>
+                  <button
+                    onClick={handleExportOverlay}
+                    disabled={overlayConfig.elements.length === 0}
+                    style={{
+                      flex: 1,
+                      padding: '8px 16px',
+                      background: overlayConfig.elements.length === 0 ? '#252525' : '#2c2c2c',
+                      border: '1px solid #3a3a3a',
+                      color: overlayConfig.elements.length === 0 ? '#a0a0a0' : '#f2f2f2',
+                      borderRadius: '6px',
+                      cursor: overlayConfig.elements.length === 0 ? 'not-allowed' : 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
+                      if (overlayConfig.elements.length > 0) {
+                        e.currentTarget.style.background = '#3a3a3a';
+                        e.currentTarget.style.borderColor = '#8a2be2';
+                      }
+                    }}
+                    onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
+                      if (overlayConfig.elements.length > 0) {
+                        e.currentTarget.style.background = '#2c2c2c';
+                        e.currentTarget.style.borderColor = '#3a3a3a';
+                      }
+                    }}
+                  >
+                    {t('overlayExportButton', lang)}
+                  </button>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{
+                      flex: 1,
+                      padding: '8px 16px',
+                      background: '#2c2c2c',
+                      border: '1px solid #3a3a3a',
+                      color: '#f2f2f2',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.currentTarget.style.background = '#3a3a3a';
+                      e.currentTarget.style.borderColor = '#8a2be2';
+                    }}
+                    onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.currentTarget.style.background = '#2c2c2c';
+                      e.currentTarget.style.borderColor = '#3a3a3a';
+                    }}
+                  >
+                    {t('overlayImportButton', lang)}
+                  </button>
+                </div>
+                <p style={{
+                  margin: 0,
+                  color: '#a0a0a0',
+                  fontSize: '11px',
+                  lineHeight: '1.5',
+                  textAlign: 'center',
+                }}>
+                  {t('overlayFooterDescription', lang)}
+                </p>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -1427,6 +1715,30 @@ export default function OverlaySettingsComponent({
           elementType={removeModalState.elementType}
         />
       )}
+
+      {/* Import Overlay Modal */}
+      <ImportOverlayModal
+        isOpen={isImportModalOpen}
+        onClose={() => {
+          setIsImportModalOpen(false);
+          setImportedElements([]);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        }}
+        onImport={handleImportOverlay}
+        importedElements={importedElements}
+        currentElementCount={overlayConfig.elements.length}
+        lang={lang}
+      />
+
+      {/* Overlay Preset Picker Modal */}
+      <OverlayPresetPickerModal
+        isOpen={isOverlayPresetModalOpen}
+        onClose={() => setIsOverlayPresetModalOpen(false)}
+        onSelect={handleOverlayPresetSelect}
+        lang={lang}
+      />
     </div>
   );
 }

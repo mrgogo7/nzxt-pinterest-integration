@@ -588,3 +588,22 @@ export function alignElementsCenterY(
     },
   };
 }
+
+/**
+ * Maximum number of overlay elements allowed.
+ */
+export const MAX_OVERLAY_ELEMENTS = 20;
+
+/**
+ * Checks if adding new elements would exceed the maximum limit.
+ * 
+ * @param currentElementCount - Current number of elements in overlay
+ * @param newElementCount - Number of elements to add
+ * @returns true if adding would exceed limit, false otherwise
+ */
+export function wouldExceedElementLimit(
+  currentElementCount: number,
+  newElementCount: number
+): boolean {
+  return (currentElementCount + newElementCount) > MAX_OVERLAY_ELEMENTS;
+}
