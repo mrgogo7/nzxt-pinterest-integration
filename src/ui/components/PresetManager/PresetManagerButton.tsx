@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Check } from 'lucide-react';
 import type { Lang } from '../../../i18n';
 import { t } from '../../../i18n';
+import type { AppSettings } from '../../../constants/defaults';
 import { 
   getPresets, 
   getActivePresetId, 
